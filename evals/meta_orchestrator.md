@@ -25,7 +25,7 @@ Score each axis from `-2` to `+2`, where `-2` means repeatedly blocking progress
 | `sim_fidelity` | Simulation diagnostics and calibration | Offline sim-fidelity reports, invariant failures, calibration notes |
 | `execution_observability` | Observability of execution-facing artifacts only | Static logs/docs/schema gaps; no broker/account/order reads or execution changes |
 | `evals` | Offline eval coverage, regressions, blind spots | Eval JSON output, missing coverage, flaky or too-broad tests |
-| `memory_lessons` | Lessons captured and reused | `corpus/improvement_log.md`, lessons files, stale decisions |
+| `memory_lessons` | Lessons captured and reused | `corpus/improvement_log.md`, `runs/CORPSES.md`, `corpus/lessons.md`, stale decisions |
 | `management_disclosure` | Human-reviewability, status clarity, disclosure quality | PR bodies, handoffs, risk disclosures, stale task state |
 | `external_systems` | Connector-adjacent interfaces and documented dependencies | Static connector config/docs only; no live connector calls |
 

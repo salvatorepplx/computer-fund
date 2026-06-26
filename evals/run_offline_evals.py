@@ -17,6 +17,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from evals.cap_calibration import MIN_CALIBRATION_SAMPLE_SIZE, run_metrics as run_cap_metrics
+from evals.corpses_lessons import validate_corpses_lessons
 from execution.safety import (
     MAX_OPTION_PREMIUM_FRAC,
     MAX_SINGLE_POS_FRAC,
@@ -304,6 +305,22 @@ def eval_observed_finance_sentiment_fixture() -> None:
             "single observed fixture must not earn lead-lag/CAP credit")
 
 
+def eval_corpses_lessons_discipline() -> None:
+    result = validate_corpses_lessons()
+    corpses = result["corpses"]
+    lessons = result["lessons"]
+
+    require(corpses["entry_count"] >= 1, "CORPSES should include at least one safe example entry")
+    require(lessons["entry_count"] >= 1, "lessons should include at least one distilled safe example")
+    require(corpses["missing_required_fields"] == [], "CORPSES should document all required fields")
+    require(lessons["missing_required_fields"] == [], "lessons should document all required fields")
+    require(corpses["has_seeder_feedback_rules"], "CORPSES should define seeder feedback rules")
+    require(lessons["links_corpses"], "lessons should link back to runs/CORPSES.md")
+    require(lessons["links_meta_orchestrator"], "lessons should link to the memory_lessons meta axis")
+    require(corpses["forbids_live_execution_touchpoints"], "CORPSES should forbid live execution touchpoints")
+    require(lessons["forbids_live_execution_touchpoints"], "lessons should forbid live execution touchpoints")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -313,6 +330,7 @@ EVALS = [
     eval_cap_calibration_fixture_metrics,
     eval_sentiment_source_weight_learning,
     eval_observed_finance_sentiment_fixture,
+    eval_corpses_lessons_discipline,
 ]
 
 
