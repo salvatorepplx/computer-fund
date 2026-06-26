@@ -20,6 +20,13 @@ broker access, live market data, account state, or order placement. Current star
   lagging, random-label, and wrong-universe controls.
 - CAP calibration fixture metrics for sentiment peak error, predate timing, edge after explicit
   costs, and conviction-vs-realized-edge readiness.
+- KG observed-series replay for `runs/sentiment/series/TICKER_NVDA.jsonl`, using only a temporary
+  graph to prove committed observed rows preserve `simulated:false`, timestamp/provenance fields,
+  latest observed sentiment, and observed-only momentum.
+
+The observed-series replay is a plumbing diagnostic, not a trading signal. The current NVDA sample is
+single-ticker, single-source, and intentionally below the readiness threshold for lead-lag/CAP credit
+or meaningful `current_step_est`; it performs no live fetches and never mutates `state/knowledge_graph.json`.
 
 See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist, and
 `evals/cap_calibration.md` for the CAP-vs-REG calibration pre-registration.
@@ -27,4 +34,5 @@ See `evals/falsification_playbook.md` for the tiered sentiment falsification che
 ```sh
 env -u PYTHONPATH python -m evals.leadlag_placebo
 env -u PYTHONPATH python -m evals.cap_calibration
+env -u PYTHONPATH python -m evals.kg_observed_series
 ```

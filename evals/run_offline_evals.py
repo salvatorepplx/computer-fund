@@ -27,6 +27,7 @@ from execution.safety import (
     kill_check,
 )
 from graph.kg import KnowledgeGraph
+from evals.kg_observed_series import MIN_SERIES_ROWS_FOR_READINESS, run_kg_observed_series_diagnostic
 from evals.leadlag_placebo import run_leadlag_placebo_checks
 from evals.observed_sentiment_fixture import validate_observed_finance_fixture
 from evals.source_weight_learning import OBSERVED_EVENT_THRESHOLD, run_source_weight_learning_fixture
@@ -304,6 +305,36 @@ def eval_observed_finance_sentiment_fixture() -> None:
             "single observed fixture must not earn lead-lag/CAP credit")
 
 
+def eval_kg_observed_series_diagnostic() -> None:
+    result = run_kg_observed_series_diagnostic()
+    latest = result["latest_observed"]
+    readiness = result["readiness"]
+
+    require(result["label"] == "kg_observed_series_offline_diagnostic",
+            "KG series diagnostic should use the stable validation label")
+    require(result["mode"] == "offline_propose_only_no_fetch_no_trading",
+            "KG series diagnostic must stay offline/propose-only")
+    require(result["series_path"] == "runs/sentiment/series/TICKER_NVDA.jsonl",
+            "KG series diagnostic should read the committed NVDA observed series")
+    require(result["entity"] == "TICKER:NVDA", "KG series diagnostic should replay NVDA ticker sentiment")
+    require(result["source"] == "finance_ticker_sentiment", "KG series diagnostic should preserve source")
+    require(result["row_count"] == 3, "committed NVDA observed series row count should stay deterministic")
+    require(set(result["required_fields"]) == {"captured_at", "entity", "score", "confidence", "source", "ts", "event_id"},
+            "KG series diagnostic should validate timestamp/provenance fields available in the series")
+    require(result["observed_rows_simulated_flags"] == [False, False, False],
+            "KG replayed observed rows must remain simulated:false")
+    require(latest["score"] == 0.5 and latest["simulated"] is False,
+            "KG latest observed should return the final non-simulated row")
+    require(latest["event_id"] == "sha256:88c1a4c35775620d",
+            "KG latest observed should preserve event_id provenance")
+    require(result["momentum"] == result["expected_momentum"] == 0.8333,
+            "KG momentum should use observed-only history from the committed series")
+    require(readiness["minimum_observed_rows"] == MIN_SERIES_ROWS_FOR_READINESS,
+            "KG series diagnostic should report the readiness threshold")
+    require(readiness["ready_for_leadlag_or_current_step_credit"] is False,
+            "short observed series must not claim lead-lag/current-step readiness")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -313,6 +344,7 @@ EVALS = [
     eval_cap_calibration_fixture_metrics,
     eval_sentiment_source_weight_learning,
     eval_observed_finance_sentiment_fixture,
+    eval_kg_observed_series_diagnostic,
 ]
 
 

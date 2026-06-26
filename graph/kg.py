@@ -54,16 +54,19 @@ class KnowledgeGraph:
         return n
 
     def add_sentiment(self, node_id: str, score: float, confidence: float,
-                      source: str, simulated: bool = False) -> None:
+                      source: str, simulated: bool = False, observed_at: str | None = None,
+                      **attrs) -> None:
         n = self.data["nodes"].get(node_id)
         if not n:
             raise KeyError(f"node {node_id} not found")
-        n["sentiment_history"].append({
+        sentiment = {
             "score": round(float(score), 4),
             "confidence": round(float(confidence), 4),
             "source": source, "simulated": bool(simulated),
-            "observed_at": _now(),
-        })
+            "observed_at": observed_at or _now(),
+        }
+        sentiment.update(attrs)
+        n["sentiment_history"].append(sentiment)
 
     def latest_sentiment(self, node_id: str, observed_only: bool = True) -> dict | None:
         n = self.data["nodes"].get(node_id)
