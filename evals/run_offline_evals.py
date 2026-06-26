@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from evals.cap_calibration import MIN_CALIBRATION_SAMPLE_SIZE, run_metrics as run_cap_metrics
 from execution.safety import (
     MAX_OPTION_PREMIUM_FRAC,
     MAX_SINGLE_POS_FRAC,
@@ -226,12 +227,33 @@ def eval_sentiment_leadlag_placebo() -> None:
     require(result["all_expectations_met"], "lead-lag placebo fixtures should accept only the true leading signal")
 
 
+def eval_cap_calibration_fixture_metrics() -> None:
+    metrics = run_cap_metrics()
+
+    require(metrics["label"] == "cap_calibration_offline_fixture", "CAP metrics should use fixture label")
+    require(metrics["row_count"] == 4, "CAP fixture row count should remain deterministic")
+    require(metrics["minimum_calibration_sample_size"] == MIN_CALIBRATION_SAMPLE_SIZE,
+            "CAP tracker should report the pre-registered calibration sample size")
+    require(metrics["sentiment_peak_error_mean"] == 0.05, "CAP sentiment peak error fixture mean should be stable")
+    require(metrics["predate_timing_steps_mean"] == 2.333333, "CAP predate timing fixture mean should be stable")
+    require(metrics["predate_success_rate"] == 0.75, "CAP predate success fixture rate should be stable")
+    require(metrics["edge_after_costs_mean"] == -0.00075, "CAP edge-after-costs fixture mean should be stable")
+    require(metrics["edge_after_costs_positive_rate"] == 0.5,
+            "CAP edge-after-costs positive fixture rate should be stable")
+    require(metrics["calibration"]["closed_with_conviction_count"] == 3,
+            "CAP calibration should only count closed rows with conviction")
+    require(metrics["calibration"]["ready"] is False, "CAP calibration should wait for the minimum sample size")
+    require(metrics["calibration"]["conviction_edge_after_costs_pearson"] is None,
+            "CAP conviction correlation should stay withheld before enough closed rows")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
     eval_battle_discovery_deterministic_ranking,
     eval_sentiment_sim_deterministic_invariants,
     eval_sentiment_leadlag_placebo,
+    eval_cap_calibration_fixture_metrics,
 ]
 
 
