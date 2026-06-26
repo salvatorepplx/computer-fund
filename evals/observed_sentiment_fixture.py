@@ -143,15 +143,23 @@ def _validate_raw_reference(fixture_path: Path, event_summary: dict[str, Any]) -
 
 def _source_weight_compatibility(event_summary: dict[str, Any]) -> dict[str, Any]:
     source_key = f"{event_summary['source']}::{event_summary['venue']}"
+    if event_summary["missing_time_fields"]:
+        reason = (
+            "Single observed fixture is schema-compatible with source/venue grouping, "
+            "but lacks timestamp fields and enough observed windows for lead-lag or CAP credit."
+        )
+    else:
+        reason = (
+            "Single observed fixture is schema-compatible with timestamped source/venue grouping, "
+            "but still lacks enough observed windows for lead-lag or CAP credit."
+        )
+
     return {
         "compatible": True,
         "source_key": source_key,
         "event_count_for_learning": 1,
         "leadlag_credit_allowed": False,
-        "reason": (
-            "Single observed fixture is schema-compatible with source/venue grouping, "
-            "but lacks timestamp fields and enough observed windows for lead-lag or CAP credit."
-        ),
+        "reason": reason,
     }
 
 
