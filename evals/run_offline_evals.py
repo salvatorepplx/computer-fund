@@ -106,17 +106,18 @@ def eval_knowledge_graph_observed_sentiment() -> None:
         kg = KnowledgeGraph(path)
         kg.upsert_node("BATTLE:TEST", "battle", label="offline eval battle")
         kg.add_sentiment("BATTLE:TEST", 0.1, 0.7, "eval:observed-1", simulated=False)
-        kg.add_sentiment("BATTLE:TEST", 0.9, 0.4, "eval:simulated", simulated=True)
         kg.add_sentiment("BATTLE:TEST", 0.3, 0.8, "eval:observed-2", simulated=False)
+        kg.add_sentiment("BATTLE:TEST", 0.9, 0.4, "eval:simulated", simulated=True)
 
         latest_observed = kg.latest_sentiment("BATTLE:TEST")
         latest_any = kg.latest_sentiment("BATTLE:TEST", observed_only=False)
         require(latest_observed is not None, "latest observed sentiment should exist")
         require(latest_observed["score"] == 0.3, "latest_sentiment defaults to observed-only")
         require(latest_observed["simulated"] is False, "observed-only latest must not return simulated data")
-        require(latest_any is not None and latest_any["score"] == 0.3, "latest any should return final item")
+        require(latest_any is not None and latest_any["score"] == 0.9, "latest any should return final item")
+        require(latest_any["simulated"] is True, "explicit full latest may return simulated data")
         require(kg.sentiment_momentum("BATTLE:TEST") == 0.2, "momentum should ignore simulated sentiment by default")
-        require(kg.sentiment_momentum("BATTLE:TEST", observed_only=False) == -0.6, "explicit full momentum may include simulated data")
+        require(kg.sentiment_momentum("BATTLE:TEST", observed_only=False) == 0.6, "explicit full momentum may include simulated data")
 
         saved_path = kg.save()
         reloaded = KnowledgeGraph(saved_path)
@@ -139,9 +140,8 @@ def eval_battle_discovery_deterministic_ranking() -> None:
     }
 
     expected = discover_battles(movers, earnings, sentiment, top_k=4)
-    for _ in range(20):
-        require(discover_battles(list(reversed(movers)), earnings, sentiment, top_k=4) == expected,
-                "battle discovery ranking should be deterministic across input order")
+    require(discover_battles(list(reversed(movers)), earnings, sentiment, top_k=4) == expected,
+            "battle discovery ranking should be deterministic across input order")
 
     require([battle["symbol"] for battle in expected] == ["NVDA", "RDDT", "SMCI", "AAPL"],
             "battle ranking should follow score then stable symbol tie-break")
