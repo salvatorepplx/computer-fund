@@ -8,8 +8,13 @@ state, or order placement.
 from __future__ import annotations
 
 import json
+import sys
 import tempfile
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from execution.safety import SafetyViolation, build_ticket, check_sizing, kill_check
 from graph.kg import KnowledgeGraph
