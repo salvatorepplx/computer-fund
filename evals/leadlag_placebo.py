@@ -129,6 +129,13 @@ FIXTURES = (
         reason="Lagging placebo: projected sentiment follows the proxy instead of leading it.",
     ),
     LeadLagFixture(
+        name="peak_leads_but_series_is_coincident",
+        predicted_sentiment=(0.0, 0.2, 0.5, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2),
+        observed_proxy=(0.0, 0.2, 0.5, 0.7, 0.7, 0.8, 0.5, 0.4, 0.3, 0.2),
+        expected_accept=False,
+        reason="Best-lag placebo: a later proxy peak is insufficient when the full series aligns at lag zero.",
+    ),
+    LeadLagFixture(
         name="random_label_placebo",
         predicted_sentiment=(0.0, 0.7, -0.4, 0.5, -0.6, 0.2, 0.1, -0.3, 0.4, -0.2),
         observed_proxy=(0.0, 0.0, 0.1, 0.3, 0.6, 1.0, 0.7, 0.3, 0.1, 0.0),
