@@ -40,6 +40,8 @@ so Teammate can see it. Teammate never fabricates live data it cannot access.
 1. Teammate researches a battle → runs sim → if it passes falsifiers + the conviction ladder,
    it commits a **PROPOSED artifact** (`runs/PROPOSED/<id>.json`, shape below) to the repo. This
    artifact is offline/propose-only and must be incapable of placing or implying an order.
+   Computer may also write `writer=computer` PROPOSED artifacts from its own alpha pipeline; these
+   remain propose-only until Computer separately promotes them after Charter review.
 2. Teammate may **@-mention Computer/Sal in Slack `#sal-teammate`** with a one-line thesis + the repo
    link to the proposal. This is only a human nudge/pointer; the typed repo artifact and CI/schema
    validation are the machine-readable contract.
@@ -60,10 +62,18 @@ so Teammate can see it. Teammate never fabricates live data it cannot access.
   "artifact_id": "battle-RDDT-squeeze-2026-06-26",
   "artifact_type": "proposal",
   "state": "PROPOSED",
-  "created_at": "ISO8601",
+  "created_at": "2026-06-26T19:30:00Z",
   "writer": "teammate",
   "owner": "computer",
-  "simulated": false,
+  "simulated": true,
+  "provenance": {
+    "inputs": ["runs/research/battle-RDDT-squeeze.md", "runs/evals/battle-RDDT-squeeze.json"],
+    "raw_ref_explanation": "Teammate proposal has no connector raw backing; Computer must fetch live inputs."
+  },
+  "validation": {
+    "required_checks": ["schema", "charter", "ownership", "transition"],
+    "passed_checks": []
+  },
   "payload": {
     "thesis": "predate retail squeeze before projected sentiment peak",
     "entities": ["TICKER:RDDT"],
@@ -75,9 +85,11 @@ so Teammate can see it. Teammate never fabricates live data it cannot access.
   }
 }
 ```
-This shape is illustrative until the `runs/PROPOSED/` schema and offline validator land. A proposal may
-ask for live checks, but it must not include proposed order fields, target sizing, broker/account data,
-or any wording that authorizes execution.
+The reviewer-facing schema is `schemas/proposed.schema.json`; the authoritative offline validator is
+`evals/proposed_validator.py`; run it with `env -u PYTHONPATH python -m evals.proposed_validator
+runs/PROPOSED`. The schema has writer-specific profiles for Teammate offline proposals and Computer
+alpha-pipeline proposals. Any proposal may ask for live checks, but it must not include proposed order
+fields, target sizing, broker/account data, or any wording that authorizes execution.
 
 ## Non-negotiables Teammate must respect
 - Never write to `execution/`, create or edit `runs/ARMED/` handoffs, promote state, attempt to

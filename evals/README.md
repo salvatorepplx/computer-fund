@@ -22,6 +22,9 @@ broker access, live market data, account state, or order placement. Current star
   costs, and conviction-vs-realized-edge readiness.
 - CORPSES/lessons discipline checks that keep killed-thesis fields, distilled seeder feedback,
   and `memory_lessons` meta-orchestrator inputs reviewable from committed Markdown only.
+- PROPOSED artifact schema validation for connector-free handoffs, including Teammate offline
+  proposals, Computer alpha-pipeline proposals, execution-authorizing field rejection, and invalid
+  state transitions.
 
 See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist, and
 `evals/cap_calibration.md` for the CAP-vs-REG calibration pre-registration. See
@@ -31,4 +34,5 @@ See `evals/falsification_playbook.md` for the tiered sentiment falsification che
 env -u PYTHONPATH python -m evals.leadlag_placebo
 env -u PYTHONPATH python -m evals.cap_calibration
 env -u PYTHONPATH python -m evals.corpses_lessons
+env -u PYTHONPATH python -m evals.proposed_validator runs/PROPOSED docs/integration/fixtures/proposed/example-proposed-offline.json docs/integration/fixtures/proposed/example-computer-alpha-pipeline.json
 ```
