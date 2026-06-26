@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from execution.sentiment_adapters import FinanceTickerSentimentSource, persist_raw
-from execution.ingest_runner import append_observation, series_length
+from execution.ingest_runner import append_observation, series_length, load_series
 
 
 def call_tool(source_id: str, tool_name: str, arguments: dict) -> dict:
@@ -36,7 +36,13 @@ def capture(entity: str, symbol: str) -> dict:
     rid = f"{symbol}:{dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H%M')}"
     persist_raw("finance_ticker_sentiment", rid, raw_text)
     src = FinanceTickerSentimentSource()
-    events = list(src.normalize({"entity": entity, "symbol": symbol, "raw_id": rid, "raw_text": raw_text}))
+    # EWMA smoothing: feed the last observed score as prior to damp single-fetch noise.
+    prior = None
+    series = load_series(entity)
+    if series:
+        prior = series[-1].get("score")
+    events = list(src.normalize({"entity": entity, "symbol": symbol, "raw_id": rid,
+                                 "raw_text": raw_text, "prior_score": prior}))
     if not events:
         return {"captured": False, "reason": "no sentiment signal in text"}
     ev = events[0].to_dict()
