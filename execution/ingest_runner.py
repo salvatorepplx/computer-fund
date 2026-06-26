@@ -53,10 +53,30 @@ def series_length(entity: str) -> int:
 
 
 def load_series(entity: str) -> list[dict]:
+    """Load a series, skipping any unparseable line defensively.
+
+    A single half-written line (capture append mid-flight, or a concurrent git
+    checkout swapping the file) must NOT crash the read or collapse the verdict to
+    INSUFFICIENT. We skip bad lines rather than fail the whole load. If a large
+    fraction is unparseable, that's a real signal (logged to stderr), not a race.
+    """
     path = SERIES_DIR / f"{entity.replace(':', '_')}.jsonl"
     if not path.exists():
         return []
-    return [json.loads(l) for l in path.open() if l.strip()]
+    rows, bad = [], 0
+    for l in path.open():
+        l = l.strip()
+        if not l:
+            continue
+        try:
+            rows.append(json.loads(l))
+        except json.JSONDecodeError:
+            bad += 1
+    if bad:
+        import sys as _sys
+        print(f"[load_series] skipped {bad} unparseable line(s) in {path.name} "
+              f"(likely a mid-write read race; {len(rows)} good rows kept)", file=_sys.stderr)
+    return rows
 
 
 if __name__ == "__main__":

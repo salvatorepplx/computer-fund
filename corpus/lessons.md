@@ -208,3 +208,16 @@ Copy this block for each future distilled lesson.
 - Never-idle tick: wired web_sentiment scorer invariants (7 checks) into run_offline_evals.py
   (was __main__-only -> audit scored signal tested=False). Harness now 10/10. signal axis 0.4->0.8.
 - self_audit meta_improvement detection corrected: audit IS scheduled hourly (cron 253ff74b); 0.6->0.85.
+
+## 2026-06-26 — Defensive series read (transient INSUFFICIENT verdict bug)
+- SYMPTOM: capture cron reported all 4 names INSUFFICIENT (need >=3 aligned points) while files
+  actually had 22-29 clean points. Root cause: load_series did json.loads(l) with NO error handling,
+  so a single half-written line (capture append mid-flight OR concurrent git checkout swapping the
+  file) crashed/garbled the whole read -> verdict collapsed to INSUFFICIENT.
+- RISK if unfixed: a mid-write read race at the authoritative threshold (n>=24) could trigger a WRONG
+  KILL or EDGE -> a bad real-money decision. Data-read robustness is upstream of the verdict.
+- FIX: load_series now skips unparseable lines defensively, keeps all good rows, and logs a stderr
+  warning (so genuine large-scale corruption is still visible, but a 1-line race is survived).
+  Verified: eval on a corrupted file returns a valid verdict + warning, no crash. Harness 10/10.
+- LESSON: every file READ on the critical path must tolerate a concurrent mid-write/checkout. Append
+  is atomic per-line but a reader can still catch a torn tail; skip-and-warn, never crash-or-collapse.
