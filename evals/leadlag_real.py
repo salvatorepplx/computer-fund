@@ -79,7 +79,7 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
     n_raw = len(valid)
     n = len(pts)
     if n < 3:
-        return {"entity": entity, "n": n, "verdict": "INSUFFICIENT",
+        return {"entity": entity, "n": n, "n_raw_points": n_raw, "verdict": "INSUFFICIENT",
                 "authoritative": False, "note": "need >=3 aligned points"}
 
     sent = [s for s, _ in pts]
@@ -103,7 +103,7 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
             lags.append({"lag": lag, "corr": round(_pearson(a, b), 4), "n_pairs": len(a)})
 
     if not lags:
-        return {"entity": entity, "n": n, "verdict": "INSUFFICIENT",
+        return {"entity": entity, "n": n, "n_raw_points": n_raw, "verdict": "INSUFFICIENT",
                 "authoritative": False, "note": "not enough diff pairs"}
 
     # Circularity guard: if sentiment LEVEL tracks price LEVEL contemporaneously

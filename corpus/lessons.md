@@ -119,3 +119,14 @@ Copy this block for each future distilled lesson.
 - LESSON: financial text is full of non-price $-figures; never trust a blind aggregate. Gate
   new data against history. A bad price proxy silently corrupts the lead-lag — data quality is
   upstream of every verdict.
+
+## 2026-06-26 — Accelerate the verdict honestly (cadence, not bursting)
+- Confronted the real bottleneck: authoritative lead-lag needs ~24 time-spaced pts; at */30
+  that's ~8h. The goal is the FIRST TRADE, not endless hardening. Need a faster HONEST path.
+- LEVER: tightened capture cron */30 -> */10. Every 10-min point is still >3min apart (de-burst
+  threshold) = genuine new info, NOT bursting. Time-to-verdict ~8h -> ~2.5h. Legitimate accel.
+- Rejected the dishonest shortcut (lowering N without a significance test). N stays 24 OR a
+  proper p-value gate later; never fake the verdict.
+- ACCOUNTABILITY: by ~16:00 PDT today, NVDA (the deepest series) should approach n_spaced~24 ->
+  first AUTHORITATIVE verdict (EDGE or KILL). If EDGE & not circular -> alpha pipeline -> first
+  tiny trade. If KILL -> seed strategy falsified, evolve/replace per constitution. Either is a win.
