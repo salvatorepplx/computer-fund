@@ -292,14 +292,16 @@ def eval_observed_finance_sentiment_fixture() -> None:
             "fixture must be explicitly labeled NOT simulated")
     require(event["source"] == "finance_ticker_sentiment", "event source should identify the adapter output")
     require(event["venue"] == "vendor.finance", "event venue should support source/venue attribution")
-    require(event["missing_time_fields"] == ["ts", "observed_at", "ingested_at"],
-            "first observed fixture should report, not fabricate, missing timestamp fields")
+    require(event["missing_time_fields"] == [],
+            "timestamped observed fixture should report available timestamp fields")
+    require(raw_reference["raw_ref_present_in_event"],
+            "timestamped observed fixture should carry normalized_event.raw_ref provenance")
     require(raw_reference["raw_reference_chars"] == event["raw_counts"]["chars"],
             "raw reference should match sanitized character count")
     require(compatibility["source_key"] == "finance_ticker_sentiment::vendor.finance",
             "observed fixture should expose source/venue grouping for weighting plumbing")
     require(compatibility["leadlag_credit_allowed"] is False,
-            "single timestamp-limited observed fixture must not earn lead-lag/CAP credit")
+            "single observed fixture must not earn lead-lag/CAP credit")
 
 
 EVALS = [
