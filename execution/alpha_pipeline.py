@@ -31,6 +31,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from evals.leadlag_real import probe
+from evals.leadlag_permutation import permutation_test
 from execution.ingest_runner import load_series
 
 PROPOSED_DIR = ROOT / "runs" / "PROPOSED"
@@ -59,6 +60,13 @@ def conviction_from_verdict(v: dict, sent_state: dict) -> dict:
     if not authoritative or verdict != "EDGE":
         return {"conviction": 0.0, "eligible": False,
                 "reason": f"verdict={verdict} authoritative={authoritative} (need authoritative EDGE)",
+                "components": {}}
+
+    # Permutation null gate: an EDGE that random shuffles reproduce is NOISE, not alpha.
+    perm = v.get("_perm") or {}
+    if not perm.get("significant_at_0.10", False):
+        return {"conviction": 0.0, "eligible": False,
+                "reason": f"fails permutation null test (p={perm.get('p_value')}); edge indistinguishable from chance",
                 "components": {}}
 
     best_corr = abs(v.get("best_corr", 0.0))
@@ -108,12 +116,18 @@ def rank(entities: list[str], min_n: int = 24) -> list[dict]:
     out = []
     for e in entities:
         v = probe(e, min_n=min_n)
+        # attach permutation null test; required for eligibility when authoritative
+        try:
+            v["_perm"] = permutation_test(e, k=2000, min_n=min_n)
+        except Exception as _e:
+            v["_perm"] = {"significant_at_0.10": False, "p_value": None, "error": str(_e)[:80]}
         ss = _sentiment_state(e)
         c = conviction_from_verdict(v, ss)
         out.append({"entity": e, "verdict": v.get("verdict"),
                     "authoritative": v.get("authoritative"),
                     "best_lag": v.get("best_lag"), "best_corr": v.get("best_corr"),
                     "circular": v.get("circularity_flag"),
+                    "perm_p": (v.get("_perm") or {}).get("p_value"),
                     "sentiment": ss, **c})
     out.sort(key=lambda r: r["conviction"], reverse=True)
     return out

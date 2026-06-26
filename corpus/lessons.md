@@ -157,3 +157,19 @@ Copy this block for each future distilled lesson.
 - LESSON (recurring theme): idempotency + input-normalization must live IN the script at the
   boundary, robust to ANY caller mangling. This is the 2nd cron-invocation bug (after lowercase);
   the boundary guard now covers the whole class. Cross-check entity/series_path in cron output.
+
+## 2026-06-26 — Permutation null test: the "edges" are noise so far (CRITICAL honesty)
+- Built evals/leadlag_permutation.py: shuffle sentiment labels K=2000x against the REAL price path,
+  p = fraction of shuffles whose best positive-lag |corr| >= observed. Low p => edge unlikely by chance.
+- RESULT on real series: NVDA observed corr 0.64 BUT p=0.597 (shuffles beat it 60% of the time);
+  RDDT/TSLA corr 1.0 but p=1.0 (every shuffle matches = pure small-N saturation). The
+  PRELIMINARY_EDGE labels from the simple correlation gate are STATISTICALLY INDISTINGUISHABLE FROM NOISE.
+- This is the system working as designed: a raw-correlation threshold is too easy to fool; the
+  permutation test is the rigorous gate. So far the seed lead-lag thesis is NOT surviving null testing.
+  That is real information, not failure (CORPSES candidate if it holds at N>=24).
+- WIRED permutation significance (p<=0.10) into the alpha_pipeline eligibility gate: a name needs
+  authoritative EDGE AND non-circular AND permutation-significant to ever produce a PROPOSED artifact.
+  e2e dryrun now 18/18 (added: EDGE-failing-permutation is rejected).
+- LESSON: always null-test an apparent edge before believing it. "Looks correlated" at small N is
+  almost always luck. The honest path: if the edge stays insignificant at N>=24, KILL the seed
+  strategy and evolve (predate-sentiment may need a different signal/horizon/structure).

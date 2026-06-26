@@ -36,7 +36,8 @@ edge = {"entity": "TICKER:NVDA", "verdict": "EDGE", "authoritative": True,
         "n": 26, "min_n": 24, "contemp_corr": 0.25,
         "all_lags": [{"lag": -2, "corr": 0.1}, {"lag": -1, "corr": 0.15},
                      {"lag": 0, "corr": 0.2}, {"lag": 1, "corr": 0.55},
-                     {"lag": 2, "corr": 0.71}]}
+                     {"lag": 2, "corr": 0.71}],
+        "_perm": {"significant_at_0.10": True, "p_value": 0.02}}  # survives null
 sent = {"score": 0.42, "confidence": 0.95}
 
 print("STEP 1: conviction from synthetic EDGE")
@@ -105,6 +106,9 @@ check("circular EDGE rejected", not cc["eligible"])
 prelim = dict(edge); prelim["authoritative"] = False; prelim["verdict"] = "PRELIMINARY_EDGE"
 cp = conviction_from_verdict(prelim, sent)
 check("preliminary rejected", not cp["eligible"])
+noise = dict(edge); noise["_perm"] = {"significant_at_0.10": False, "p_value": 0.6}
+cn = conviction_from_verdict(noise, sent)
+check("EDGE failing permutation null rejected", not cn["eligible"])
 
 # cleanup the dry-run proposal so it can't be mistaken for a real one
 (ROOT / path).unlink(missing_ok=True)
