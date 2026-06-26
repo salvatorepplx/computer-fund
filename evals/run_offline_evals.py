@@ -26,6 +26,7 @@ from execution.safety import (
     kill_check,
 )
 from graph.kg import KnowledgeGraph
+from evals.leadlag_placebo import run_leadlag_placebo_checks
 from research.battle_discovery import discover_battles, score_battle
 from sim.sentiment_sim import predate_signal, simulate
 
@@ -220,11 +221,17 @@ def eval_sentiment_sim_deterministic_invariants() -> None:
     require("projected" in signal["reason"], "signal reason should label simulated projection as projected")
 
 
+def eval_sentiment_leadlag_placebo() -> None:
+    result = run_leadlag_placebo_checks()
+    require(result["all_expectations_met"], "lead-lag placebo fixtures should accept only the true leading signal")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
     eval_battle_discovery_deterministic_ranking,
     eval_sentiment_sim_deterministic_invariants,
+    eval_sentiment_leadlag_placebo,
 ]
 
 
