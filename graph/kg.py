@@ -77,6 +77,15 @@ class KnowledgeGraph:
             hist = [s for s in hist if not s["simulated"]]
         return hist[-1] if hist else None
 
+    def sentiment_history(self, node_id: str, observed_only: bool = False) -> list[dict]:
+        n = self.data["nodes"].get(node_id)
+        if not n:
+            return []
+        hist = n["sentiment_history"]
+        if observed_only:
+            hist = [s for s in hist if not s["simulated"]]
+        return list(hist)
+
     def sentiment_momentum(self, node_id: str, observed_only: bool = True) -> float | None:
         """Latest observed score minus the prior one — proxy for sentiment velocity."""
         n = self.data["nodes"].get(node_id)

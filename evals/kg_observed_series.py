@@ -106,12 +106,12 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
                 price_proxy=row.get("price_proxy"),
             )
 
-        history = kg.data["nodes"][EXPECTED_ENTITY]["sentiment_history"]
+        history = kg.sentiment_history(EXPECTED_ENTITY)
         latest = kg.latest_sentiment(EXPECTED_ENTITY)
         momentum = kg.sentiment_momentum(EXPECTED_ENTITY)
         saved_path = kg.save()
         reloaded = KnowledgeGraph(saved_path)
-        reloaded_history = reloaded.data["nodes"][EXPECTED_ENTITY]["sentiment_history"]
+        reloaded_history = reloaded.sentiment_history(EXPECTED_ENTITY)
 
     _require(len(history) == len(rows), "KG sentiment history length must match observed series rows")
     _require(all(entry["simulated"] is False for entry in history), "KG replayed rows must remain simulated:false")
