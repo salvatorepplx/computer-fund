@@ -69,3 +69,16 @@ Copy this block for each future distilled lesson.
   changes between captures. Burst proved the pipeline end-to-end; cron produces the verdict.
 - Equilibria from burst (calibration sanity, matches real narratives): NVDA ~+0.26 (Strong
   Buy but technically weak), RDDT ~+0.40 (Moderate/Strong Buy), TSLA ~+0.07 (range-bound/mixed).
+
+## 2026-06-26 — Split-series bug (caught via cron-result cross-check)
+- BUG: capture cron invoked capture_web_tick.py with lowercase bare symbols (nvda/rddt/tsla),
+  which wrote to nvda.jsonl etc. — a PARALLEL series from the canonical TICKER_NVDA.jsonl that
+  my burst captures used. Two fragmented series, neither feeding the other => silently ~2x'd
+  time-to-verdict and corrupted the lead-lag input. Spotted because the cron result reported
+  "series now 2 points" while local canonical files had 15 — the discrepancy was the tell.
+- FIX: canonical_entity() in capture_web_tick.py normalizes ANY invocation
+  (nvda / NVDA / TICKER:NVDA) -> TICKER:NVDA, so the series file is stable regardless of caller.
+  Merged orphan points back in (no data lost): NVDA 17, RDDT/TSLA 13. Removed orphan files.
+- LESSON: cross-check cron-reported state against ground-truth files every time. A subagent
+  cron can invoke a script differently than intended; idempotency must live IN the script, not
+  in the caller's discipline. State belongs in canonical files, normalized at the boundary.

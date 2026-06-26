@@ -102,7 +102,22 @@ def get_price(symbol: str, corpus: list[dict]):
     return p, ("robinhood" if p is not None else "none")
 
 
+def canonical_entity(entity: str, symbol: str) -> str:
+    """Canonicalize the entity ID so the series file is stable no matter how the
+    script is invoked (e.g. 'nvda', 'NVDA', 'TICKER:NVDA' all -> 'TICKER:NVDA').
+    Prevents the split-series bug where lowercase args wrote to a parallel file.
+    """
+    e = (entity or "").strip()
+    if ":" in e:
+        prefix, sym = e.split(":", 1)
+        return f"{prefix.upper()}:{sym.upper()}"
+    # bare symbol given as entity -> treat as a TICKER
+    sym = (e or symbol).upper()
+    return f"TICKER:{sym}"
+
+
 def capture(entity: str, symbol: str, name: str = "") -> dict:
+    entity = canonical_entity(entity, symbol)
     src = WebSearchSentimentSource(search=web_search)
     corpus = src.fetch(symbol, name)
     if not corpus:
