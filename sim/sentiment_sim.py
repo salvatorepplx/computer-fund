@@ -90,15 +90,29 @@ def _build_population(n, mix, rng):
     return pop
 
 
+def _build_persistent_network(pop, network_k, rng):
+    network = []
+    for p in pop:
+        candidates = [q for q in pop if q.idx != p.idx]
+        network.append(rng.sample(candidates, min(network_k, len(candidates))))
+    return network
+
+
 def simulate(seed_sentiment: float, n_agents: int = 400, steps: int = 30,
              mix: dict | None = None, network_k: int = 8,
-             observed_now: float | None = None, seed: int = 0) -> SimResult:
+             observed_now: float | None = None, seed: int = 0,
+             network_mode: str = "resampled",
+             influencer_cascade: float = 1.0) -> SimResult:
     """
     seed_sentiment: initial directional impulse of the narrative (-1..+1), e.g. from research.
     observed_now: latest OBSERVED aggregate sentiment (to locate where we are on the curve).
     Returns a SimResult with the predicted trajectory and the predate window.
     """
     rng = random.Random(seed)
+    if network_mode not in {"resampled", "persistent"}:
+        raise ValueError("network_mode must be 'resampled' or 'persistent'")
+    if influencer_cascade <= 0:
+        raise ValueError("influencer_cascade must be positive")
     mix = mix or DEFAULT_MIX
     pop = _build_population(n_agents, mix, rng)
     # seed: influencers + a few randoms get the narrative first
@@ -106,14 +120,22 @@ def simulate(seed_sentiment: float, n_agents: int = 400, steps: int = 30,
     for p in seeds:
         p.s = seed_sentiment * (0.8 + 0.4 * rng.random())
 
+    persistent_network = None
+    if network_mode == "persistent":
+        persistent_network = _build_persistent_network(pop, network_k, rng)
+
     # random k-regular-ish network via neighbor sampling each step (cheap, stochastic)
     traj = []
-    for _ in range(steps):
+    for _step in range(steps):
         new = [p.s for p in pop]
         for p in pop:
-            nbrs = rng.sample(pop, min(network_k, n_agents - 1))
-            peer = statistics.fmean(q.s * q.infl for q in nbrs) / max(
-                1e-9, statistics.fmean(q.infl for q in nbrs))
+            if persistent_network is None:
+                nbrs = rng.sample(pop, min(network_k, n_agents - 1))
+            else:
+                nbrs = persistent_network[p.idx]
+            weights = [q.infl * (influencer_cascade if q.kind == "influencer" else 1.0) for q in nbrs]
+            peer = statistics.fmean(q.s * w for q, w in zip(nbrs, weights)) / max(
+                1e-9, statistics.fmean(weights))
             target = -peer if p.contra else peer
             if abs(peer) < p.threshold:
                 pull = 0.0
@@ -146,7 +168,13 @@ def simulate(seed_sentiment: float, n_agents: int = 400, steps: int = 30,
         predate_window=predate_window, edge_score=edge_score,
         current_step_est=current_step_est, direction=direction,
         n_agents=n_agents, seed_sentiment=round(seed_sentiment, 4),
-        params={"steps": steps, "network_k": network_k, "mix": mix},
+        params={
+            "steps": steps,
+            "network_k": network_k,
+            "network_mode": network_mode,
+            "influencer_cascade": influencer_cascade,
+            "mix": mix,
+        },
     )
 
 
