@@ -149,11 +149,20 @@ def canonical_entity(entity: str, symbol: str) -> str:
     Prevents the split-series bug where lowercase args wrote to a parallel file.
     """
     e = (entity or "").strip()
+    s = (symbol or "").strip().upper()
     if ":" in e:
         prefix, sym = e.split(":", 1)
-        return f"{prefix.upper()}:{sym.upper()}"
-    # bare symbol given as entity -> treat as a TICKER
-    sym = (e or symbol).upper()
+        sym = sym.strip().upper()
+        # guard: if the part after ':' is empty or a placeholder, fall back to symbol arg
+        if not sym or sym == "TICKER":
+            sym = s
+        return f"{(prefix.strip().upper() or 'TICKER')}:{sym}"
+    # No colon in entity. A bare 'TICKER' token (cron split 'TICKER:NVDA' on space/colon)
+    # is NOT a real symbol -> the actual ticker is the `symbol` arg. Same if entity is empty.
+    eu = e.upper()
+    sym = s if (not eu or eu == "TICKER") else eu
+    if not sym:
+        raise ValueError(f"cannot canonicalize: entity={entity!r} symbol={symbol!r} (no usable ticker)")
     return f"TICKER:{sym}"
 
 

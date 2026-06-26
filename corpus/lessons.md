@@ -143,3 +143,17 @@ Copy this block for each future distilled lesson.
 - LESSON: unit-testing each link is not enough; integration-test the whole flow before live data
   depends on it. A dry-run with a synthetic verdict is the cheapest insurance against a silent
   failure at the worst possible moment (when the real edge finally appears).
+
+## 2026-06-26 — TICKER:TICKER contamination (cron arg-split) — fixed at the boundary
+- BUG (escalated by capture cron): cron invoked capture_web_tick.py with the entity split into
+  separate tokens ('TICKER' 'NVDA' ...). canonical_entity saw bare 'TICKER' (no colon) and did
+  sym=(e or symbol) -> picked 'TICKER' -> wrote ALL names into ONE file TICKER_TICKER.jsonl.
+  Every run contaminated the shared file with cross-stock points (wrong-prior EWMA too).
+- FIX: hardened canonical_entity to treat a bare/empty/'TICKER' entity token as NOT-a-symbol and
+  fall back to the symbol arg; handles 9 invocation variants (verified). Also clarified cron task to
+  quote the colon token AND self-verify entity!=TICKER:TICKER each run (defense in depth).
+- CLEANUP: discarded the 4 contaminated points (cross-stock + wrong-prior EWMA = untrustworthy;
+  4 pts not worth the contamination risk). Good series intact (NVDA 19/RDDT 14/TSLA 14/SNDK 2).
+- LESSON (recurring theme): idempotency + input-normalization must live IN the script at the
+  boundary, robust to ANY caller mangling. This is the 2nd cron-invocation bug (after lowercase);
+  the boundary guard now covers the whole class. Cross-check entity/series_path in cron output.
