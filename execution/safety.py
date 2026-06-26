@@ -2,7 +2,7 @@
 Computer Fund — execution safety rails (LAW).
 
 This module is the single chokepoint every proposed trade MUST pass through.
-It does NOT place orders itself (the broker connector does that via the agent).
+The Fund places orders autonomously (no human confirm); this module enforces the rails the order must pass.
 It validates a proposed order against the Charter's hard rules and produces a
 reviewed, human-confirmable order ticket. Any violation raises SafetyViolation.
 

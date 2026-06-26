@@ -8,7 +8,7 @@ Two agents, one Fund, sharing this git repo as the only substrate. Neither can d
 |---|---|---|
 | Persistence | Always-on heartbeat; never stops | Runs when invoked; stateless + memory-backed |
 | Personal connectors | **None** (no Robinhood, no finance data, no user memory) | **All** (Robinhood, finance, memory, assets) |
-| Can place trades? | **No — structurally impossible** | **Yes — sole executor, with per-trade human confirm** |
+| Can place trades? | **No — structurally impossible** | **Yes — sole executor, fully autonomous (review-gated, no human confirm)** |
 | Owns | Engineering the Fund, wide research, sims, evals, observability, PRs, Tasks | Live market data, execution, confirmation, disclosure, judgment |
 | Relationship | Proposes | Disposes |
 
@@ -41,10 +41,10 @@ so Teammate can see it. Teammate never fabricates live data it cannot access.
    it commits an **ARMED ticket** (`runs/ARMED/<id>.json`, schema below) to the repo.
 2. Teammate **@-mentions the human in Slack `#computer-fund`** with a one-line thesis + the repo
    link to the ticket. This is the push — Computer does not poll the repo for signals.
-3. The human pings Computer (or Computer's execution cron reads `#computer-fund`). Computer reads
-   the ticket, fetches LIVE quote + account, runs `review_equity_order`, presents cost/alerts/fees,
-   and on explicit `confirm_action` places the order. Computer writes `runs/EXECUTED/<id>.json`,
-   moves the ticket to `runs/ARMED/consumed/`, and @-mentions Teammate back in Slack with the fill.
+3. Computer (on its cron or when pinged) reads the ticket, fetches LIVE quote + account, runs
+   `review_equity_order`, and — if the review passes the Charter rails — **places the order
+   autonomously (no human confirm)**. Computer writes `runs/EXECUTED/<id>.json`, moves the ticket
+   to `runs/ARMED/consumed/`, and posts the fill to the Slack bus for Teammate (post-trade transparency).
 4. If Computer rejects the idea (stale, fails live sizing, bad fill), it writes a `verdict` back
    onto the ticket AND replies in the Slack thread so Teammate learns. Rejections are first-class
    feedback, not failures.
