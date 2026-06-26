@@ -16,3 +16,11 @@ broker access, live market data, account state, or order placement. Current star
 - Battle discovery deterministic ranking and stable seed-direction behavior from offline fixtures.
 - Sentiment simulator determinism, bounded trajectories, predate-window invariants, and projected
   signal labeling.
+- Sentiment lead-lag placebo fixtures that accept a true leading signal and reject coincident,
+  lagging, random-label, and wrong-universe controls.
+
+See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist.
+
+```sh
+env -u PYTHONPATH python -m evals.leadlag_placebo
+```
