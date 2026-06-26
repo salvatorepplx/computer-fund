@@ -200,3 +200,11 @@ Copy this block for each future distilled lesson.
   diffusion-sim becomes the next candidate thesis. Until then they must not be mistaken for live infra.
 - Next forced improvements (from audit, in order): wire OR formally retire sim/graph; add cross-source
   sentiment corroboration to raise signal health; schedule self_audit hourly; upgrade watch-cron prompt.
+
+## 2026-06-26 — Slack dual-route + signal now regression-tested
+- Slack read routes (connector call_external_tool vs external-tool CLI) fail INDEPENDENTLY during
+  blips — connector gave UNAUTHORIZED while CLI worked the same minute. Resilience: try one, fall
+  back to the other. Folded into watch flow.
+- Never-idle tick: wired web_sentiment scorer invariants (7 checks) into run_offline_evals.py
+  (was __main__-only -> audit scored signal tested=False). Harness now 10/10. signal axis 0.4->0.8.
+- self_audit meta_improvement detection corrected: audit IS scheduled hourly (cron 253ff74b); 0.6->0.85.

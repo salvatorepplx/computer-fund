@@ -29,6 +29,7 @@ from execution.safety import (
 )
 from graph.kg import KnowledgeGraph
 from evals.leadlag_placebo import run_leadlag_placebo_checks
+from evals.web_sentiment_invariants import run_web_sentiment_invariants
 from evals.observed_sentiment_fixture import validate_observed_finance_fixture
 from evals.source_weight_learning import OBSERVED_EVENT_THRESHOLD, run_source_weight_learning_fixture
 from research.battle_discovery import discover_battles, score_battle
@@ -321,6 +322,12 @@ def eval_corpses_lessons_discipline() -> None:
     require(lessons["forbids_live_execution_touchpoints"], "lessons should forbid live execution touchpoints")
 
 
+def eval_web_sentiment_invariants() -> None:
+    result = run_web_sentiment_invariants()
+    require(result["all_passed"], "web_sentiment scorer invariants must all pass")
+    require(result["n"] >= 6, "web_sentiment must exercise at least 6 invariants")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -331,6 +338,7 @@ EVALS = [
     eval_sentiment_source_weight_learning,
     eval_observed_finance_sentiment_fixture,
     eval_corpses_lessons_discipline,
+    eval_web_sentiment_invariants,
 ]
 
 

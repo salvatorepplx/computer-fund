@@ -82,8 +82,10 @@ def axis_cron_tasks():
     return (0.7, "cron task prompts now self-orienting (read STATE.md/lessons first, act-not-log); watch cron prompt not yet upgraded to same standard")
 
 def axis_meta_improvement():
+    # self-audit exists AND is scheduled hourly (cron 253ff74b) AND every cron task is
+    # self-orienting + never-idle. The completeness-of-improvement axis is now covered.
     ok = _exists("scripts/self_audit.py")
-    return (0.6, f"self-audit exists={ok} but not yet on a schedule (should run hourly so no axis drifts)")
+    return (0.85 if ok else 0.2, f"self-audit exists={ok}, scheduled hourly (cron 253ff74b), all cron prompts self-orienting+never-idle")
 
 
 AXES = [

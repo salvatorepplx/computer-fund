@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-26T23:46:56.844537+00:00 · HEAD 1ab0b8d_
+_Last updated: 2026-06-26T23:49:11.334219+00:00 · HEAD 8de11f7_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated every capture tick by scripts/state_snapshot.py from ground truth — never stale.
@@ -44,9 +44,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
+8de11f7 Infra resilience: diagnose multi-credential 400, switch capture to single-credential path
 1ab0b8d Watch tick: nothing to act on -> resolve weakest axis (sim/graph formally PARKED)
 89abe2a web series capture tick
 9702edc Close the RSI loop: self-improving cron prompts + hourly self-audit cron
 fa96887 Make RSI structural: self_audit.py scores every axis, forces the weakest into the queue
-37faf1b Add STATE.md cold-agent front door + wire into capture wrapper; complement Computer memory
 ```
