@@ -20,11 +20,15 @@ broker access, live market data, account state, or order placement. Current star
   lagging, random-label, and wrong-universe controls.
 - CAP calibration fixture metrics for sentiment peak error, predate timing, edge after explicit
   costs, and conviction-vs-realized-edge readiness.
+- CORPSES/lessons discipline checks that keep killed-thesis fields, distilled seeder feedback,
+  and `memory_lessons` meta-orchestrator inputs reviewable from committed Markdown only.
 
 See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist, and
-`evals/cap_calibration.md` for the CAP-vs-REG calibration pre-registration.
+`evals/cap_calibration.md` for the CAP-vs-REG calibration pre-registration. See
+`runs/CORPSES.md` and `corpus/lessons.md` for killed-thesis logging and lesson distillation.
 
 ```sh
 env -u PYTHONPATH python -m evals.leadlag_placebo
 env -u PYTHONPATH python -m evals.cap_calibration
+env -u PYTHONPATH python -m evals.corpses_lessons
 ```
