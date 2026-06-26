@@ -73,9 +73,11 @@ class FinanceTickerSentimentSource:
     source_id = "finance_ticker_sentiment"
     venue = "vendor.finance"
 
-    # bull/bear lexicon for scoring the textual issue analysis
+    # Lexicons kept ONLY as a fallback when the structured issue format is absent.
     _BULL = re.compile(r"\b(raised|buy|accelerat|stronger|outpace|entrenched|growth|beat|upgrade|record)\b", re.I)
     _BEAR = re.compile(r"\b(sold off|drawdown|skeptic|slowdown|net selling|bearish|decline|weaken|miss|downgrade|cut)\b", re.I)
+    # Embedded quantified sentiment signal, e.g. "social sentiment declined 9.88 points".
+    _QUANT = re.compile(r"social sentiment (declined|dropped|fell|rose|increased|gained)\s+([0-9.]+)", re.I)
 
     def fetch(self, since: str, until: str, query: SentimentQuery, call_tool) -> Iterable[dict]:
         """Computer-side. call_tool(ticker, q) -> raw connector dict."""
@@ -87,18 +89,64 @@ class FinanceTickerSentimentSource:
             raw = call_tool(sym, " ".join(query.keywords) or f"{sym} sentiment")
             yield {"entity": ent, "symbol": sym, "raw_text": raw, "raw_id": f"{sym}:{since}"}
 
+    def _score_text(self, text: str) -> tuple[float, float, dict]:
+        """Return (score[-1..1], confidence[0..1], provenance). Structured-first, lexicon fallback.
+
+        Primary signal: the source emits discrete issues, each with a bull case and a bear case.
+        Per issue we balance bull vs bear prose (lexicon-weighted), then average across issues.
+        Far more stable than counting trigger words across the whole blob. Folds in any embedded
+        QUANTIFIED sentiment delta (e.g. 'social sentiment declined 9.88').
+        """
+        issues = re.split(r"(?im)^\**\s*Issue\s+\d+", text)
+        issue_scores = []
+        for block in issues:
+            low = block.lower()
+            bull_i, bear_i = low.find("bull case"), low.find("bear case")
+            if bull_i == -1 or bear_i == -1:
+                continue
+            if bull_i < bear_i:
+                bull_txt, bear_txt = block[bull_i:bear_i], block[bear_i:]
+            else:
+                bear_txt, bull_txt = block[bear_i:bull_i], block[bull_i:]
+            bull_w = len(self._BULL.findall(bull_txt)) + 1
+            bear_w = len(self._BEAR.findall(bear_txt)) + 1
+            issue_scores.append((bull_w - bear_w) / (bull_w + bear_w))
+        prov = {"sanitized": True, "chars": len(text)}
+        if issue_scores:
+            score = sum(issue_scores) / len(issue_scores)
+            confidence = min(1.0, 0.4 + 0.15 * len(issue_scores))
+            prov.update({"method": "issue_balance", "n_issues": len(issue_scores)})
+        else:
+            bull = len(self._BULL.findall(text)); bear = len(self._BEAR.findall(text))
+            tot = bull + bear
+            if tot == 0:
+                return 0.0, 0.0, {**prov, "method": "none"}
+            score = (bull - bear) / tot
+            confidence = min(0.5, tot / 30.0)  # lexicon is unreliable -> capped low
+            prov.update({"method": "lexicon_fallback", "bull_hits": bull, "bear_hits": bear})
+        qm = self._QUANT.search(text)
+        if qm:
+            direction = -1 if qm.group(1).lower() in ("declined", "dropped", "fell") else 1
+            mag = min(0.3, float(qm.group(2)) / 50.0)
+            score = max(-1.0, min(1.0, score + direction * mag))
+            prov["quant_delta"] = round(direction * mag, 4)
+        return round(score, 4), round(confidence, 4), prov
+
     def normalize(self, record: dict) -> Iterable[SentimentEvent]:
-        """Pure. Score = (bull_hits - bear_hits) / (bull+bear), confidence from signal density."""
+        """Pure. Issue-balance scoring + optional EWMA smoothing via prior_score."""
         text = record.get("raw_text", "") or ""
         if not text:
             return []
-        bull = len(self._BULL.findall(text))
-        bear = len(self._BEAR.findall(text))
-        total = bull + bear
-        if total == 0:
+        raw_score, confidence, prov = self._score_text(text)
+        if prov.get("method") == "none":
             return []
-        score = round((bull - bear) / total, 4)
-        confidence = round(min(1.0, total / 20.0), 4)  # more polarized language -> more confident
+        prior = record.get("prior_score")
+        if prior is not None:
+            alpha = 0.5  # EWMA weight on new reading; lower = smoother
+            score = round(alpha * raw_score + (1 - alpha) * float(prior), 4)
+            prov.update({"smoothed_from_prior": float(prior), "raw_score": raw_score})
+        else:
+            score = raw_score
         now = _now_iso()
         ent = record["entity"]
         ev = SentimentEvent(
@@ -108,7 +156,7 @@ class FinanceTickerSentimentSource:
             ts=now, observed_at=now, ingested_at=now,
             source=self.source_id, venue=self.venue,
             raw_ref=f"runs/sentiment/raw/{self.source_id}/{record['raw_id'].replace(':','_')}.txt",
-            raw={"sanitized": True, "bull_hits": bull, "bear_hits": bear, "chars": len(text)},
+            raw=prov,
         )
         return [ev]
 
