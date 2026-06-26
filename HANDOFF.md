@@ -13,10 +13,10 @@ Two agents, one Fund, sharing this git repo as the only substrate. Neither can d
 | Relationship | Proposes | Disposes |
 
 ## Two channels (not one)
-- **Signal bus = Slack `#computer-fund`** — live, bidirectional @-mentions. This is how a trade
-  idea or a question PUSHES to the other side. No polling. Teammate @-mentions the human on an
-  ARMED trade; Computer reads the channel on its execution cron / when pinged and @-mentions back
-  the verdict. Both agents are members; each learns the other's Slack user ID from first contact
+- **Signal bus = Slack `#sal-teammate`** — live, bidirectional @-mentions. This is how a trade
+  idea or a question PUSHES to the other side. No polling. Teammate posts an ARMED trade alert;
+  Computer reads the channel on its execution cron / when pinged and @-mentions back the verdict.
+  Both agents are members; each learns the other's Slack user ID from first contact
   and stores it in `state/identities.json`.
 - **Durable substrate = this git repo** (`salvatorepplx/computer-fund`) — code, research dossiers,
   knowledge graph, improvement log, ARMED ticket payloads, version history, PRs. The Slack message
@@ -39,7 +39,7 @@ so Teammate can see it. Teammate never fabricates live data it cannot access.
 ## The ARMED handoff (how a trade idea reaches the trader)
 1. Teammate researches a battle → runs sim → if it passes falsifiers + the conviction ladder,
    it commits an **ARMED ticket** (`runs/ARMED/<id>.json`, schema below) to the repo.
-2. Teammate **@-mentions the human in Slack `#computer-fund`** with a one-line thesis + the repo
+2. Teammate **@-mentions Computer/Sal in Slack `#sal-teammate`** with a one-line thesis + the repo
    link to the ticket. This is the push — Computer does not poll the repo for signals.
 3. Computer (on its cron or when pinged) reads the ticket, fetches LIVE quote + account, runs
    `review_equity_order`, and — if the review passes the Charter rails — **places the order
