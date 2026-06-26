@@ -28,6 +28,7 @@ from execution.safety import (
 )
 from graph.kg import KnowledgeGraph
 from evals.leadlag_placebo import run_leadlag_placebo_checks
+from evals.source_weight_learning import OBSERVED_EVENT_THRESHOLD, run_source_weight_learning_fixture
 from research.battle_discovery import discover_battles, score_battle
 from sim.sentiment_sim import predate_signal, simulate
 
@@ -247,6 +248,33 @@ def eval_cap_calibration_fixture_metrics() -> None:
             "CAP conviction correlation should stay withheld before enough closed rows")
 
 
+def eval_sentiment_source_weight_learning() -> None:
+    result = run_source_weight_learning_fixture()
+    source_metrics = {row["source_id"]: row for row in result["source_metrics"]}
+    criteria = result["success_criteria"]
+    leading = source_metrics["fixture.leading_social"]
+    lagging = source_metrics["fixture.lagging_correlated_aggregate"]
+
+    require(result["label"] == "sentiment_source_weight_learning_offline_fixture",
+            "source weight learning should use the offline fixture label")
+    require(criteria["minimum_observed_events"] == OBSERVED_EVENT_THRESHOLD,
+            "source weight learning should report the event threshold")
+    require(criteria["all_sources_have_enough_events"],
+            "source weight fixture should update only after enough observed events")
+    require(criteria["learned_weights_correlate_with_measured_lead"] > 0.5,
+            "learned source weights should correlate with measured lead")
+    require(criteria["leading_source_weight_gt_lagging_source_weight"],
+            "leading fixture source should earn more trust than lagging source")
+    require(criteria["lagging_source_demoted_below_prior"],
+            "lagging correlated source should be demoted below its prior")
+    require(leading["measured_lead_steps"] > 0 and leading["leadlag_accepted"],
+            "leading source should pass lead-lag attribution")
+    require(lagging["best_correlation"] > 0.9 and lagging["measured_lead_steps"] < 0,
+            "lagging fixture should stay correlated while following the proxy")
+    require(lagging["learned_prior_weight"] < leading["learned_prior_weight"],
+            "lagging source learned trust should be lower than leading source trust")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -254,6 +282,7 @@ EVALS = [
     eval_sentiment_sim_deterministic_invariants,
     eval_sentiment_leadlag_placebo,
     eval_cap_calibration_fixture_metrics,
+    eval_sentiment_source_weight_learning,
 ]
 
 
