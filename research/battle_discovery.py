@@ -62,7 +62,7 @@ def discover_battles(movers: list[dict], earnings: list[dict],
     """Combine signals into ranked battle candidates."""
     earn_symbols = {e["symbol"] for e in earnings}
     by_symbol = {m["symbol"]: m for m in movers}
-    universe = set(by_symbol) | earn_symbols | set(sentiment)
+    universe = sorted(set(by_symbol) | earn_symbols | set(sentiment))
     scored = []
     for sym in universe:
         b = score_battle(sym, by_symbol.get(sym), sym in earn_symbols, sentiment.get(sym))
@@ -71,7 +71,7 @@ def discover_battles(movers: list[dict], earnings: list[dict],
         move = by_symbol.get(sym, {}).get("pct_change", 0.0)
         b["seed_direction"] = 1.0 if (sent_score + move / 100.0) >= 0 else -1.0
         scored.append(b)
-    scored.sort(key=lambda x: x["score"], reverse=True)
+    scored.sort(key=lambda x: (-x["score"], x["symbol"]))
     return scored[:top_k]
 
 
