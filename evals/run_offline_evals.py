@@ -67,6 +67,21 @@ def eval_safety_rails_fail_closed() -> None:
         check_sizing(1000, 0, 200.01, "equity"),
         "single-position cap should reject more than 20% of book",
     )
+    require_raises(
+        SafetyViolation,
+        lambda: build_ticket(
+            account_number="696264779",
+            symbol="NVDA",
+            side="buy",
+            type="market",
+            book_value=1000,
+            deployed_cost=0,
+            new_position_cost=200.01,
+            dollar_amount="200.01",
+            rationale="offline eval only",
+        ),
+        "build_ticket should enforce the single-position cap for buys",
+    )
     require(
         check_sizing(1000, 700, 100.01, "equity"),
         "total deployed cap should reject more than 80% of book",
@@ -74,6 +89,24 @@ def eval_safety_rails_fail_closed() -> None:
     require(
         check_sizing(1000, 0, 50, "option", option_premium_at_risk=100.01),
         "option premium cap should reject more than 10% of book",
+    )
+    require_raises(
+        SafetyViolation,
+        lambda: build_ticket(
+            account_number="696264779",
+            symbol="NVDA",
+            side="buy",
+            type="limit",
+            book_value=1000,
+            deployed_cost=0,
+            new_position_cost=50,
+            asset_class="option",
+            quantity="1",
+            limit_price="0.50",
+            rationale="offline eval only",
+            option_premium_at_risk=100.01,
+        ),
+        "build_ticket should enforce the option-premium cap for buys",
     )
 
     ticket = build_ticket(
