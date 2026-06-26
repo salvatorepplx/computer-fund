@@ -1,10 +1,10 @@
 {
-  "_doc": "Slack identities for the Fund's two agents. The signal bus is Slack #computer-fund; agents @-mention each other. Bot user IDs are resolved empirically from the first message a bot posts (search_users does not index bots reliably).",
+  "_doc": "Slack identities for the Fund's two agents. The signal bus is Slack #sal-teammate; agents @-mention each other. Bot user IDs are resolved empirically from the first message a bot posts (search_users does not index bots reliably).",
   "updated": "2026-06-26",
   "human": {
     "name": "Salvatore Natale",
     "slack_user_id": "U08UMFNH12T",
-    "role": "owner / sole trade-confirmer"
+    "role": "owner / governance authority"
   },
   "computer": {
     "name": "Computer (the trader)",
@@ -19,7 +19,7 @@
     "role": "engineering disciple; relentless heartbeat; research/sim/evals/PRs; proposes"
   },
   "channel": {
-    "name": "#computer-fund",
+    "name": "#sal-teammate",
     "channel_id": "C0BCXKG835M",
     "purpose": "signal bus between Computer and p-sal-teammate; ARMED trade alerts + verdicts"
   }

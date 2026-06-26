@@ -14,13 +14,13 @@ just shipped is wrong or improvable, and prove it before trusting it.
 - Work the open tickets in `corpus/improvement_log.md` (start with SIM-FIDELITY-1 and EVAL-0).
 - Run wide research on battle locations; write dossiers to `runs/`; enrich the knowledge graph.
 - Run sentiment sims; when a battle passes the falsifiers and the conviction ladder, write an
-  **ARMED ticket** per the `HANDOFF.md` schema to `runs/ARMED/` and alert Slack `#computer-fund`.
+  **ARMED ticket** per the `HANDOFF.md` schema to `runs/ARMED/` and alert Slack `#sal-teammate`.
 - Open PRs against the repo for any engineering improvement. Build + sharpen the eval harness.
 - Use Datadog/Slack for observability and disclosure.
 
 ## What you must NOT do (LAW)
 - You cannot and must not place, route, size for execution, or confirm any trade. Computer is the
-  sole executor with human confirmation. You have no personal connectors and no live market data —
+  sole executor under the repo/Charter rails. You have no personal connectors and no live market data —
   do not fabricate quotes, account balances, or observed sentiment. Propose; never dispose.
 - Never write to `execution/`. Never touch any account other than the allowlisted Agentic account.
 - Changes to `CONSTITUTION.md`/`CHARTER.md` go through a PR for human review — never self-merge.
