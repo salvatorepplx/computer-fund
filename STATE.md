@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-26T23:38:59.987520+00:00 · HEAD 89abe2a_
+_Last updated: 2026-06-26T23:46:56.844537+00:00 · HEAD 1ab0b8d_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated every capture tick by scripts/state_snapshot.py from ground truth — never stale.
@@ -18,17 +18,17 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 16 (raw 26) | PRELIMINARY_EDGE | 5/0.5579 | circ=False |
-| TICKER:RDDT | 10 (raw 20) | PRELIMINARY_EDGE | 2/0.8457 | circ=False |
-| TICKER:TSLA | 10 (raw 20) | PRELIMINARY_NO_EDGE | 4/0.9294 | circ=True |
-| TICKER:SNDK | 7 (raw 8) | PRELIMINARY_EDGE | 4/1.0 | circ=False |
+| TICKER:NVDA | 17 (raw 27) | PRELIMINARY_EDGE | 2/0.5696 | circ=False |
+| TICKER:RDDT | 11 (raw 21) | PRELIMINARY_EDGE | 2/0.8472 | circ=False |
+| TICKER:TSLA | 11 (raw 21) | PRELIMINARY_NO_EDGE | 4/0.8815 | circ=True |
+| TICKER:SNDK | 8 (raw 9) | PRELIMINARY_EDGE | 5/1.0 | circ=False |
 
 ## The one honest finding
 Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent edges ~ chance).
 Pipeline correctly proposes ZERO trades. An honest KILL is a win, not a failure.
 
 ## What's blocking the next outcome
-No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=16 (~8 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
+No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=17 (~7 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
 
 ## Single next action
 Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is authoritative: if it survives permutation (p<=0.10) -> trade; else KILL seed thesis, evolve.
@@ -44,9 +44,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
+1ab0b8d Watch tick: nothing to act on -> resolve weakest axis (sim/graph formally PARKED)
 89abe2a web series capture tick
 9702edc Close the RSI loop: self-improving cron prompts + hourly self-audit cron
 fa96887 Make RSI structural: self_audit.py scores every axis, forces the weakest into the queue
 37faf1b Add STATE.md cold-agent front door + wire into capture wrapper; complement Computer memory
-3da12e1 Harden capture cron: single capture_and_commit.sh wrapper (fixes git-add pathspec strand bug)
 ```
