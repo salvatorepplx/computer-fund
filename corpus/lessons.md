@@ -186,3 +186,17 @@ Copy this block for each future distilled lesson.
 - LESSON (3rd cron bug, same root): the cron's fre/eedom to hand-write shell is the hazard. Collapse
   the cron to a SINGLE audited script; put ALL fragility (arg parsing, git add, commit gating) inside
   it where it's tested. Never trust a generated bash block to get git plumbing right.
+
+## 2026-06-26 — Self-audit: enforce "no axis unscrutinized" (meta-RSI)
+- Built scripts/self_audit.py: scores EVERY axis (signal, verdict, pipeline, safety, capture_infra,
+  universe, state_memory, lessons, sim, graph, cron_tasks, meta_improvement) from ground truth,
+  finds the weakest, writes runs/SELF_AUDIT.md, and inserts the weakest-axis fix at the top of QUEUE.json.
+  The *completeness of improvement* is now itself an audited axis.
+- First audit verdict: weakest = sim (0.3) and graph (0.3) — present but UNUSED in the live verdict
+  path (early-scaffolding dead weight). signal (0.4) = single-source, no cross-source corroboration.
+- DECISION (RSI pruning, not just adding): sim/ and graph/ are explicitly OFF the critical path. They
+  are only exercised by the offline eval harness, not by capture->verdict->trade. Kept as reference,
+  NOT deleted. They get reconsidered ONLY if the seed lead-lag thesis dies under the null and a
+  diffusion-sim becomes the next candidate thesis. Until then they must not be mistaken for live infra.
+- Next forced improvements (from audit, in order): wire OR formally retire sim/graph; add cross-source
+  sentiment corroboration to raise signal health; schedule self_audit hourly; upgrade watch-cron prompt.
