@@ -38,8 +38,12 @@ done
 echo "=== alpha pipeline (writes PROPOSED only for authoritative non-circular EDGE) ==="
 python execution/alpha_pipeline.py 2>/dev/null | tail -2
 
+echo "=== refresh STATE.md (the cold-agent front door) ==="
+python scripts/state_snapshot.py 2>/dev/null || echo "  WARN: STATE.md refresh failed (non-fatal)"
+
 # ---- robust commit: add ONLY paths that exist; never fail the commit on a bad pathspec ----
 echo "=== commit+push ==="
+git add -A STATE.md 2>/dev/null || true
 git add -A runs/sentiment/series 2>/dev/null || true
 git add -A runs/sentiment/raw 2>/dev/null || true
 git add -A runs/PROPOSED 2>/dev/null || true   # only matters if a proposal was written
