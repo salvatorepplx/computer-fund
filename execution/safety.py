@@ -17,10 +17,33 @@ from pathlib import Path
 ALLOWED_ACCOUNTS = {"696264779"}          # "Agentic" cash account ONLY
 HARD_EXCLUDED = {"875691461", "671638849"}  # margin individual, Roth IRA
 
-# ---- LAW: sizing caps (Charter §3) -----------------------------------------
-MAX_SINGLE_POS_FRAC = 0.20    # ≤20% of book at entry
-MAX_TOTAL_DEPLOYED_FRAC = 0.80  # ≥20% cash always
-MAX_OPTION_PREMIUM_FRAC = 0.10  # ≤10% of book in option premium
+# ---- LAW: graduated sizing ladder (Charter §3) ------------------------------
+# Caps are phase-driven; loaded from state/risk_phase.json. Phase advances with
+# proven edge, regresses on negative expectancy / calibration decay.
+import json as _json
+_PHASE_PATH = Path(__file__).resolve().parent.parent / "state" / "risk_phase.json"
+_PHASE_CAPS = {  # fallback if file missing = most conservative (Phase 0)
+    0: {"single": 0.20, "option": 0.15, "cash_floor": 0.25},
+    1: {"single": 0.30, "option": 0.30, "cash_floor": 0.20},
+    2: {"single": 0.40, "option": 0.40, "cash_floor": 0.15},
+}
+
+def _load_caps() -> dict:
+    try:
+        p = _json.loads(_PHASE_PATH.read_text())
+        c = p.get("caps", {})
+        return {
+            "single": float(c["single_pos_frac"]),
+            "option": float(c["option_premium_frac"]),
+            "cash_floor": float(c["cash_floor_frac"]),
+        }
+    except Exception:
+        return _PHASE_CAPS[0]
+
+_caps = _load_caps()
+MAX_SINGLE_POS_FRAC = _caps["single"]
+MAX_OPTION_PREMIUM_FRAC = _caps["option"]
+MAX_TOTAL_DEPLOYED_FRAC = 1.0 - _caps["cash_floor"]  # keep cash_floor in cash always
 
 # ---- LAW: kill-switch (Charter §4) -----------------------------------------
 PER_POSITION_STOP = -0.25     # -25% unrealized hard stop

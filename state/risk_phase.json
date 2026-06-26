@@ -1,0 +1,11 @@
+{
+  "_doc": "Current risk phase for the graduated sizing ladder (CHARTER rail 3). Computer owns this. Advances on closed-trade track record; regresses if expectancy turns negative or calibration decays.",
+  "phase": 0,
+  "phase_name": "Unproven",
+  "set_at": "2026-06-26",
+  "set_by": "computer",
+  "closed_trades": 0,
+  "caps": {"single_pos_frac": 0.20, "option_premium_frac": 0.15, "cash_floor_frac": 0.25},
+  "next_phase_gate": "\u22655 closed trades with positive expectancy -> Phase 1 (single 30% / option 30% / cash floor 20%)",
+  "rationale": "Zero closed trades. Start measured, earn the right to scale. Mandate is aggression but confidence must be earned, not assumed."
+}

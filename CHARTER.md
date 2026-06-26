@@ -21,8 +21,17 @@ rails and coordinates transparency with Teammate on the Slack bus — not with t
 2. **Review-before-place (autonomous gate).** Always run `review_*` before `place_*` and abort on a
    blocking pre-trade alert (buying power, halt, PDT, etc.). A self-check, not a human stop —
    Computer places the order itself once review passes the rails.
-3. **Sizing caps (of book B):** single position ≤20% · total deployed ≤80% (keep ≥20% cash) ·
-   option premium ≤10%. No fixed dollar ceiling beyond these.
+3. **Graduated sizing ladder (of book B) — capital scales with PROVEN edge, not confidence.**
+   Computer owns these dials (Sal delegated safety). Phase advances on closed-trade track record;
+   it can also REGRESS a phase if expectancy turns negative or the calibration tracker decays.
+   | Phase | Gate | single pos | option premium | cash floor |
+   |---|---|---|---|---|
+   | 0 Unproven   | 0 closed trades                          | ≤20% | ≤15% | ≥25% |
+   | 1 Emerging   | ≥5 closed, positive expectancy           | ≤30% | ≤30% | ≥20% |
+   | 2 Calibrated | ≥15 closed, conviction→P&L Spearman ≥+0.3 | ≤40% | ≤40% | ≥15% |
+   Current phase recorded in `state/risk_phase.json`. No fixed dollar ceiling beyond these.
+   Rationale: the mandate is aggression, but I have zero closed trades — start measured, earn the
+   right to scale. Static caps either betray the mandate (too timid) or LARP unearned confidence.
 4. **Kill-switch:** per-position stop −25% · book circuit breaker −15% from high-water mark pauses
    NEW entries until the Fund reviews; exits/stops still fire.
 5. **Cash account / option level 2 — downside is bounded by construction:** no margin, no naked options.
