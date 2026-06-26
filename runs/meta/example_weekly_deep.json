@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "date": "2026-06-26",
+  "mode": "weekly_deep",
+  "decision": "PROPOSE",
+  "binding_component": "evals",
+  "axis_scores": {
+    "engineering": {
+      "score": 0,
+      "evidence": ["offline eval harness runs deterministically"],
+      "counter_evidence": ["no package-level CI contract is defined yet"]
+    },
+    "research_depth_breadth": {
+      "score": 0,
+      "evidence": ["research modules have deterministic fixtures"],
+      "counter_evidence": ["weekly pass did not inspect new thesis breadth"]
+    },
+    "graph": {
+      "score": 1,
+      "evidence": ["observed-only sentiment behavior is covered by offline evals"],
+      "counter_evidence": ["provenance coverage is still limited"]
+    },
+    "sim_fidelity": {
+      "score": 0,
+      "evidence": ["simulation invariants are covered offline"],
+      "counter_evidence": ["calibration diagnostics need longitudinal data"]
+    },
+    "execution_observability": {
+      "score": 0,
+      "evidence": ["no execution-facing changes were inspected"],
+      "counter_evidence": ["live execution state is intentionally out of scope"]
+    },
+    "evals": {
+      "score": -1,
+      "evidence": ["meta-orchestrator output had no required schema before this pass", "weekly bottleneck decisions were not machine-readable"],
+      "counter_evidence": ["core safety and sim evals already exist"]
+    },
+    "memory_lessons": {
+      "score": 0,
+      "evidence": ["improvement log exists"],
+      "counter_evidence": ["no reuse audit was performed"]
+    },
+    "management_disclosure": {
+      "score": 0,
+      "evidence": ["draft PR process captures validation"],
+      "counter_evidence": ["meta-pass handoff format was undefined"]
+    },
+    "external_systems": {
+      "score": 0,
+      "evidence": ["static connector files are present"],
+      "counter_evidence": ["live connector checks are forbidden for this pass"]
+    }
+  },
+  "evidence": [
+    "runs/AUTORESEARCH_TEARDOWN.md asks to build evals/meta_log.csv and structured meta-orchestrator diagnosis",
+    "evals/README.md documents deterministic offline evals but not weekly bottleneck triage"
+  ],
+  "counter_evidence": [
+    "EVAL-0 already covers important safety and simulation invariants",
+    "sim-fidelity and falsification work should not be duplicated by this pass"
+  ],
+  "expected_eval_delta": {
+    "signal": "human-reviewable meta pass completeness",
+    "expected_change": "future weekly entries include binding_component, evidence, counter_evidence, expected_eval_delta, and self_check"
+  },
+  "smallest_change": "Add a concise offline meta-orchestrator design and example entry schema; defer CSV automation until repeated entries exist.",
+  "noise_guard": {
+    "multiple_signals": true,
+    "recent_but_not_single_sample": true,
+    "counter_evidence_recorded": true,
+    "eval_linked_delta": true,
+    "overlap_check": "Does not implement lead-lag placebo or falsification logic."
+  },
+  "self_check": {
+    "am_i_chasing_noise": "No; the teardown explicitly names this missing pass and the repo lacked a local schema.",
+    "is_this_overlapping_active_work": "No; falsification/lead-lag placebo remains separate.",
+    "why_not_noop": "The missing schema blocks future workers from producing comparable weekly decisions."
+  },
+  "allowed_inputs_used": [
+    "runs/AUTORESEARCH_TEARDOWN.md",
+    "evals/README.md",
+    "python -m evals.run_offline_evals"
+  ],
+  "follow_up_for_teammate": "After at least two real weekly entries, consider a stdlib-only checker or CSV appender for evals/meta_log.csv."
+}
