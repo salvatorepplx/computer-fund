@@ -1,0 +1,18 @@
+# Offline Evals
+
+Run the deterministic, connector-free Computer Fund eval harness:
+
+```sh
+python -m evals.run_offline_evals
+```
+
+The harness is intentionally small and stdlib-only so it can run locally or in CI without network,
+broker access, live market data, account state, or order placement. Current starter evals cover:
+
+- Charter safety rails fail-closed behavior for account allowlist, sizing caps, option premium caps,
+  and kill-switch outputs.
+- Knowledge graph persistence plus observed-only sentiment behavior so simulated sentiment is never
+  treated as observed fact by default.
+- Battle discovery deterministic ranking and stable seed-direction behavior from offline fixtures.
+- Sentiment simulator determinism, bounded trajectories, predate-window invariants, and projected
+  signal labeling.
