@@ -17,6 +17,7 @@ from typing import Any
 from graph.kg import KnowledgeGraph
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+STATE_GRAPH_PATH = REPO_ROOT / "state" / "knowledge_graph.json"
 DEFAULT_SERIES_PATH = REPO_ROOT / "runs" / "sentiment" / "series" / "TICKER_NVDA.jsonl"
 EXPECTED_ENTITY = "TICKER:NVDA"
 EXPECTED_SOURCE = "finance_ticker_sentiment"
@@ -90,6 +91,7 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         graph_path = Path(tmp_dir) / "knowledge_graph.json"
+        state_graph_before = STATE_GRAPH_PATH.read_bytes() if STATE_GRAPH_PATH.exists() else None
         kg = KnowledgeGraph(graph_path)
         kg.upsert_node(EXPECTED_ENTITY, "ticker", symbol="NVDA", fixture="observed_series_offline_diagnostic")
 
@@ -112,6 +114,9 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
         saved_path = kg.save()
         reloaded = KnowledgeGraph(saved_path)
         reloaded_history = reloaded.sentiment_history(EXPECTED_ENTITY)
+        temp_graph_path = saved_path.resolve()
+
+    state_graph_after = STATE_GRAPH_PATH.read_bytes() if STATE_GRAPH_PATH.exists() else None
 
     _require(len(history) == len(rows), "KG sentiment history length must match observed series rows")
     _require(all(entry["simulated"] is False for entry in history), "KG replayed rows must remain simulated:false")
@@ -122,6 +127,8 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
         expected_momentum = round(float(rows[-1]["score"]) - float(rows[-2]["score"]), 4)
     _require(momentum == expected_momentum, "KG momentum must use observed-only replayed history")
     _require(reloaded_history == history, "temp KG save/reload must preserve observed metadata")
+    _require(state_graph_after == state_graph_before, "diagnostic must not mutate state/knowledge_graph.json")
+    _require(temp_graph_path != STATE_GRAPH_PATH.resolve(), "diagnostic must write only to temp graph state")
 
     readiness = {
         "ready_for_leadlag_or_current_step_credit": False,
@@ -137,6 +144,8 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
         "label": "kg_observed_series_offline_diagnostic",
         "mode": "offline_propose_only_no_fetch_no_trading",
         "series_path": _repo_relative(resolved_series_path),
+        "state_graph_mutated": state_graph_after != state_graph_before,
+        "temp_graph_used": temp_graph_path != STATE_GRAPH_PATH.resolve(),
         "entity": EXPECTED_ENTITY,
         "source": EXPECTED_SOURCE,
         "row_count": len(rows),

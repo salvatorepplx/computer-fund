@@ -310,10 +310,10 @@ def eval_kg_observed_series_diagnostic() -> None:
     latest = result["latest_observed"]
     readiness = result["readiness"]
 
-    require(result["label"] == "kg_observed_series_offline_diagnostic",
-            "KG series diagnostic should use the stable validation label")
-    require(result["mode"] == "offline_propose_only_no_fetch_no_trading",
-            "KG series diagnostic must stay offline/propose-only")
+    require(result["state_graph_mutated"] is False,
+            "KG series diagnostic must not mutate committed graph state")
+    require(result["temp_graph_used"] is True,
+            "KG series diagnostic must write replayed rows only to temp graph state")
     require(result["series_path"] == "runs/sentiment/series/TICKER_NVDA.jsonl",
             "KG series diagnostic should read the committed NVDA observed series")
     require(result["entity"] == "TICKER:NVDA", "KG series diagnostic should replay NVDA ticker sentiment")
