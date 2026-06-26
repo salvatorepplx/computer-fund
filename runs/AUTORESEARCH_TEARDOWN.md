@@ -52,7 +52,7 @@ the most informative artifact." We already have `corpus/improvement_log.md`; add
 
 ### 5. Agent-role specialization — ADOPT SELECTIVELY as Teammate worker types
 autoresearch has 13 roles. We don't need 13. The ones that map to our two-agent model, run BY Teammate:
-- **quant_critic** (adversarial review of ARMED tickets before they reach Computer) — yes.
+- **quant_critic** (adversarial offline review of research theses, eval evidence, and PROPOSED artifacts before nudging Computer) — yes.
 - **bug_hunter** (finds bugs in the Fund's own code) — yes, core engineering axis.
 - **signal_engineer** (implements sentiment signals from a registry) — yes, our edge depends on it.
 - **lessons_distiller** — yes, cheap and high-value.
