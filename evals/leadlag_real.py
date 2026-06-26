@@ -106,10 +106,19 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
         return {"entity": entity, "n": n, "verdict": "INSUFFICIENT",
                 "authoritative": False, "note": "not enough diff pairs"}
 
+    # Circularity guard: if sentiment LEVEL tracks price LEVEL contemporaneously
+    # too tightly, the "signal" may just be reading price action back (lookahead-ish).
+    # Flag it so a high-corr name cannot quietly graduate to an EDGE verdict.
+    _ms = sum(sent) / len(sent); _mp = sum(price) / len(price)
+    _cs = [x - _ms for x in sent]; _cp = [x - _mp for x in price]
+    _den = (sum(a * a for a in _cs) * sum(b * b for b in _cp)) ** 0.5
+    contemp_corr = round((sum(a * b for a, b in zip(_cs, _cp)) / _den), 4) if _den else 0.0
+    circularity_flag = abs(contemp_corr) >= 0.6
+
     best = max(lags, key=lambda r: (r["corr"], r["lag"]))
     authoritative = n >= min_n
     # Edge requires: best correlation at positive lead, clearing magnitude bar.
-    edge = best["lag"] >= 1 and best["corr"] >= min_corr
+    edge = best["lag"] >= 1 and best["corr"] >= min_corr and not circularity_flag
 
     if not authoritative:
         verdict = "PRELIMINARY_EDGE" if edge else "PRELIMINARY_NO_EDGE"
@@ -119,7 +128,7 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
     return {
         "entity": entity, "n": n, "n_raw_points": n_raw, "min_n": min_n, "authoritative": authoritative,
         "verdict": verdict, "best_lag": best["lag"], "best_corr": best["corr"],
-        "min_corr": min_corr, "all_lags": lags,
+        "min_corr": min_corr, "contemp_corr": contemp_corr, "circularity_flag": circularity_flag, "all_lags": lags,
         "note": ("Authoritative read." if authoritative else
                  f"PRELIMINARY only: N={n} < {min_n}. Not a basis for capital."),
     }

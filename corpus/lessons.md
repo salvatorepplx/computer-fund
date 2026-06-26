@@ -92,3 +92,14 @@ Copy this block for each future distilled lesson.
   until n>=24). Bursting cannot fix this — only TIME (the */30 cron) adds real spaced points.
 - IMPLICATION: stop bursting for "depth"; it inflates n_raw but not n_spaced. The verdict is
   gated on wall-clock accumulation. Patience is the correct move now, not more captures.
+
+## 2026-06-26 — Circularity / lookahead guard (chip-on-shoulder self-audit)
+- Self-audited: is the sentiment score circular with price (reading price action back as
+  "sentiment")? Contemporaneous corr(sentiment_level, price_level): RDDT +0.007, TSLA +0.034
+  (clean, distinct signal) but NVDA +0.62 (yellow flag — possible mild circularity, inflated
+  by early burst points spanning a wide price range).
+- ADDED circularity guard to leadlag_real.py: compute contemp_corr; if |corr|>=0.6 set
+  circularity_flag and BLOCK an EDGE verdict regardless of lead-lag. A possibly-circular
+  signal must not masquerade as alpha. NVDA now flagged; RDDT/TSLA clean.
+- Conservative by design: better to under-claim edge than trade on lookahead. Expect NVDA's
+  contemp_corr to settle as genuinely time-spaced points replace burst inflation.
