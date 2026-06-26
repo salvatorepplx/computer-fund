@@ -41,6 +41,8 @@ def _quantiles(values: list[float]) -> dict[str, float]:
 
 
 def measure_scenario(scenario: Scenario, *, seeds: int, steps: int, n_agents: int, saturation_threshold: float) -> dict[str, Any]:
+    if seeds <= 0:
+        raise ValueError("seeds must be positive")
     rows = []
     for seed in range(seeds):
         result = simulate(
@@ -96,6 +98,8 @@ def measure_scenario(scenario: Scenario, *, seeds: int, steps: int, n_agents: in
 
 
 def run_metrics(*, seeds: int = 30, steps: int = 30, n_agents: int = 400, saturation_threshold: float = 0.18) -> dict[str, Any]:
+    if seeds <= 0:
+        raise ValueError("seeds must be positive")
     return {
         "label": "simulated_sentiment_offline_fixture",
         "note": "All values are deterministic simulated sentiment diagnostics, not observed facts or trading advice.",
