@@ -18,9 +18,13 @@ broker access, live market data, account state, or order placement. Current star
   signal labeling.
 - Sentiment lead-lag placebo fixtures that accept a true leading signal and reject coincident,
   lagging, random-label, and wrong-universe controls.
+- CAP calibration fixture metrics for sentiment peak error, predate timing, edge after explicit
+  costs, and conviction-vs-realized-edge readiness.
 
-See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist.
+See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist, and
+`evals/cap_calibration.md` for the CAP-vs-REG calibration pre-registration.
 
 ```sh
 env -u PYTHONPATH python -m evals.leadlag_placebo
+env -u PYTHONPATH python -m evals.cap_calibration
 ```
