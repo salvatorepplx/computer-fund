@@ -173,3 +173,16 @@ Copy this block for each future distilled lesson.
 - LESSON: always null-test an apparent edge before believing it. "Looks correlated" at small N is
   almost always luck. The honest path: if the edge stays insignificant at N>=24, KILL the seed
   strategy and evolve (predate-sentiment may need a different signal/horizon/structure).
+
+## 2026-06-26 — Cron git-add pathspec bug stranded commits (3rd cron-invocation failure)
+- BUG (escalated): capture cron ran `git add ... runs/evals/leadlag_real/*.json ...` — a path that
+  doesn't exist -> the whole `git add` returned nonzero -> later commit saw "no changes" -> series
+  points captured but NEVER committed/pushed. Data sat in the working tree at risk of sandbox recycle.
+- FIX: scripts/capture_and_commit.sh — ONE hardened wrapper the cron calls. Each `git add <path>`
+  is independent with `|| true` (a missing/empty path can't block the commit); set -uo pipefail
+  but NOT -e; commit only fires if `git diff --cached` is non-empty; push failure leaves data staged
+  for the next tick to retry. Also self-guards against TICKER:TICKER contamination.
+- Pointed cron 8cdef537 at the wrapper; cron task forbids hand-rolled git add lines.
+- LESSON (3rd cron bug, same root): the cron's fre/eedom to hand-write shell is the hazard. Collapse
+  the cron to a SINGLE audited script; put ALL fragility (arg parsing, git add, commit gating) inside
+  it where it's tested. Never trust a generated bash block to get git plumbing right.
