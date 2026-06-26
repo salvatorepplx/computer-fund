@@ -25,7 +25,12 @@ rails and coordinates transparency with Teammate on the Slack bus — not with t
    option premium ≤10%. No fixed dollar ceiling beyond these.
 4. **Kill-switch:** per-position stop −25% · book circuit breaker −15% from high-water mark pauses
    NEW entries until the Fund reviews; exits/stops still fire.
-5. **Cash account / option level 2:** no margin, no naked options, settlement-aware.
+5. **Cash account / option level 2 — downside is bounded by construction:** no margin, no naked options.
+   ONLY long calls/puts (max loss = premium), covered calls, and cash-secured puts (max loss = collateral)
+   are permitted — these are the only Level-2 structures, and the broker rejects anything requiring Level 3+/
+   margin. There is NO unlimited-downside path reachable from this account. A long option can still lose
+   100% of premium, so option premium at risk is capped at ≤10% of book (rail §3). Settlement-aware (T+1).
+   Execution must refuse any option order that is not one of the three permitted structures.
 6. **No look-ahead / no fabrication:** every signal timestamped; simulated sentiment labeled, never fact.
 7. **Post-trade transparency:** every fill logged to `state/order_log.jsonl` + `runs/EXECUTED/` and
    surfaced on the Slack bus for Teammate. The human is hands-off and not pinged per trade.
