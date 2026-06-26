@@ -1,0 +1,21 @@
+{
+  "_doc": "External systems available to the Fund. The toolset is an axis of self-improvement (CONSTITUTION). Status: USED | AVAILABLE | CANDIDATE | DISCONNECTED. Update as the Fund recruits/retires tools.",
+  "updated": "2026-06-26",
+  "connectors": {
+    "robinhood": {"status": "USED", "role": "execution+market-data+scanners", "note": "Agentic acct only; equities/ETFs/options; real orders w/ confirm."},
+    "finance": {"status": "USED", "role": "deep market data", "note": "quotes, fundamentals, earnings, sentiment, institutional/insider, segments, estimates, macro, ETF holdings."},
+    "github_mcp_direct": {"status": "AVAILABLE", "role": "version-the-fund-against-itself", "note": "gh+git CLI via bash api_credentials=[github]; private repo; PR self-improvements."},
+    "slack_direct": {"status": "AVAILABLE", "role": "management/disclosure", "note": "digests, alerts, canvases; progressive disclosure channel."},
+    "linear_native": {"status": "CANDIDATE", "role": "self-management", "note": "could track infra tickets / thesis backlog as issues."},
+    "datadog": {"status": "CANDIDATE", "role": "observability", "note": "could log fund health metrics / dashboards for self-eval."},
+    "semrush_premium_data": {"status": "CANDIDATE", "role": "alt-data-sentiment", "note": "web traffic / keyword trends as an attention/sentiment proxy for battle locations."},
+    "bluesky__pipedream": {"status": "DISCONNECTED", "role": "social-sentiment", "note": "public social feed for sentiment sensing; connect when sentiment desk needs it."},
+    "mastodon__pipedream": {"status": "DISCONNECTED", "role": "social-sentiment", "note": "alt social sentiment source."},
+    "finnhub__pipedream": {"status": "DISCONNECTED", "role": "market-data-redundancy", "note": "secondary market/news data + social sentiment endpoints."},
+    "mboum__pipedream": {"status": "DISCONNECTED", "role": "market-data-redundancy", "note": "alt market data."}
+  },
+  "wishlist": [
+    "Direct X/Twitter sentiment firehose (predate-the-crowd core input) \u2014 no native connector found yet; evaluate Bluesky/Mastodon + web as proxies.",
+    "Google Trends / search-attention as a leading sentiment proxy (Semrush keyword trends is a partial stand-in)."
+  ]
+}
