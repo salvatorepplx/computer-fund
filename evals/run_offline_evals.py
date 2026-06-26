@@ -16,7 +16,15 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from execution.safety import SafetyViolation, build_ticket, check_sizing, kill_check
+from execution.safety import (
+    MAX_OPTION_PREMIUM_FRAC,
+    MAX_SINGLE_POS_FRAC,
+    MAX_TOTAL_DEPLOYED_FRAC,
+    SafetyViolation,
+    build_ticket,
+    check_sizing,
+    kill_check,
+)
 from graph.kg import KnowledgeGraph
 from research.battle_discovery import discover_battles, score_battle
 from sim.sentiment_sim import predate_signal, simulate
@@ -42,6 +50,11 @@ def require_raises(expected_exception: type[BaseException], fn, message: str) ->
 
 
 def eval_safety_rails_fail_closed() -> None:
+    book_value = 1000
+    single_cap_amount = MAX_SINGLE_POS_FRAC * book_value
+    total_deployed_cap_amount = MAX_TOTAL_DEPLOYED_FRAC * book_value
+    option_cap_amount = MAX_OPTION_PREMIUM_FRAC * book_value
+
     for account in ("671638849", "875691461", "999999999", ""):
         require_raises(
             SafetyViolation,
@@ -50,7 +63,7 @@ def eval_safety_rails_fail_closed() -> None:
                 symbol="NVDA",
                 side="buy",
                 type="market",
-                book_value=1000,
+                book_value=book_value,
                 deployed_cost=0,
                 new_position_cost=100,
                 dollar_amount="100",
@@ -60,12 +73,12 @@ def eval_safety_rails_fail_closed() -> None:
         )
 
     require(
-        check_sizing(1000, 0, 200, "equity") == [],
-        "single-position cap should allow exactly 20% of book",
+        check_sizing(book_value, 0, single_cap_amount, "equity") == [],
+        "single-position cap should allow exactly the active phase cap",
     )
     require(
-        check_sizing(1000, 0, 200.01, "equity"),
-        "single-position cap should reject more than 20% of book",
+        check_sizing(book_value, 0, single_cap_amount + 0.01, "equity"),
+        "single-position cap should reject more than the active phase cap",
     )
     require_raises(
         SafetyViolation,
@@ -74,21 +87,21 @@ def eval_safety_rails_fail_closed() -> None:
             symbol="NVDA",
             side="buy",
             type="market",
-            book_value=1000,
+            book_value=book_value,
             deployed_cost=0,
-            new_position_cost=200.01,
-            dollar_amount="200.01",
+            new_position_cost=single_cap_amount + 0.01,
+            dollar_amount=f"{single_cap_amount + 0.01:.2f}",
             rationale="offline eval only",
         ),
         "build_ticket should enforce the single-position cap for buys",
     )
     require(
-        check_sizing(1000, 700, 100.01, "equity"),
-        "total deployed cap should reject more than 80% of book",
+        check_sizing(book_value, total_deployed_cap_amount - 100, 100.01, "equity"),
+        "total deployed cap should reject more than the active phase cap",
     )
     require(
-        check_sizing(1000, 0, 50, "option", option_premium_at_risk=100.01),
-        "option premium cap should reject more than 10% of book",
+        check_sizing(book_value, 0, 50, "option", option_premium_at_risk=option_cap_amount + 0.01),
+        "option premium cap should reject more than the active phase cap",
     )
     require_raises(
         SafetyViolation,
@@ -97,14 +110,14 @@ def eval_safety_rails_fail_closed() -> None:
             symbol="NVDA",
             side="buy",
             type="limit",
-            book_value=1000,
+            book_value=book_value,
             deployed_cost=0,
             new_position_cost=50,
             asset_class="option",
             quantity="1",
             limit_price="0.50",
             rationale="offline eval only",
-            option_premium_at_risk=100.01,
+            option_premium_at_risk=option_cap_amount + 0.01,
         ),
         "build_ticket should enforce the option-premium cap for buys",
     )
@@ -114,7 +127,7 @@ def eval_safety_rails_fail_closed() -> None:
         symbol="NVDA",
         side="buy",
         type="market",
-        book_value=1000,
+        book_value=book_value,
         deployed_cost=0,
         new_position_cost=100,
         dollar_amount="100",
