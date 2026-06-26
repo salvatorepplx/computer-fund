@@ -67,12 +67,16 @@ def axis_lessons():
     return (0.8, f"lessons.md age={age}h; capturing bug-classes + findings")
 
 def axis_sim():
+    if _exists("sim/RETIRED.md"):
+        return (0.7, "sim PARKED by decision (RETIRED.md): off critical path, re-activate only if a future thesis needs it")
     ok = _exists("sim/sentiment_sim.py")
-    return (0.3, f"sim present={ok} but UNUSED in the live verdict path (SIM-FIDELITY-1 open; dead weight unless wired or killed)")
+    return (0.3, f"sim present={ok} but UNUSED in the live verdict path (wire, kill, or formally park)")
 
 def axis_graph():
+    if _exists("graph/RETIRED.md"):
+        return (0.7, "graph PARKED by decision (RETIRED.md): off critical path, re-activate only if a future thesis needs it")
     ok = _exists("graph/kg.py")
-    return (0.3, f"knowledge graph present={ok} but UNDERUSED — not feeding discovery or verdict")
+    return (0.3, f"knowledge graph present={ok} but UNDERUSED (wire, kill, or formally park)")
 
 def axis_cron_tasks():
     return (0.7, "cron task prompts now self-orienting (read STATE.md/lessons first, act-not-log); watch cron prompt not yet upgraded to same standard")

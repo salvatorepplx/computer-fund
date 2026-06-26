@@ -1,7 +1,16 @@
 {
   "_doc": "Durable work backlog for the Computer Fund continuous loop. Drain highest-value pending item every wake.",
-  "updated": "2026-06-26T23:26:35.214917+00:00",
+  "updated": "2026-06-26T23:38:46.962870+00:00",
   "items": [
+    {
+      "id": "AUDIT-signal",
+      "kind": "improve",
+      "priority": 1,
+      "owner": "computer",
+      "desc": "Weakest axis per self-audit: signal (health 0.4). web_sentiment present=True tested=False; single source (no cross-source corroboration yet)",
+      "status": "pending",
+      "added": "2026-06-26T23:38:46.962870+00:00"
+    },
     {
       "id": "AUDIT-sim",
       "kind": "improve",

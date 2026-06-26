@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-26T23:33:44.813393+00:00 · HEAD 9702edc_
+_Last updated: 2026-06-26T23:38:59.987520+00:00 · HEAD 89abe2a_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated every capture tick by scripts/state_snapshot.py from ground truth — never stale.
@@ -44,9 +44,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
+89abe2a web series capture tick
 9702edc Close the RSI loop: self-improving cron prompts + hourly self-audit cron
 fa96887 Make RSI structural: self_audit.py scores every axis, forces the weakest into the queue
 37faf1b Add STATE.md cold-agent front door + wire into capture wrapper; complement Computer memory
 3da12e1 Harden capture cron: single capture_and_commit.sh wrapper (fixes git-add pathspec strand bug)
-3260afb web series capture tick
 ```
