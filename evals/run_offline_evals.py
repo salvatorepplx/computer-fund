@@ -28,6 +28,7 @@ from execution.safety import (
 )
 from graph.kg import KnowledgeGraph
 from evals.leadlag_placebo import run_leadlag_placebo_checks
+from evals.observed_sentiment_fixture import validate_observed_finance_fixture
 from evals.source_weight_learning import OBSERVED_EVENT_THRESHOLD, run_source_weight_learning_fixture
 from research.battle_discovery import discover_battles, score_battle
 from sim.sentiment_sim import predate_signal, simulate
@@ -275,6 +276,32 @@ def eval_sentiment_source_weight_learning() -> None:
             "lagging source learned trust should be lower than leading source trust")
 
 
+def eval_observed_finance_sentiment_fixture() -> None:
+    result = validate_observed_finance_fixture()
+    event = result["event"]
+    raw_reference = result["raw_reference"]
+    compatibility = result["source_weight_compatibility"]
+
+    require(result["label"] == "observed_finance_ticker_sentiment_fixture_validation",
+            "observed fixture eval should use the stable validation label")
+    require(result["mode"] == "offline_propose_only_no_fetch",
+            "observed fixture eval must stay offline/propose-only")
+    require(result["observed_labeling"]["doc_labels_observed"],
+            "fixture must be explicitly labeled OBSERVED")
+    require(result["observed_labeling"]["doc_labels_not_simulated"],
+            "fixture must be explicitly labeled NOT simulated")
+    require(event["source"] == "finance_ticker_sentiment", "event source should identify the adapter output")
+    require(event["venue"] == "vendor.finance", "event venue should support source/venue attribution")
+    require(event["missing_time_fields"] == ["ts", "observed_at", "ingested_at"],
+            "first observed fixture should report, not fabricate, missing timestamp fields")
+    require(raw_reference["raw_reference_chars"] == event["raw_counts"]["chars"],
+            "raw reference should match sanitized character count")
+    require(compatibility["source_key"] == "finance_ticker_sentiment::vendor.finance",
+            "observed fixture should expose source/venue grouping for weighting plumbing")
+    require(compatibility["leadlag_credit_allowed"] is False,
+            "single timestamp-limited observed fixture must not earn lead-lag/CAP credit")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -283,6 +310,7 @@ EVALS = [
     eval_sentiment_leadlag_placebo,
     eval_cap_calibration_fixture_metrics,
     eval_sentiment_source_weight_learning,
+    eval_observed_finance_sentiment_fixture,
 ]
 
 
