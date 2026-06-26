@@ -197,6 +197,7 @@ class WebSearchSentimentSource:
                         "this afternoon", "breaking", "intraday", "this hour"]
         fresh = fresh_tokens[now.hour % len(fresh_tokens)]
         return [
+            f"{symbol} {nm} stock price quote today closed at",  # clean live quote doc
             f"{symbol} stocktwits sentiment {fresh}",          # fast intraday gauge
             f"{nm} stock bull bear sentiment {datestamp}",     # date-pinned fresh news
             f"{symbol} stock bullish bearish analyst {fresh}",

@@ -103,3 +103,19 @@ Copy this block for each future distilled lesson.
   signal must not masquerade as alpha. NVDA now flagged; RDDT/TSLA clean.
 - Conservative by design: better to under-claim edge than trade on lookahead. Expect NVDA's
   contemp_corr to settle as genuinely time-spaced points replace burst inflation.
+
+## 2026-06-26 — Price extraction hardening (SNDK exposed it)
+- BUG: corpus price extractor (blind median of $-figures) failed badly on SNDK:
+  bimodal corpus (small EPS/%/target figures + real ~$2316 quote) -> median landed at $112,
+  then $21. Also: SNDK trades ~$2316, ABOVE the old $2000 sane-band cap -> real price excluded.
+- FIXES (all generic, not SNDK-specific):
+  1. Context-aware scoring: prefer $-figures with cents + near price-cue words ("closed at",
+     "trading at", "shares", "current") + near the ticker. NVDA/TSLA/RDDT now spot-on.
+  2. Raised band cap 2000 -> 5000; added a dedicated "stock price quote today closed at" query
+     so every name gets a clean live-quote doc in its corpus.
+  3. Series-consistency gate: reject a corpus price >35% off the last good price for that name
+     (real intraday moves between captures rarely exceed that) -> fall back to broker, else hold
+     last. SNDK's noisy price correctly REJECTED (held_last) instead of corrupting the series.
+- LESSON: financial text is full of non-price $-figures; never trust a blind aggregate. Gate
+  new data against history. A bad price proxy silently corrupts the lead-lag — data quality is
+  upstream of every verdict.
