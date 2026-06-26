@@ -9,9 +9,14 @@ This is the thing that converts "one observation" into "a series we can falsify.
 Computer-side only (calls live connectors via injected call_tool). Writes observed
 events to runs/sentiment/series/<ENTITY>.jsonl and mirrors a price proxy when given.
 
-Usage (Computer-side, with a call_tool that hits the finance connector):
-    from execution.ingest_runner import capture
-    capture("TICKER:NVDA", call_sentiment=..., call_price=...)
+Usage:
+    from execution.ingest_runner import append_observation
+
+    append_observation("TICKER:NVDA", normalized_event, price_proxy=...)
+
+Computer-side capture orchestration lives in `scripts/capture_sentiment_tick.py`,
+which owns live connector calls, bounded retry/backoff, normalization, and the
+single append once a valid event is available.
 """
 from __future__ import annotations
 import json, datetime as dt

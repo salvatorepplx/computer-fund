@@ -24,6 +24,12 @@ Two agents, one Fund, sharing this git repo as the only substrate. Neither can d
 State that needs live data (quotes, account, sentiment) is fetched by Computer and committed back
 so Teammate can see it. Teammate never fabricates live data it cannot access.
 
+Computer-side sentiment refreshes use `scripts/capture_sentiment_tick.py` through the
+`FinanceTickerSentimentSource` fetch/normalize seam. The finance sentiment fetch is bounded at 3
+attempts per tick with capped 15s/45s backoff for empty, rate-limited, or otherwise no-signal
+responses. Failed attempts do not append to the observed JSONL series; if all attempts fail, the
+script returns `captured:false` so the missed sample is explicit and retry limits remain finite.
+
 ## Directories Teammate owns (proposes via PR or direct commit)
 - `sim/`, `research/`, `graph/` logic improvements
 - `evals/` — build + sharpen the eval harness (open ticket EVAL-0)
