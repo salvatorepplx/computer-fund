@@ -130,3 +130,16 @@ Copy this block for each future distilled lesson.
 - ACCOUNTABILITY: by ~16:00 PDT today, NVDA (the deepest series) should approach n_spaced~24 ->
   first AUTHORITATIVE verdict (EDGE or KILL). If EDGE & not circular -> alpha pipeline -> first
   tiny trade. If KILL -> seed strategy falsified, evolve/replace per constitution. Either is a win.
+
+## 2026-06-26 — End-to-end dry-run caught a real integration bug (Q-005 hardening)
+- Built evals/e2e_dryrun.py: exercises the FULL chain with a synthetic authoritative EDGE,
+  places nothing. conviction -> PROPOSE-only artifact -> account allowlist -> sizing caps ->
+  build_ticket -> kill_check, plus negative tests (circular/preliminary refused, Roth/margin rejected).
+- CAUGHT: write_proposed() indexed conviction_row["verdict"] etc. via [], but conviction_from_verdict()
+  doesn't return those keys (only rank() merges them). Direct call -> KeyError. This would have
+  SILENTLY broken the live trade path the moment a real EDGE arrived. Fixed with .get().
+- Result: 17/17 checks pass. Rails verified to FIRE (allowlist fail-closed on 875691461/671638849,
+  oversize rejected, circuit breaker trips at -26% DD). Happy path builds a ticket WITHOUT placing.
+- LESSON: unit-testing each link is not enough; integration-test the whole flow before live data
+  depends on it. A dry-run with a synthetic verdict is the cheapest insurance against a silent
+  failure at the worst possible moment (when the real edge finally appears).
