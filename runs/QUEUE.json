@@ -1,16 +1,16 @@
 {
-  "_doc": "Durable work backlog for the Computer Fund continuous loop. Any invocation drains the highest-value pending item. State lives here, not in an agent's head, so 'between ticks' stops mattering — every wake advances real work. Items: {id, kind, priority(1=highest), desc, owner(computer|teammate), status(pending|in_progress|done|blocked), added, notes}.",
-  "updated": "2026-06-26T12:26:00Z",
+  "_doc": "Durable work backlog for the Computer Fund continuous loop. Drain highest-value pending item every wake.",
+  "updated": "2026-06-26T19:45:00Z",
   "items": [
     {"id": "Q-001", "kind": "experiment", "priority": 1, "owner": "computer",
-     "desc": "When any series reaches >=24 points, run the lead-lag falsifier on the REAL series vs price and record the verdict (edge or kill).", "status": "blocked", "notes": "blocked on series depth; capture cron building it"},
+     "desc": "When any series reaches >=24 TIME-SPACED points, run leadlag_real.py for the AUTHORITATIVE verdict (EDGE or KILL) and record it in runs/.", "status": "in_progress", "notes": "cron now feeds time-spaced points via capture_web_tick.py; NVDA at 13 (mostly burst). Need ~11+ more time-spaced."},
     {"id": "Q-002", "kind": "build", "priority": 2, "owner": "computer",
-     "desc": "Add retry+backoff to capture_sentiment_tick.py so source rate-limits never silently drop a series point (SOURCE-RATELIMIT-1).", "status": "pending", "notes": ""},
+     "desc": "Reliable sentiment substrate (web_search) + retry. DONE.", "status": "done", "notes": "web_sentiment.py + capture_web_tick.py; killed finance-connector dependency"},
+    {"id": "Q-006", "kind": "build", "priority": 2, "owner": "computer",
+     "desc": "Make captures actually time-vary: widen/rotate queries + freshen corpus each tick (recency) so EWMA tracks real news drift instead of converging to a fixed point. Otherwise lead-lag is untestable.", "status": "pending", "notes": "core blocker on a meaningful verdict"},
     {"id": "Q-003", "kind": "build", "priority": 3, "owner": "computer",
-     "desc": "Add 2-3 more battle-location names to the capture set (widen coverage for cross-sectional lead-lag).", "status": "pending", "notes": ""},
-    {"id": "Q-004", "kind": "probe", "priority": 4, "owner": "computer",
-     "desc": "Curiosity: compute simple lead-lag correlation on whatever NVDA series exists now (even if <24 pts) as a preliminary read, label it non-authoritative.", "status": "pending", "notes": ""},
+     "desc": "Add 2-3 more battle-location names (cross-sectional lead-lag breadth).", "status": "pending", "notes": ""},
     {"id": "Q-005", "kind": "build", "priority": 5, "owner": "computer",
-     "desc": "Build the alpha pipeline stub: research->graph->sim->ranked PROPOSED ticket writer (no execution), so a surviving edge can flow to a PROPOSED artifact.", "status": "pending", "notes": "depends on Q-001 verdict being non-kill"}
+     "desc": "Alpha pipeline stub: research->graph->sim->ranked PROPOSED ticket writer (no execution).", "status": "pending", "notes": "depends on Q-001 non-kill verdict"}
   ]
 }

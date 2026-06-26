@@ -42,8 +42,13 @@ def _diffs(xs: list[float]) -> list[float]:
 def probe(entity: str, min_n: int = 24, max_lag: int = 5,
           min_corr: float = 0.30) -> dict:
     series = load_series(entity)
-    pts = [(p.get("score"), p.get("price_proxy")) for p in series
-           if p.get("score") is not None and p.get("price_proxy") is not None]
+    # Prefer the unsmoothed raw score (more responsive -> better lead-lag signal);
+    # fall back to the EWMA score for older points captured before score_raw existed.
+    def _sent(p):
+        v = p.get("score_raw")
+        return v if v is not None else p.get("score")
+    pts = [(_sent(p), p.get("price_proxy")) for p in series
+           if _sent(p) is not None and p.get("price_proxy") is not None]
     n = len(pts)
     if n < 3:
         return {"entity": entity, "n": n, "verdict": "INSUFFICIENT",

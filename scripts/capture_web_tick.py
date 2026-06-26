@@ -119,12 +119,13 @@ def capture(entity: str, symbol: str, name: str = "") -> dict:
     if series:
         prior = series[-1].get("score")
     r = normalize(corpus, prior_score=prior)
+    raw = normalize(corpus, prior_score=None)  # unsmoothed, for responsive lead-lag
 
     obs_at = now.isoformat()
     eid = "sha256:" + hashlib.sha256(f"web:{rid}:{entity}:{obs_at}".encode()).hexdigest()[:16]
     ev = {
         "event_id": eid, "entity": entity, "entity_type": "ticker",
-        "score": r.score, "confidence": r.confidence,
+        "score": r.score, "score_raw": raw.score, "confidence": r.confidence,
         "ts": obs_at, "observed_at": obs_at, "ingested_at": obs_at,
         "source": "web_search_sentiment", "venue": "web.search",
         "raw_ref": rid, "raw": {"sanitized": True, "n_docs": r.n_docs,

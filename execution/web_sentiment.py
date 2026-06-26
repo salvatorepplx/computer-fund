@@ -21,7 +21,7 @@ This module has NO hard dependency on any connector: the search callable is
 injected so normalize() stays pure and unit-testable from fixtures.
 """
 from __future__ import annotations
-import re, math
+import re, math, datetime as dt
 from dataclasses import dataclass
 from typing import Callable, Optional
 
@@ -181,11 +181,26 @@ class WebSearchSentimentSource:
         self._search = search
 
     def queries_for(self, symbol: str, name: str = "") -> list[str]:
+        """Freshness-biased, rotating queries so the corpus TRACKS news drift
+        instead of returning a static set each tick (otherwise EWMA converges to
+        a fixed point and lead-lag is untestable). Strategy:
+          - always include fast-moving live-sentiment sources (Stocktwits/Adanos/
+            Perplexity Finance) that update intraday;
+          - stamp the current date + an hour-rotating freshness token so repeated
+            captures pull genuinely different fresh coverage.
+        """
         nm = name or symbol
+        now = dt.datetime.now(dt.timezone.utc)
+        datestamp = now.strftime("%B %d %Y")          # e.g. 'June 26 2026'
+        # rotate the freshness phrasing by hour so the corpus composition shifts
+        fresh_tokens = ["today", "this morning", "right now", "latest",
+                        "this afternoon", "breaking", "intraday", "this hour"]
+        fresh = fresh_tokens[now.hour % len(fresh_tokens)]
         return [
-            f"{nm} stock bull bear sentiment today",
-            f"{symbol} stock bullish bearish analyst",
-            f"{symbol} stocktwits sentiment",
+            f"{symbol} stocktwits sentiment {fresh}",          # fast intraday gauge
+            f"{nm} stock bull bear sentiment {datestamp}",     # date-pinned fresh news
+            f"{symbol} stock bullish bearish analyst {fresh}",
+            f"{nm} stock news {datestamp}",                    # raw fresh headlines
         ]
 
     def fetch(self, symbol: str, name: str = "") -> list[dict]:

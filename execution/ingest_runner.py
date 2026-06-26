@@ -33,6 +33,7 @@ def append_observation(entity: str, event: dict, price_proxy: float | None = Non
         "captured_at": _now(),
         "entity": entity,
         "score": event.get("score"),
+        "score_raw": event.get("score_raw"),
         "confidence": event.get("confidence"),
         "source": event.get("source"),
         "ts": event.get("ts"),
