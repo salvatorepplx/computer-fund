@@ -20,5 +20,8 @@ Each entry: `[DATE] AXIS — what was wrong / could be better → what changed (
 
 ## Done
 
+- [2026-06-26] simulation — added offline SIM-FIDELITY-1 diagnostics for saturation rate,
+  time-to-saturation, peak timing, edge-score distribution, and persistent-network/cascade
+  sensitivity. Current output measures the weakness; it does not yet prove improvement.
 - [2026-06-26] engineering — replaced deprecated `datetime.utcnow()` with timezone-aware UTC.
 - [2026-06-26] external-systems — Fund versioned in private GitHub repo; can PR against itself.
