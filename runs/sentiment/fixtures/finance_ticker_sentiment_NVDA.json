@@ -1,12 +1,26 @@
 {
-  "_doc": "Sanitized OBSERVED fixture from the live finance_ticker_sentiment adapter (Computer-side fetch). Real-shaped data for Teammate's offline evals. NOT simulated.",
+  "_doc": "Sanitized OBSERVED fixture from the live finance_ticker_sentiment adapter (Computer-side fetch). Full RFC-001 SentimentEvent with timestamps + raw_ref. NOT simulated.",
   "source": "finance_ticker_sentiment",
   "entity": "TICKER:NVDA",
+  "simulated": false,
   "normalized_event": {
-    "entity": "TICKER:NVDA", "entity_type": "ticker",
-    "score": 0.0769, "confidence": 0.65,
-    "source": "finance_ticker_sentiment", "venue": "vendor.finance",
-    "raw": {"sanitized": true, "bull_hits": 7, "bear_hits": 6, "chars": 653}
+    "event_id": "sha256:e47b4585afdd2c69",
+    "entity": "TICKER:NVDA",
+    "entity_type": "ticker",
+    "score": 0.0769,
+    "confidence": 0.65,
+    "ts": "2026-06-26T11:15:49.955995+00:00",
+    "observed_at": "2026-06-26T11:15:49.955995+00:00",
+    "ingested_at": "2026-06-26T11:15:49.955995+00:00",
+    "source": "finance_ticker_sentiment",
+    "venue": "vendor.finance",
+    "raw_ref": "runs/sentiment/raw/finance_ticker_sentiment/NVDA_2026-06-26T10.txt",
+    "raw": {
+      "sanitized": true,
+      "bull_hits": 7,
+      "bear_hits": 6,
+      "chars": 653
+    }
   },
-  "note": "Near-neutral slight-bull tilt on NVDA from live bull/bear issue analysis (Vera Rubin durability, custom-silicon competition, AI-capex sustainability). Confidence scales with polarized-language density."
+  "note": "Near-neutral slight-bull tilt on NVDA from live bull/bear issue analysis. Confidence scales with polarized-language density. Single observation -> lead-lag/CAP credit withheld until a timestamped series exists."
 }
