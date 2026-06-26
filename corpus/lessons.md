@@ -82,3 +82,13 @@ Copy this block for each future distilled lesson.
 - LESSON: cross-check cron-reported state against ground-truth files every time. A subagent
   cron can invoke a script differently than intended; idempotency must live IN the script, not
   in the caller's discipline. State belongs in canonical files, normalized at the boundary.
+
+## 2026-06-26 — Time-spacing the lead-lag (de-bursting) + small-N honesty
+- Added time-spacing to leadlag_real.py: collapse captures <180s apart to the last in
+  the cluster, so each retained point is genuine new info. NVDA 17 raw -> 8 time-spaced.
+  Drops null-price rows too. Reports both n (spaced) and n_raw_points.
+- HONESTY: with n_spaced=4-8 and small lag windows, best_corr trivially saturates to +/-1.0.
+  That is small-N artifact, NOT edge. Probe correctly keeps verdict PRELIMINARY (non-authoritative
+  until n>=24). Bursting cannot fix this — only TIME (the */30 cron) adds real spaced points.
+- IMPLICATION: stop bursting for "depth"; it inflates n_raw but not n_spaced. The verdict is
+  gated on wall-clock accumulation. Patience is the correct move now, not more captures.

@@ -47,8 +47,36 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
     def _sent(p):
         v = p.get("score_raw")
         return v if v is not None else p.get("score")
-    pts = [(_sent(p), p.get("price_proxy")) for p in series
-           if _sent(p) is not None and p.get("price_proxy") is not None]
+
+    # Keep only points with both sentiment and a real price.
+    valid = [p for p in series
+             if _sent(p) is not None and p.get("price_proxy") is not None]
+
+    # TIME-SPACING: collapse burst/near-duplicate captures so each retained point
+    # is a genuine time-spaced observation. Burst points (many in seconds) create
+    # fake stationary pairs that corrupt the lead-lag. Keep the LAST point in each
+    # cluster separated by >= min_gap_s seconds.
+    import datetime as _dt
+    def _t(p):
+        try:
+            return _dt.datetime.fromisoformat(p.get("ts").replace("Z", "+00:00"))
+        except Exception:
+            return None
+    min_gap_s = 180.0  # 3 min: anything closer is a burst duplicate, not new info
+    spaced = []
+    last_t = None
+    for p in sorted(valid, key=lambda r: r.get("ts", "")):
+        t = _t(p)
+        if t is None:
+            continue
+        if last_t is None or (t - last_t).total_seconds() >= min_gap_s:
+            spaced.append(p)
+            last_t = t
+        else:
+            spaced[-1] = p  # replace: keep most recent in this burst cluster
+            last_t = t
+    pts = [(_sent(p), p.get("price_proxy")) for p in spaced]
+    n_raw = len(valid)
     n = len(pts)
     if n < 3:
         return {"entity": entity, "n": n, "verdict": "INSUFFICIENT",
@@ -89,7 +117,7 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
         verdict = "EDGE" if edge else "KILL"
 
     return {
-        "entity": entity, "n": n, "min_n": min_n, "authoritative": authoritative,
+        "entity": entity, "n": n, "n_raw_points": n_raw, "min_n": min_n, "authoritative": authoritative,
         "verdict": verdict, "best_lag": best["lag"], "best_corr": best["corr"],
         "min_corr": min_corr, "all_lags": lags,
         "note": ("Authoritative read." if authoritative else
