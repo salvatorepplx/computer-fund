@@ -49,3 +49,23 @@ Copy this block for each future distilled lesson.
 - **Meta/eval linkage**: `memory_lessons` evidence and/or named deterministic eval.
 - **Revisit trigger**: Exact new evidence required before changing the lesson.
 ```
+
+## 2026-06-26 — Substrate swap + burst-vs-time lesson (web_search > finance connector)
+- KILLED reliance on finance_ticker_sentiment: 401 UNAUTHORIZED under any load; it is a
+  static summarizer, not a moving signal. robinhood get_equity_quotes also 401ing (env-wide
+  connector auth blip, not our code). Building lead-lag alpha on those = building on sand.
+- NEW substrate: pplx_sdk.search.web (execution/web_sentiment.py). Reliable, no-auth,
+  timestamped, MOVES as news moves, and carries explicit parseable readings (Adanos
+  "% bullish across N sources", Stocktwits "extremely bearish", Perplexity Finance
+  bull/bear split + analyst consensus, "Strong Buy/Sell"). Scorer blends explicit
+  readings (high weight) + lexical bull/bear balance + EWMA. Self-tests discriminate
+  bull(+0.67)/bear(-0.91)/mixed correctly. Confidence 0.95 on 16-doc corpus vs 0.2-0.65
+  single noisy finance fetch. Price proxy now extracted from corpus (median of dense band)
+  — reliable, with robinhood as fallback only.
+- LESSON (burst vs time): bursting captures builds N fast but NOT real time-variation —
+  intraday news corpus is slow-moving, so EWMA converges to a fixed point within a burst.
+  Lead-lag on burst data = convergence artifacts (labeled PRELIMINARY, not capital-grade).
+  A trustworthy verdict needs TIME-SPACED points (the */30 cron), where news actually
+  changes between captures. Burst proved the pipeline end-to-end; cron produces the verdict.
+- Equilibria from burst (calibration sanity, matches real narratives): NVDA ~+0.26 (Strong
+  Buy but technically weak), RDDT ~+0.40 (Moderate/Strong Buy), TSLA ~+0.07 (range-bound/mixed).

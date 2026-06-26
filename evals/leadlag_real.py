@@ -1,0 +1,107 @@
+"""
+Lead-lag probe on the REAL captured series (Computer Fund).
+
+Tests the core thesis directly: do sentiment CHANGES lead price CHANGES?
+For each candidate lag L (sentiment at t vs price-return at t+L), compute the
+Pearson correlation of d(sentiment) vs d(price). A real predate edge shows the
+best correlation at a POSITIVE lag (sentiment moves first) and clears a
+magnitude bar. Negative/zero best-lag = coincident or lagging = NO edge.
+
+This is honest about its own limits:
+- Reports N and whether N meets the authoritative minimum (default 24).
+- Below the minimum it still prints a PRELIMINARY, explicitly non-authoritative read.
+- Differences (returns) are used, not levels, to avoid spurious trend correlation.
+
+Usage: python evals/leadlag_real.py TICKER:NVDA [--min-n 24] [--max-lag 5]
+"""
+from __future__ import annotations
+import sys, json, argparse, math
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from execution.ingest_runner import load_series
+
+
+def _pearson(a: list[float], b: list[float]) -> float:
+    if len(a) != len(b) or len(a) < 2:
+        return 0.0
+    ma, mb = sum(a) / len(a), sum(b) / len(b)
+    ca = [x - ma for x in a]
+    cb = [x - mb for x in b]
+    num = sum(x * y for x, y in zip(ca, cb))
+    da = math.sqrt(sum(x * x for x in ca))
+    db = math.sqrt(sum(y * y for y in cb))
+    return num / (da * db) if da and db else 0.0
+
+
+def _diffs(xs: list[float]) -> list[float]:
+    return [xs[i + 1] - xs[i] for i in range(len(xs) - 1)]
+
+
+def probe(entity: str, min_n: int = 24, max_lag: int = 5,
+          min_corr: float = 0.30) -> dict:
+    series = load_series(entity)
+    pts = [(p.get("score"), p.get("price_proxy")) for p in series
+           if p.get("score") is not None and p.get("price_proxy") is not None]
+    n = len(pts)
+    if n < 3:
+        return {"entity": entity, "n": n, "verdict": "INSUFFICIENT",
+                "authoritative": False, "note": "need >=3 aligned points"}
+
+    sent = [s for s, _ in pts]
+    price = [pr for _, pr in pts]
+    dsent = _diffs(sent)
+    dret = _diffs(price)  # absolute price change; sign is what matters for lead-lag
+
+    lags = []
+    for lag in range(-max_lag, max_lag + 1):
+        # positive lag: sentiment change at t vs price change at t+lag
+        if lag >= 0:
+            end = min(len(dsent), len(dret) - lag)
+            a = dsent[:end]
+            b = dret[lag:lag + end]
+        else:
+            off = -lag
+            end = min(len(dsent) - off, len(dret))
+            a = dsent[off:off + end]
+            b = dret[:end]
+        if len(a) >= 2:
+            lags.append({"lag": lag, "corr": round(_pearson(a, b), 4), "n_pairs": len(a)})
+
+    if not lags:
+        return {"entity": entity, "n": n, "verdict": "INSUFFICIENT",
+                "authoritative": False, "note": "not enough diff pairs"}
+
+    best = max(lags, key=lambda r: (r["corr"], r["lag"]))
+    authoritative = n >= min_n
+    # Edge requires: best correlation at positive lead, clearing magnitude bar.
+    edge = best["lag"] >= 1 and best["corr"] >= min_corr
+
+    if not authoritative:
+        verdict = "PRELIMINARY_EDGE" if edge else "PRELIMINARY_NO_EDGE"
+    else:
+        verdict = "EDGE" if edge else "KILL"
+
+    return {
+        "entity": entity, "n": n, "min_n": min_n, "authoritative": authoritative,
+        "verdict": verdict, "best_lag": best["lag"], "best_corr": best["corr"],
+        "min_corr": min_corr, "all_lags": lags,
+        "note": ("Authoritative read." if authoritative else
+                 f"PRELIMINARY only: N={n} < {min_n}. Not a basis for capital."),
+    }
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("entity", nargs="?", default="TICKER:NVDA")
+    ap.add_argument("--min-n", type=int, default=24)
+    ap.add_argument("--max-lag", type=int, default=5)
+    ap.add_argument("--min-corr", type=float, default=0.30)
+    a = ap.parse_args()
+    print(json.dumps(probe(a.entity, a.min_n, a.max_lag, a.min_corr), indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -19,12 +19,22 @@ from execution.sentiment_adapters import FinanceTickerSentimentSource, persist_r
 from execution.ingest_runner import append_observation, series_length, load_series
 
 
-def call_tool(source_id: str, tool_name: str, arguments: dict) -> dict:
+def call_tool(source_id: str, tool_name: str, arguments: dict, retries: int = 3) -> dict:
+    """Call a connector with retry+backoff. Handles rate-limit empty returns (SOURCE-RATELIMIT-1)."""
+    import time
     payload = json.dumps({"source_id": source_id, "tool_name": tool_name, "arguments": arguments})
-    out = subprocess.run(["external-tool", "call", payload], capture_output=True, text=True, timeout=60)
-    if out.returncode != 0:
-        raise RuntimeError(out.stderr[:300])
-    return json.loads(out.stdout)
+    last_err = ""
+    for attempt in range(retries):
+        out = subprocess.run(["external-tool", "call", payload], capture_output=True, text=True, timeout=90)
+        if out.returncode == 0 and out.stdout.strip():
+            try:
+                return json.loads(out.stdout)
+            except json.JSONDecodeError:
+                last_err = "non-json response"
+        else:
+            last_err = (out.stderr or "empty response")[:200]
+        time.sleep(2 ** attempt * 2)  # 2s, 4s, 8s backoff
+    raise RuntimeError(f"call_tool failed after {retries} attempts: {last_err}")
 
 
 def capture(entity: str, symbol: str) -> dict:
