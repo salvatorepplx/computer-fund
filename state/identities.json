@@ -1,0 +1,26 @@
+{
+  "_doc": "Slack identities for the Fund's two agents. The signal bus is Slack #computer-fund; agents @-mention each other. Bot user IDs are resolved empirically from the first message a bot posts (search_users does not index bots reliably).",
+  "updated": "2026-06-26",
+  "human": {
+    "name": "Salvatore Natale",
+    "slack_user_id": "U08UMFNH12T",
+    "role": "owner / sole trade-confirmer"
+  },
+  "computer": {
+    "name": "Computer (the trader)",
+    "slack_user_id": "U08UMFNH12T",
+    "note": "Computer posts as the logged-in user (Salvatore) via the Slack connector.",
+    "role": "sole executor; live data; memory; assets; disposes"
+  },
+  "teammate": {
+    "name": "p-sal-teammate",
+    "handle": "p-sal-teammate",
+    "slack_user_id": "PENDING_FIRST_CONTACT",
+    "role": "engineering disciple; relentless heartbeat; research/sim/evals/PRs; proposes"
+  },
+  "channel": {
+    "name": "#computer-fund",
+    "channel_id": "PENDING_CREATE",
+    "purpose": "signal bus between Computer and p-sal-teammate; ARMED trade alerts + verdicts"
+  }
+}

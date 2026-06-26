@@ -1,0 +1,70 @@
+{
+  "nodes": {
+    "TICKER:NVDA": {
+      "id": "TICKER:NVDA",
+      "type": "ticker",
+      "created": "2026-06-26T09:06:47.311032Z",
+      "sentiment_history": [],
+      "attrs": {
+        "sector": "Semiconductors"
+      },
+      "updated": "2026-06-26T09:06:47.311036Z"
+    },
+    "NARR:ai-capex-peak": {
+      "id": "NARR:ai-capex-peak",
+      "type": "narrative",
+      "created": "2026-06-26T09:06:47.311039Z",
+      "sentiment_history": [],
+      "attrs": {
+        "label": "AI capex is peaking; hyperscaler spend will roll over"
+      },
+      "updated": "2026-06-26T09:06:47.311041Z"
+    },
+    "BATTLE:NVDA-capex": {
+      "id": "BATTLE:NVDA-capex",
+      "type": "battle",
+      "created": "2026-06-26T09:06:47.311044Z",
+      "sentiment_history": [
+        {
+          "score": -0.2,
+          "confidence": 0.5,
+          "source": "seed:self-test",
+          "simulated": false,
+          "observed_at": "2026-06-26T09:06:47.311061Z"
+        },
+        {
+          "score": 0.1,
+          "confidence": 0.6,
+          "source": "seed:self-test-2",
+          "simulated": false,
+          "observed_at": "2026-06-26T09:06:47.311067Z"
+        }
+      ],
+      "attrs": {
+        "label": "Is NVDA's demand durable or a capex bubble?"
+      },
+      "updated": "2026-06-26T09:06:47.311046Z"
+    }
+  },
+  "edges": [
+    {
+      "src": "BATTLE:NVDA-capex",
+      "type": "TARGETS",
+      "dst": "TICKER:NVDA",
+      "attrs": {},
+      "created": "2026-06-26T09:06:47.311048Z"
+    },
+    {
+      "src": "NARR:ai-capex-peak",
+      "type": "DRIVES",
+      "dst": "BATTLE:NVDA-capex",
+      "attrs": {},
+      "created": "2026-06-26T09:06:47.311051Z"
+    }
+  ],
+  "meta": {
+    "created": "2026-06-26T09:06:47.310956Z",
+    "ticks": 1,
+    "last_saved": "2026-06-26T09:06:47.311095Z"
+  }
+}

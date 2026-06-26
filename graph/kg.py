@@ -30,7 +30,7 @@ EDGE_TYPES = {"MENTIONS", "DRIVES", "CONTRADICTS", "TARGETS", "SCHEDULED_FOR", "
 
 
 def _now() -> str:
-    return dt.datetime.utcnow().isoformat() + "Z"
+    return dt.datetime.now(dt.timezone.utc).isoformat()
 
 
 class KnowledgeGraph:

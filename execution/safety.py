@@ -142,7 +142,7 @@ def build_ticket(account_number: str, symbol: str, side: str, type: str,
         limit_price=limit_price, stop_price=stop_price,
         time_in_force=time_in_force, market_hours=market_hours,
         asset_class=asset_class, rationale=rationale,
-        created_at=dt.datetime.utcnow().isoformat() + "Z",
+        created_at=dt.datetime.now(dt.timezone.utc).isoformat(),
     )
 
 
