@@ -1,0 +1,175 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-05-18",
+  "signals": {
+    "price_momentum": {
+      "family": "conventional_price",
+      "fetch": "yfinance + return-window calc",
+      "horizons": ["1d","5d","20d","60d","250d"],
+      "universes": ["any_equity"]
+    },
+    "volume_zscore": {
+      "family": "conventional_price",
+      "fetch": "yfinance",
+      "horizons": ["1d"],
+      "universes": ["any_equity"]
+    },
+    "realized_vol": {
+      "family": "conventional_price",
+      "fetch": "yfinance + 20d std",
+      "horizons": ["1d","5d","20d"],
+      "universes": ["any_equity","etf","crypto"]
+    },
+    "vix_term_structure": {
+      "family": "options_implied",
+      "fetch": "yfinance ^VIX ^VIX3M ^VIX9D",
+      "horizons": ["1d"],
+      "universes": ["spy_indexed"]
+    },
+    "skew_index": {
+      "family": "options_implied",
+      "fetch": "yfinance ^SKEW",
+      "universes": ["spy_indexed"]
+    },
+    "yield_curve_slope": {
+      "family": "macro",
+      "fetch": "FRED DGS10 - DGS2",
+      "universes": ["any_us"]
+    },
+    "real_yields": {
+      "family": "macro",
+      "fetch": "FRED DGS10 - T10YIE",
+      "universes": ["any_us","gold","tech"]
+    },
+    "credit_spreads_ighy": {
+      "family": "macro",
+      "fetch": "FRED BAMLC0A0CM BAMLH0A0HYM2",
+      "universes": ["any_us"]
+    },
+    "epu_index": {
+      "family": "macro",
+      "fetch": "FRED USEPUINDXD",
+      "universes": ["any_us"]
+    },
+    "financial_conditions_index": {
+      "family": "macro",
+      "fetch": "FRED NFCI",
+      "universes": ["any_us"]
+    },
+    "advance_decline_breadth": {
+      "family": "market_breadth",
+      "fetch": "computed from S&P500 component returns",
+      "universes": ["spy_indexed"]
+    },
+    "pct_above_200dma": {
+      "family": "market_breadth",
+      "fetch": "computed cross-sectional",
+      "universes": ["spy_indexed"]
+    },
+    "earnings_surprise": {
+      "family": "fundamental",
+      "fetch": "yfinance .earnings_dates or finance tools",
+      "horizons": ["event_window"],
+      "universes": ["any_equity_with_earnings"]
+    },
+    "earnings_revisions": {
+      "family": "fundamental",
+      "fetch": "TBD (need vendor — Tipranks free tier or Wisesheets)",
+      "status": "PLANNED"
+    },
+    "fcf_yield_trend": {
+      "family": "fundamental",
+      "fetch": "yfinance .info or finance tools",
+      "horizons": ["20d","60d"],
+      "universes": ["any_equity"]
+    },
+    "google_trends_query": {
+      "family": "alt_attention",
+      "fetch": "pytrends with retry; fallback to alternative APIs",
+      "horizons": ["1d","5d"],
+      "universes": ["any_equity_with_brand"]
+    },
+    "wsb_mention_velocity": {
+      "family": "alt_sentiment",
+      "fetch": "ApeWisdom free tier (current snapshot) + cumulative history via daily polls",
+      "horizons": ["1d"],
+      "universes": ["retail_attention_basket"],
+      "status": "WIP — history is sparse"
+    },
+    "options_skew_pct": {
+      "family": "options_flow",
+      "fetch": "Cboe Datashop or alpha-vantage options",
+      "status": "PLANNED (license required for full surface)"
+    },
+    "dealer_gex": {
+      "family": "options_flow",
+      "fetch": "SpotGamma / GammaLab — paid; or compute proxy from open-interest weighted gamma",
+      "status": "PROXY_BUILDABLE"
+    },
+    "cds_spreads": {
+      "family": "credit_alt",
+      "fetch": "FRED for IG/HY aggregates; single-name CDS requires Markit",
+      "status": "AGGREGATE_ONLY"
+    },
+    "btc_funding_rates": {
+      "family": "crypto_microstructure",
+      "fetch": "binance funding history (public)",
+      "universes": ["btc","eth","sol"]
+    },
+    "app_store_rank": {
+      "family": "alt_consumer",
+      "fetch": "Sensor Tower API or appfigures; manual scrape rate-limited",
+      "status": "PLANNED"
+    },
+    "card_spend_proxy": {
+      "family": "alt_consumer",
+      "fetch": "Earnest, YipitData — paid; proxy via Census MARTS for sector",
+      "status": "AGGREGATE_ONLY"
+    },
+    "satellite_traffic": {
+      "family": "alt_physical",
+      "fetch": "Orbital Insight, RS Metrics — paid",
+      "status": "PLANNED"
+    },
+    "news_novelty_score": {
+      "family": "alt_news",
+      "fetch": "Compute from pplx search + embedding distance to recent history",
+      "status": "BUILDABLE"
+    },
+    "analyst_dispersion": {
+      "family": "fundamental",
+      "fetch": "Refinitiv I/B/E/S — paid; rough proxy via yfinance .recommendations",
+      "status": "PROXY_ONLY"
+    },
+    "insider_trading_signal": {
+      "family": "alt_filings",
+      "fetch": "Form 4 EDGAR scraping (free, full history)",
+      "horizons": ["20d","60d"],
+      "status": "BUILDABLE"
+    },
+    "short_interest": {
+      "family": "alt_positioning",
+      "fetch": "FINRA bi-monthly; nasdaq.com per-ticker",
+      "status": "BUILDABLE"
+    },
+    "etf_flows": {
+      "family": "alt_positioning",
+      "fetch": "etf.com or Bloomberg; free via aum-change calc",
+      "status": "PROXY_BUILDABLE"
+    }
+  },
+  "universes": {
+    "any_equity": "any US-listed equity with >$100M ADV",
+    "spy_indexed": "SPY and direct factor ETFs",
+    "social_attention_basket": ["RDDT","META","SNAP","PINS","RBLX","COIN","HOOD","PLTR","CVNA","TSLA","GME","AMC"],
+    "retail_attention_basket": ["GME","AMC","BB","PLTR","SOFI","TSLA","COIN","HOOD","RDDT","CVNA","RIVN","LCID"],
+    "agi_buildout_full": ["NVDA","AVGO","AMD","ORCL","TSM","CRWV","INTC","MU","SNDK","WDC","LUMN","COHR","BE","NRG","VST","CEG","GEV","ETR","CORZ","RIOT","IREN","CIFR","APLD"],
+    "sector_etfs": ["XLK","XLF","XLE","XLU","XLV","XLY","XLI","XLB","XLP","XLRE","XLC"],
+    "factor_etfs": ["MTUM","QUAL","VLUE","USMV","SPLV","SIZE","COWZ"],
+    "rates": ["TLT","IEI","IEF","SHY","TIP","HYG","LQD"],
+    "commodities": ["GLD","SLV","USO","UNG","CPER","DBC","UUP"],
+    "crypto": ["BTC-USD","ETH-USD","SOL-USD","COIN","MSTR"]
+  },
+  "horizons": ["intraday_oc","1d","3d","5d","10d","20d","60d","event_t_minus_5_to_plus_5"],
+  "structures": ["long_only","short_only","pair_beta_neutral","spread_basket","ranked_decile","regime_overlay","catalyst_conditional"]
+}

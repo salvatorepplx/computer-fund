@@ -1,0 +1,241 @@
+{
+  "version": "0.1-provisional",
+  "stance": "Every script here is a current working answer to a recurring need. All are explicitly open to replacement by something better.",
+  "scripts": {
+    "paper_engine.py": {
+      "purpose": "Daily-close paper-trade ledger for armed theses",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Daily-close MTM is a crude proxy for intraday strategies; the attention_fade_rddt thesis is intraday but tracked daily",
+        "No multi-leg support yet \u2014 pair trades and spreads have to be opened as two positions",
+        "Borrow cost is hardcoded; should pull live or recent FINRA short-interest data",
+        "No corporate-action handling (splits, dividends)"
+      ],
+      "candidate_successors": [
+        "A multi-leg ledger with intraday MTM via 5-min bars",
+        "Public.com API integration via existing skill for real fill data once G1 is cleared"
+      ]
+    },
+    "orchestrator.py": {
+      "purpose": "Per-tick action selection (KILL/ITERATE/RE-FALSIFY/SEED/MTM/EXPLORE)",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Action priority is hardcoded; should it be learned from outcome data?",
+        "Currently action-budget-bounded but doesn't account for cost \u2014 a SEED might be cheaper than ITERATE_STALE for the same expected gain"
+      ]
+    },
+    "run_iteration.py": {
+      "purpose": "Scaffold a new PR file from the template",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Scaffolds a stub the meta-orchestrator can mistake for an iteration (caused first HPR false-positive)",
+        "Should perhaps emit a sentinel file rather than a draft PR until the iteration agent actually fills it"
+      ]
+    },
+    "hypothesis_space.py": {
+      "purpose": "Thompson-sampling generator over (signal \u00d7 universe \u00d7 horizon \u00d7 structure)",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Independent sampling per axis assumes axes are independent \u2014 they aren't (intraday horizon \u2194 short-only structure correlate)",
+        "Beta priors are uninformed; bootstrap from prior session learnings?",
+        "No mechanism yet to incorporate explicit user preferences into the prior"
+      ]
+    },
+    "explorer.py": {
+      "purpose": "One bandit-pull \u2192 one scaffolded thesis",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Doesn't yet run cross-sectional generalization automatically after single-name survival",
+        "Naming scheme creates noisy directory listings"
+      ]
+    },
+    "multiple_testing.py": {
+      "purpose": "BH FDR correction over weekly hypothesis families",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Family = week is arbitrary; should family be by signal-family or by exploration session?",
+        "Doesn't account for correlation between hypotheses (BH-Y would be more honest)"
+      ]
+    },
+    "holdout_vault.py": {
+      "purpose": "Deterministic 30% (ticker, date) holdout via hash",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Hash-based holdout may correlate accidentally with calendar features",
+        "30% is a guess \u2014 should be tuned to the actual size of the typical universe"
+      ]
+    },
+    "run_evals.py": {
+      "purpose": "Deterministic eval suite over runs/ artifacts",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Capability evals are mostly counts; should be effect-size weighted",
+        "Spearman in E-CAP-01 is computed in pure Python \u2014 fine for n<100, slow beyond that",
+        "Template-stub detection is a string-match hack; brittle to template changes"
+      ]
+    },
+    "meta_orchestrator.py": {
+      "purpose": "Reasoning layer over harness; drafts HPR stubs",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "EVAL_TO_COMPONENT mapping is hand-coded; should be learned from which HPRs actually improved which evals",
+        "No mechanism for meta-orchestrator to propose changes to itself (recursive bound)"
+      ]
+    },
+    "self_improve.py": {
+      "purpose": "GEPA-style reflective HPR drafter (currently a simpler version)",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Not yet wired into the cron \u2014 meta_orchestrator.py supersedes parts of it",
+        "Should either merge with meta_orchestrator.py or be deprecated"
+      ]
+    },
+    "critic.py": {
+      "purpose": "CriticGPT-style adversarial reviewer prompt builder",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Currently emits a prompt; doesn't yet spawn the subagent itself",
+        "No tracking of critic\u2194primary divergence over time"
+      ]
+    },
+    "iterate.py": {
+      "purpose": "Thin I/O wrapper for thesis iterations: prepare (lock + packet) \u2192 subagent does work \u2192 finalize (status, bandit, p-value, paper-open, release).",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "finalize ticker inference falls back to thesis_id.split last token \u2014 brittle; should read from thesis.md or signal axis",
+        "No retry on partial failure (e.g. if paper_engine.open fails after status change)",
+        "Subagent spawning is done by the cron itself, not by iterate.py \u2014 could centralize"
+      ]
+    },
+    "locks.py": {
+      "purpose": "File-based per-thesis locks with 10-min staleness",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Hash on tick start could collide if two ticks fire in same millisecond \u2014 unlikely but possible"
+      ]
+    },
+    "notify_budget.py": {
+      "purpose": "Daily notification rate limiting + coalesced digest",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Cap of 6 high/day is a guess \u2014 should be tuned to user preference"
+      ]
+    },
+    "continuous.py": {
+      "purpose": "Session-resident background process firing cheap ticks every N seconds",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Daemonization via fork is fragile in some envs; would prefer a proper process manager"
+      ]
+    },
+    "backtest_runner.py": {
+      "purpose": "Fully shell-executable thesis iteration: prepare \u2192 backtest \u2192 3 falsifiers \u2192 PR write \u2192 finalize \u2192 release. No agent-layer dependency.",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Only runs 3 of 11 falsifiers (random-label, date-split, cost-stress) \u2014 needs ext. for the full playbook",
+        "Generic long/short basket model; no thesis-specific signal logic (event-conditional, attention-spike, factor-neutral)",
+        "HUMAN_THESIS_DEFAULTS is hand-coded; should be auto-extracted from thesis.md",
+        "Universe ticker resolution for grammar-generated theses uses a placeholder default",
+        "No support yet for intraday strategies (e.g. attention_fade_rddt is daily-close-to-close here)"
+      ]
+    },
+    "data_fetcher.py": {
+      "purpose": "Persistent yfinance + FRED + earnings cache with 24h freshness check; warm-pack of ~80 tickers + 10 macro series",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "No options surface data",
+        "No CDS / credit-tranche data",
+        "24h cache freshness is a guess \u2014 should be per-source"
+      ]
+    },
+    "historical_sweep.py": {
+      "purpose": "Event-study runner across an event calendar \u00d7 ticker universe, with BH FDR correction",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Two-sided t-test only \u2014 no event-type-specific direction",
+        "Event-window is symmetric; some catalysts have asymmetric impact",
+        "BH applied within sweep only; not joint with the rest of htest_log"
+      ]
+    },
+    "frontier.py": {
+      "purpose": "Compute current (signal,universe,horizon,structure) frontier from bandit arm posteriors + STATUS files",
+      "added": "2026-05-18",
+      "last_reviewed": "2026-05-18",
+      "open_questions": [
+        "Single-axis posteriors only \u2014 no joint distribution over the 4-tuple"
+      ]
+    }
+  },
+  "data_sources": {
+    "yfinance": {
+      "status": "PRIMARY",
+      "open_questions": [
+        "history quality varies; corporate actions are messy"
+      ]
+    },
+    "FRED": {
+      "status": "PRIMARY for macro",
+      "open_questions": [
+        "coverage gaps on intraday macro"
+      ]
+    },
+    "pplx_finance_tools": {
+      "status": "USED",
+      "open_questions": [
+        "dependent on pplx CLI availability"
+      ]
+    },
+    "pytrends": {
+      "status": "FLAKY",
+      "open_questions": [
+        "urllib3 compatibility, rate limits \u2014 needs replacement"
+      ]
+    },
+    "ApeWisdom": {
+      "status": "CURRENT_ONLY",
+      "open_questions": [
+        "no historical API; need to poll + accumulate"
+      ]
+    },
+    "EDGAR Form 4": {
+      "status": "PLANNED",
+      "open_questions": [
+        "free, full history available \u2014 high value"
+      ]
+    },
+    "event_calendars": {
+      "status": "BUILDING",
+      "open_questions": [
+        "Earnings calendars per-ticker still need full pre-fetch",
+        "NFP / PCE / ISM not yet captured",
+        "Need a generator that pulls these from FRED + Investing.com programmatically"
+      ]
+    }
+  },
+  "wishlist": [
+    "Generalized data-fetcher abstraction so adding a new alt-data source is a 5-line PR",
+    "A backtest primitive that handles cross-sectional ranking + neutralization cleanly",
+    "An options-surface fetcher (even free-tier proxies)",
+    "Live regime detector (vol, growth, inflation quadrant) that all theses can condition on",
+    "Position-sizing primitive that supports Kelly-fraction + risk parity + vol target without re-implementing each time",
+    "A 'thesis lineage' viewer showing how each new thesis evolved from prior corpses + merges"
+  ]
+}

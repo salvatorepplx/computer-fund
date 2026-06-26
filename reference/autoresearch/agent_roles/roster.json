@@ -1,0 +1,96 @@
+{
+  "version": "1.0",
+  "stance": "Each role is a current working hypothesis about a valuable kind of reasoning the system needs. The architect role may propose new roles or retire existing ones.",
+  "roles": {
+    "chief_research_officer": {
+      "purpose": "Strategic direction. Reads the entire system state, identifies the single highest-leverage piece of work for the next 4 hours, writes a recommendation.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 30,
+      "deliverable_dir": "reasoning/cro/"
+    },
+    "quant_critic": {
+      "purpose": "Adversarial review of recent ARMED/ITERATING theses. Tries to break each one. Spawns own sub-critics if needed.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 2,
+      "max_runtime_min": 40,
+      "deliverable_dir": "reasoning/quant_critic/"
+    },
+    "signal_engineer": {
+      "purpose": "Implements missing signals from data/registry.json. Each invocation picks one PLANNED/WIP signal and writes its real implementation in signal_library.py, with proper lag and edge cases.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 2,
+      "max_runtime_min": 45,
+      "deliverable_dir": "reasoning/signal_engineer/",
+      "may_modify_scripts": true
+    },
+    "bug_hunter": {
+      "purpose": "Reads recent reasoning_log + cron_tracking + git-diff equivalents (file mtimes) to find bugs in the system. Spawns its own subagent to reproduce and fix each one.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 30,
+      "deliverable_dir": "reasoning/bug_hunter/",
+      "may_modify_scripts": true
+    },
+    "hpr_filler": {
+      "purpose": "Picks up DRAFT HPR stubs in references/HARNESS-PRS/ and fills in the full structured reasoning (bottleneck_diagnosis, proposed_change, shadow_eval_design, alternative_considered, self_check). Then proposes the concrete diff. Never auto-applies — leaves a fully-reasoned HPR for human approval.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 30,
+      "deliverable_dir": "reasoning/hpr_filler/"
+    },
+    "lessons_distiller": {
+      "purpose": "Reads reasoning_log.jsonl, CORPSES.md, and recent PRs. Distills new patterns into corpus/lessons.md. One new lesson per invocation OR an explicit 'no new lesson worth adding'.",
+      "model": "claude_sonnet_4_6",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 20,
+      "deliverable_dir": "reasoning/lessons_distiller/"
+    },
+    "capacity_analyst": {
+      "purpose": "For any thesis nearing ARM (reviewer >=5/10 in latest PR), produce a real-world execution estimate: ADV vs position size, borrow availability for shorts, slippage at 5/15/30 bps, capacity ceiling, post-cost expected return.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 30,
+      "deliverable_dir": "reasoning/capacity_analyst/"
+    },
+    "calibration_analyst": {
+      "purpose": "Computes reviewer-score vs realized-P&L correlation across closed paper positions. Flags any drift in the reviewer's predictive ability. Currently we have only 1 closed paper position (RDDT) so the deliverable for now is 'when we have N=10 we can compute X; here's our pre-registered plan'.",
+      "model": "claude_sonnet_4_6",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 20,
+      "deliverable_dir": "reasoning/calibration_analyst/"
+    },
+    "literature_scout": {
+      "purpose": "Searches recent quant finance literature, public quant blogs (Newfound, Verdad, AQR insights), Twitter quant threads. Finds 1-2 genuinely novel anomalies. Drafts each as a new SEEDED thesis.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 30,
+      "deliverable_dir": "reasoning/literature_scout/"
+    },
+    "architect": {
+      "purpose": "Meta-meta level. May propose structural changes to the system, including modifying agent_roles/ itself, retiring crons, adding new infra primitives, rewriting references. May spawn its own subagents.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 1,
+      "max_runtime_min": 45,
+      "deliverable_dir": "reasoning/architect/",
+      "may_modify_scripts": true
+    },
+    "event_conditional_iterator": {
+      "purpose": "Picks one swept_* thesis (from FOMC/CPI sweep promotion). Builds a proper event-conditional backtest: only trades inside the T-1..T+5 window around each event. Writes the real result back to the thesis dir as a new PR.",
+      "model": "claude_opus_4_7",
+      "frequency_per_swarm_tick": 2,
+      "max_runtime_min": 40,
+      "deliverable_dir": "reasoning/event_conditional/",
+      "may_modify_scripts": true
+    }
+  },
+  "default_swarm_size": 14,
+  "spawn_in_parallel": true,
+  "every_role_must": [
+    "Read /home/user/workspace/autoresearch/references/ethos.md first",
+    "Read /home/user/workspace/autoresearch/SKILL.md",
+    "Read the role's own manual in agent_roles/<role>.md",
+    "Write a self_critique paragraph in every output",
+    "Log a reasoning_log entry summarizing what was done and why"
+  ]
+}

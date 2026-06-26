@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "evals": {
+    "E-CAP-01": {
+      "kind": "capability",
+      "name": "Reviewer score → realized P&L correlation",
+      "grader": "deterministic",
+      "target": 0.5,
+      "metric": "spearman_rho",
+      "script": "run_evals.py::e_cap_01"
+    },
+    "E-CAP-02": {
+      "kind": "capability",
+      "name": "Falsifier hit rate on bad theses",
+      "grader": "deterministic",
+      "target": 0.80,
+      "script": "run_evals.py::e_cap_02"
+    },
+    "E-CAP-03": {
+      "kind": "capability",
+      "name": "Seeder edge: % of seeded → ARMED",
+      "grader": "deterministic",
+      "target": 0.35,
+      "script": "run_evals.py::e_cap_03"
+    },
+    "E-CAP-04": {
+      "kind": "capability",
+      "name": "Avg iteration depth at MERGE",
+      "grader": "deterministic",
+      "target_max": 3.0,
+      "script": "run_evals.py::e_cap_04"
+    },
+    "E-CAP-05": {
+      "kind": "capability",
+      "name": "Time-to-kill on bad theses",
+      "grader": "deterministic",
+      "target_max": 2.0,
+      "script": "run_evals.py::e_cap_05"
+    },
+    "E-CAP-06": {
+      "kind": "capability",
+      "name": "Armed portfolio annualized Sharpe vs SPY",
+      "grader": "deterministic",
+      "target": 1.0,
+      "script": "run_evals.py::e_cap_06"
+    },
+    "E-REG-01": {
+      "kind": "regression",
+      "name": "Look-ahead leak audit on merged theses",
+      "grader": "deterministic",
+      "threshold": 1.0,
+      "script": "run_evals.py::e_reg_01"
+    },
+    "E-REG-02": {
+      "kind": "regression",
+      "name": "All falsifiers run per PR",
+      "grader": "deterministic",
+      "threshold": 1.0,
+      "script": "run_evals.py::e_reg_02"
+    },
+    "E-REG-03": {
+      "kind": "regression",
+      "name": "Pre-registered targets present per PR",
+      "grader": "deterministic",
+      "threshold": 1.0,
+      "script": "run_evals.py::e_reg_03"
+    },
+    "E-REG-04": {
+      "kind": "regression",
+      "name": "Every MERGE has ≥20d paper history",
+      "grader": "deterministic",
+      "threshold": 1.0,
+      "script": "run_evals.py::e_reg_04"
+    },
+    "E-REG-05": {
+      "kind": "regression",
+      "name": "Every KILLED has CORPSES.md entry",
+      "grader": "deterministic",
+      "threshold": 1.0,
+      "script": "run_evals.py::e_reg_05"
+    },
+    "E-REG-06": {
+      "kind": "regression",
+      "name": "agentskills validator passes",
+      "grader": "deterministic",
+      "threshold": 1.0,
+      "script": "run_evals.py::e_reg_06"
+    },
+    "E-JUDGE-01": {
+      "kind": "llm_judge",
+      "name": "Reviewer adversarial-ness",
+      "grader": "llm_judge",
+      "target": 7.0,
+      "rubric": "Did the reviewer steelman the counter-thesis with specific evidence? 0-10."
+    },
+    "E-JUDGE-02": {
+      "kind": "llm_judge",
+      "name": "Thesis novelty vs corpses",
+      "grader": "llm_judge",
+      "target": 6.0,
+      "rubric": "Is this thesis materially different from prior killed/merged theses? Penalize cosmetic re-wraps. 0-10."
+    },
+    "E-JUDGE-03": {
+      "kind": "llm_judge",
+      "name": "PR clarity",
+      "grader": "llm_judge",
+      "target": 7.0,
+      "rubric": "Could an external PM audit this PR in <10min? Specific entry rules, falsifiers run, verdict justified? 0-10."
+    }
+  }
+}
