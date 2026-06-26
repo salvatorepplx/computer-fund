@@ -38,7 +38,8 @@ rails and coordinates transparency with Teammate on the Slack bus — not with t
    ONLY long calls/puts (max loss = premium), covered calls, and cash-secured puts (max loss = collateral)
    are permitted — these are the only Level-2 structures, and the broker rejects anything requiring Level 3+/
    margin. There is NO unlimited-downside path reachable from this account. A long option can still lose
-   100% of premium, so option premium at risk is capped at ≤10% of book (rail §3). Settlement-aware (T+1).
+   100% of premium, so option premium at risk is capped by the current phase's option-premium cap in
+   the rail §3 ladder (Phase 0 = ≤15% of book). Settlement-aware (T+1).
    Execution must refuse any option order that is not one of the three permitted structures.
 6. **No look-ahead / no fabrication:** every signal timestamped; simulated sentiment labeled, never fact.
 7. **Post-trade transparency:** every fill logged to `state/order_log.jsonl` + `runs/EXECUTED/` and
