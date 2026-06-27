@@ -1,7 +1,16 @@
 {
   "_doc": "Durable work backlog for the Computer Fund continuous loop. Drain highest-value pending item every wake.",
-  "updated": "2026-06-26T23:49:11.303305+00:00",
+  "updated": "2026-06-27T00:17:45.050837+00:00",
   "items": [
+    {
+      "id": "STRAT-WIDE",
+      "kind": "build",
+      "priority": 1,
+      "owner": "computer",
+      "desc": "Go wide: build per-signal test runners for the strategy portfolio (runs/strategies/REGISTRY.json), a breadth-first explorer that tests proposed theses each idle tick using research subagents + RH scanners, and the cross-sectional generalization gate (thesis must hold on >=30% of its universe).",
+      "status": "pending",
+      "added": "2026-06-27T00:17:45.050837+00:00"
+    },
     {
       "id": "AUDIT-universe",
       "kind": "improve",

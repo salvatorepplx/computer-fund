@@ -221,3 +221,19 @@ Copy this block for each future distilled lesson.
   Verified: eval on a corrupted file returns a valid verdict + warning, no crash. Harness 10/10.
 - LESSON: every file READ on the critical path must tolerate a concurrent mid-write/checkout. Append
   is atomic per-line but a reader can still catch a torn tail; skip-and-warn, never crash-or-collapse.
+
+## 2026-06-26 — Go WIDE: strategy portfolio, not a single thesis (Sal: "not nearly broad enough")
+- HARD TRUTH: I went deep on ONE thesis (sentiment lead-lag, 4 hand-picked names) and hardened its
+  plumbing while it was failing its null test. That is one fragile guess, not a portfolio. The mandate
+  was a BROAD hypothesis space + "anything tradeable on Robinhood is in scope."
+- BUILT research/strategy_space.py: the autoresearch grammar THESIS=(SIGNAL,UNIVERSE,HORIZON,STRUCTURE,RISK).
+  Space = 4800 tuples (8 signals x 8 OPEN-universe selectors x 5 horizons x 5 structures x 3 risk).
+  Universe is OPEN: RH scanners + web research resolve live tickers (all liquid US equities/ETFs, sector/
+  index ETFs, crypto-beta names) — NOT a hardcoded basket.
+- CAPABILITY-AWARE: each thesis declares which of MY OWN capabilities test it — pplx_sdk web research,
+  research subagents (deep falsification), wide_browse (cross-sectional at scale), finance/RH scanners,
+  parallel subagents. The edge is orchestration, not hand-coded heuristics.
+- Registered a first 12-thesis portfolio (6 signal families) in runs/strategies/REGISTRY.json, all status
+  proposed. Sentiment lead-lag is now ONE arm among many, not the whole fund.
+- NEXT: build the per-signal test runners + a bandit/explorer that pulls arms each idle tick (breadth-first),
+  and the cross-sectional generalization gate (a thesis must hold on >=30% of its universe, not 1 name).

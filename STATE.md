@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-26T23:52:50.238068+00:00 · HEAD fa2a629_
+_Last updated: 2026-06-27T00:17:45.078945+00:00 · HEAD 20fb681_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated every capture tick by scripts/state_snapshot.py from ground truth — never stale.
@@ -44,9 +44,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
+20fb681 Fix transient INSUFFICIENT verdict bug: defensive series read (skip torn lines)
+4c70067 web series capture tick
 fa2a629 Never-idle tick: regression-test the signal scorer; fix audit meta detection; Slack dual-route
 8de11f7 Infra resilience: diagnose multi-credential 400, switch capture to single-credential path
 1ab0b8d Watch tick: nothing to act on -> resolve weakest axis (sim/graph formally PARKED)
-89abe2a web series capture tick
-9702edc Close the RSI loop: self-improving cron prompts + hourly self-audit cron
 ```
