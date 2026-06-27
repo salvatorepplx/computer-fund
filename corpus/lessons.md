@@ -237,3 +237,15 @@ Copy this block for each future distilled lesson.
   proposed. Sentiment lead-lag is now ONE arm among many, not the whole fund.
 - NEXT: build the per-signal test runners + a bandit/explorer that pulls arms each idle tick (breadth-first),
   and the cross-sectional generalization gate (a thesis must hold on >=30% of its universe, not 1 name).
+
+## 2026-06-26 — Generation != breadth (Sal: hesitant we'd rely on 12 fast-made theses)
+- CORRECTION: I sampled 12 random grammar tuples and registered them as "proposed" — implying they
+  were portfolio-worthy. They were NOT: zero evidence, no mechanism, no research. Fast generation of
+  combinations is curve-fit-by-volume dressed as breadth. Worse than the single thesis (which at least
+  has real data). Demoted all 12 to status=candidate_unvetted (zero weight).
+- FIX (structural): runs/strategies/LADDER.md status ladder — candidate_unvetted -> researched ->
+  testing -> edge -> killed. ONLY `edge` (survived all falsifiers incl cross-sectional >=30%) can
+  produce a PROPOSED trade. Real breadth = count of theses at `researched`+ with DISTINCT mechanisms,
+  NOT count of generated tuples. No silent promotions; each rung needs logged evidence.
+- The right SOURCE of breadth is real research (Computer web-research + Teammate's eng-org investigating
+  mechanisms), not a tuple sampler. Generation proposes coordinates; evidence earns theses.
