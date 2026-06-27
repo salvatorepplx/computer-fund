@@ -9,8 +9,9 @@ theses so the fund is a PORTFOLIO of bets, not a single fragile guess.
 THESIS := (SIGNAL, UNIVERSE, HORIZON, STRUCTURE, RISK)
 
 Each generated thesis gets a stable id and a registry entry in runs/strategies/REGISTRY.json
-with status=proposed. The falsification pipeline (lead-lag / null / circularity, and future
-backtest harnesses) advances each independently: proposed -> testing -> {edge | killed}.
+with status=candidate_unvetted. Generated coordinates carry zero weight until evidence
+advances them through the status ladder documented in runs/strategies/LADDER.md:
+candidate_unvetted -> researched -> testing -> {edge | killed}.
 
 This module is PURE generation + registry bookkeeping. It places NOTHING and fetches
 no live data. Signals that need a data source declare it so the runner knows what to wire.
@@ -90,7 +91,7 @@ def make_thesis(sig_row, uni_row, hor, struct, risk):
         "signal": sig, "data_source": datasrc, "signal_desc": sdesc,
         "universe": uni, "selector": selector, "universe_desc": udesc,
         "horizon": hor, "structure": struct, "risk": risk,
-        "status": "proposed",
+        "status": "candidate_unvetted",
         "falsifiers_required": ["min_n", "permutation_null", "circularity_guard",
                                  "cross_sectional_generalization"],
         "capabilities": _capabilities_for(sig_row),

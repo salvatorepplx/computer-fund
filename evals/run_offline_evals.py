@@ -33,6 +33,7 @@ from evals.web_sentiment_invariants import run_web_sentiment_invariants
 from evals.observed_sentiment_fixture import validate_observed_finance_fixture
 from evals.source_weight_learning import OBSERVED_EVENT_THRESHOLD, run_source_weight_learning_fixture
 from research.battle_discovery import discover_battles, score_battle
+from research import strategy_space
 from sim.sentiment_sim import predate_signal, simulate
 
 
@@ -328,6 +329,38 @@ def eval_web_sentiment_invariants() -> None:
     require(result["n"] >= 6, "web_sentiment must exercise at least 6 invariants")
 
 
+def eval_strategy_space_candidate_status() -> None:
+    thesis = strategy_space.make_thesis(
+        strategy_space.SIGNALS[0],
+        strategy_space.UNIVERSES[0],
+        strategy_space.HORIZONS[0],
+        strategy_space.STRUCTURES[0],
+        strategy_space.RISKS[0],
+    )
+    require(
+        thesis["status"] == "candidate_unvetted",
+        "generated strategy coordinates must start at the untrusted ladder rung",
+    )
+
+    original_reg = strategy_space.REG
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        strategy_space.REG = Path(tmp_dir) / "REGISTRY.json"
+        try:
+            before_exists = strategy_space.REG.exists()
+            sampled = strategy_space.sample(3, seed=123)
+            require(len(sampled) == 3, "deterministic strategy sample should produce requested theses")
+            require(
+                {row["status"] for row in sampled} == {"candidate_unvetted"},
+                "sampled strategy coordinates must start at candidate_unvetted",
+            )
+            require(
+                strategy_space.REG.exists() == before_exists,
+                "dry generation/sample must not create or mutate the strategy registry",
+            )
+        finally:
+            strategy_space.REG = original_reg
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -339,6 +372,7 @@ EVALS = [
     eval_observed_finance_sentiment_fixture,
     eval_corpses_lessons_discipline,
     eval_web_sentiment_invariants,
+    eval_strategy_space_candidate_status,
 ]
 
 
