@@ -8,7 +8,7 @@
 #   only pplx-sdk for capture (price comes from the web corpus; robinhood 401s anyway) and
 #   github for the commit. Invoke with api_credentials=["pplx-sdk","github"] (NOT external-tools).
 #   If even two creds flap, run capture (pplx-sdk) and commit (github) as two separate bash calls.
-# Requires api_credentials=["pplx-sdk","external-tools","github"].
+# Requires api_credentials=["pplx-sdk","github"], or split capture/commit credentials as above.
 set -uo pipefail   # NOT -e: we never want one failing step to strand a commit
 
 ROOT="/home/user/workspace/computer_fund"
