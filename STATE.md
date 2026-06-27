@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-27T00:17:45.078945+00:00 · HEAD 20fb681_
+_Last updated: 2026-06-27T00:20:03.567238+00:00 · HEAD 2af7050_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated every capture tick by scripts/state_snapshot.py from ground truth — never stale.
@@ -18,17 +18,17 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 18 (raw 28) | PRELIMINARY_EDGE | 2/0.5635 | circ=False |
-| TICKER:RDDT | 12 (raw 22) | PRELIMINARY_EDGE | 2/0.8192 | circ=False |
-| TICKER:TSLA | 12 (raw 22) | PRELIMINARY_NO_EDGE | 4/0.854 | circ=True |
-| TICKER:SNDK | 9 (raw 10) | PRELIMINARY_NO_EDGE | -5/0.873 | circ=False |
+| TICKER:NVDA | 19 (raw 29) | PRELIMINARY_EDGE | 2/0.5588 | circ=False |
+| TICKER:RDDT | 13 (raw 23) | PRELIMINARY_EDGE | 2/0.7677 | circ=False |
+| TICKER:TSLA | 13 (raw 23) | PRELIMINARY_EDGE | 4/0.7717 | circ=False |
+| TICKER:SNDK | 10 (raw 11) | PRELIMINARY_NO_EDGE | -5/0.4982 | circ=False |
 
 ## The one honest finding
 Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent edges ~ chance).
 Pipeline correctly proposes ZERO trades. An honest KILL is a win, not a failure.
 
 ## What's blocking the next outcome
-No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=18 (~6 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
+No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=19 (~5 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
 
 ## Single next action
 Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is authoritative: if it survives permutation (p<=0.10) -> trade; else KILL seed thesis, evolve.
@@ -44,9 +44,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
+2af7050 Correct the breadth mistake: generation != theses. Demote 12 auto-tuples; add evidence ladder
+1b37208 Go WIDE: strategy portfolio over a 4800-tuple OPEN hypothesis space (was 1 thesis)
 20fb681 Fix transient INSUFFICIENT verdict bug: defensive series read (skip torn lines)
 4c70067 web series capture tick
 fa2a629 Never-idle tick: regression-test the signal scorer; fix audit meta detection; Slack dual-route
-8de11f7 Infra resilience: diagnose multi-credential 400, switch capture to single-credential path
-1ab0b8d Watch tick: nothing to act on -> resolve weakest axis (sim/graph formally PARKED)
 ```
