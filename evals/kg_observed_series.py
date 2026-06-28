@@ -1,7 +1,7 @@
-"""Offline KG replay diagnostic for committed observed sentiment series.
+"""Offline KG replay diagnostic for a frozen observed sentiment fixture.
 
 This diagnostic is connector-free and propose-only. It reads the sanitized
-Computer-committed observed series JSONL, replays it into a temporary
+static observed series JSONL fixture, replays it into a temporary
 KnowledgeGraph, and verifies observed rows remain non-simulated while preserving
 available timestamp/provenance fields. It does not call live adapters, broker
 APIs, market data, account state, orders, sizing, or ARMED/EXECUTED handoffs.
@@ -10,17 +10,25 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 from graph.kg import KnowledgeGraph
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
 STATE_GRAPH_PATH = REPO_ROOT / "state" / "knowledge_graph.json"
-DEFAULT_SERIES_PATH = REPO_ROOT / "runs" / "sentiment" / "series" / "TICKER_NVDA.jsonl"
+DEFAULT_SERIES_PATH = REPO_ROOT / "evals" / "fixtures" / "kg_observed_series_nvda.jsonl"
 EXPECTED_ENTITY = "TICKER:NVDA"
 EXPECTED_SOURCE = "finance_ticker_sentiment"
+EXPECTED_ROW_COUNT = 3
+EXPECTED_LATEST_EVENT_ID = "sha256:88c1a4c35775620d"
+EXPECTED_LATEST_SCORE = 0.5
+EXPECTED_MOMENTUM = 0.8333
 REQUIRED_FIELDS = ("captured_at", "entity", "score", "confidence", "source", "ts", "event_id")
 MIN_SERIES_ROWS_FOR_READINESS = 20
 
@@ -81,6 +89,7 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
     """Replay committed observed sentiment rows into a temp KG and summarize checks."""
     resolved_series_path = series_path.resolve()
     rows = _load_series(resolved_series_path)
+    _require(len(rows) == EXPECTED_ROW_COUNT, f"fixture row count must stay frozen at {EXPECTED_ROW_COUNT}")
 
     prior_ts: str | None = None
     event_ids: set[str] = set()
@@ -126,6 +135,9 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
     if len(rows) >= 2:
         expected_momentum = round(float(rows[-1]["score"]) - float(rows[-2]["score"]), 4)
     _require(momentum == expected_momentum, "KG momentum must use observed-only replayed history")
+    _require(latest["event_id"] == EXPECTED_LATEST_EVENT_ID, "fixture latest event_id must stay frozen")
+    _require(latest["score"] == EXPECTED_LATEST_SCORE, "fixture latest score must stay frozen")
+    _require(momentum == EXPECTED_MOMENTUM, "fixture observed-only momentum must stay frozen")
     _require(reloaded_history == history, "temp KG save/reload must preserve observed metadata")
     _require(state_graph_after == state_graph_before, "diagnostic must not mutate state/knowledge_graph.json")
     _require(temp_graph_path != STATE_GRAPH_PATH.resolve(), "diagnostic must write only to temp graph state")
@@ -164,7 +176,7 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
         "expected_momentum": expected_momentum,
         "readiness": readiness,
         "limitations": [
-            "Uses only committed sanitized JSONL series rows; no live connector fetches are performed.",
+            "Uses only a committed static JSONL fixture; no live connector fetches are performed.",
             "Writes only to a TemporaryDirectory KnowledgeGraph and does not mutate state/knowledge_graph.json.",
             "The sample is NVDA-only, source-limited, and below the pre-registered readiness threshold.",
         ],
@@ -172,7 +184,7 @@ def run_kg_observed_series_diagnostic(series_path: Path = DEFAULT_SERIES_PATH) -
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Replay a committed observed sentiment series into a temp KG offline.")
+    parser = argparse.ArgumentParser(description="Replay a frozen observed sentiment fixture into a temp KG offline.")
     parser.add_argument("series", nargs="?", type=Path, default=DEFAULT_SERIES_PATH)
     args = parser.parse_args()
     result = run_kg_observed_series_diagnostic(args.series)

@@ -17,6 +17,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from evals.cap_calibration import MIN_CALIBRATION_SAMPLE_SIZE, run_metrics as run_cap_metrics
+from evals.corpses_lessons import validate_corpses_lessons
 from execution.safety import (
     MAX_OPTION_PREMIUM_FRAC,
     MAX_SINGLE_POS_FRAC,
@@ -29,9 +30,13 @@ from execution.safety import (
 from graph.kg import KnowledgeGraph
 from evals.kg_observed_series import MIN_SERIES_ROWS_FOR_READINESS, run_kg_observed_series_diagnostic
 from evals.leadlag_placebo import run_leadlag_placebo_checks
+from evals.web_sentiment_invariants import run_web_sentiment_invariants
 from evals.observed_sentiment_fixture import validate_observed_finance_fixture
+import evals.proposed_validator as proposed_validator
+from evals.proposed_validator import validate_proposed_file, validate_proposed_paths
 from evals.source_weight_learning import OBSERVED_EVENT_THRESHOLD, run_source_weight_learning_fixture
 from research.battle_discovery import discover_battles, score_battle
+from research import strategy_space
 from sim.sentiment_sim import predate_signal, simulate
 
 
@@ -307,32 +312,147 @@ def eval_observed_finance_sentiment_fixture() -> None:
 
 def eval_kg_observed_series_diagnostic() -> None:
     result = run_kg_observed_series_diagnostic()
-    latest = result["latest_observed"]
-    readiness = result["readiness"]
 
-    require(result["state_graph_mutated"] is False,
-            "KG series diagnostic must not mutate committed graph state")
-    require(result["temp_graph_used"] is True,
-            "KG series diagnostic must write replayed rows only to temp graph state")
-    require(result["series_path"] == "runs/sentiment/series/TICKER_NVDA.jsonl",
-            "KG series diagnostic should read the committed NVDA observed series")
-    require(result["entity"] == "TICKER:NVDA", "KG series diagnostic should replay NVDA ticker sentiment")
-    require(result["source"] == "finance_ticker_sentiment", "KG series diagnostic should preserve source")
-    require(result["row_count"] == 3, "committed NVDA observed series row count should stay deterministic")
-    require(set(result["required_fields"]) == {"captured_at", "entity", "score", "confidence", "source", "ts", "event_id"},
-            "KG series diagnostic should validate timestamp/provenance fields available in the series")
+    require(result["label"] == "kg_observed_series_offline_diagnostic",
+            "KG observed-series diagnostic should report the stable label")
+    require(result["mode"] == "offline_propose_only_no_fetch_no_trading",
+            "KG observed-series diagnostic should remain offline/propose-only")
+    require(result["series_path"] == "evals/fixtures/kg_observed_series_nvda.jsonl",
+            "KG observed-series diagnostic should use the frozen fixture")
+    require(result["state_graph_mutated"] is False, "diagnostic must not mutate state/knowledge_graph.json")
+    require(result["temp_graph_used"] is True, "diagnostic must use a temporary KG state file")
+    require(result["entity"] == "TICKER:NVDA", "diagnostic should replay the frozen NVDA entity")
+    require(result["source"] == "finance_ticker_sentiment", "diagnostic fixture source should remain frozen")
+    require(result["row_count"] == 3, "diagnostic fixture row count should remain frozen")
     require(result["observed_rows_simulated_flags"] == [False, False, False],
-            "KG replayed observed rows must remain simulated:false")
-    require(latest["score"] == 0.5 and latest["simulated"] is False,
-            "KG latest observed should return the final non-simulated row")
-    require(latest["event_id"] == "sha256:88c1a4c35775620d",
-            "KG latest observed should preserve event_id provenance")
-    require(result["momentum"] == result["expected_momentum"] == 0.8333,
-            "KG momentum should use observed-only history from the committed series")
-    require(readiness["minimum_observed_rows"] == MIN_SERIES_ROWS_FOR_READINESS,
-            "KG series diagnostic should report the readiness threshold")
-    require(readiness["ready_for_leadlag_or_current_step_credit"] is False,
-            "short observed series must not claim lead-lag/current-step readiness")
+            "replayed observed rows must remain simulated:false")
+    require(result["latest_observed"]["score"] == 0.5, "latest observed fixture score should remain frozen")
+    require(result["latest_observed"]["event_id"] == "sha256:88c1a4c35775620d",
+            "latest observed fixture event_id should remain frozen")
+    require(result["momentum"] == 0.8333, "observed-only KG momentum should remain frozen")
+    require(result["expected_momentum"] == result["momentum"], "momentum summary should match recomputed value")
+    require(result["readiness"]["ready_for_leadlag_or_current_step_credit"] is False,
+            "fixture plumbing must not grant lead-lag/current-step readiness")
+    require(result["readiness"]["minimum_observed_rows"] == MIN_SERIES_ROWS_FOR_READINESS,
+            "diagnostic should report the pre-registered readiness floor")
+
+
+def eval_corpses_lessons_discipline() -> None:
+    result = validate_corpses_lessons()
+    corpses = result["corpses"]
+    lessons = result["lessons"]
+
+    require(corpses["entry_count"] >= 1, "CORPSES should include at least one safe example entry")
+    require(lessons["entry_count"] >= 1, "lessons should include at least one distilled safe example")
+    require(corpses["missing_required_fields"] == [], "CORPSES should document all required fields")
+    require(lessons["missing_required_fields"] == [], "lessons should document all required fields")
+    require(corpses["has_seeder_feedback_rules"], "CORPSES should define seeder feedback rules")
+    require(lessons["links_corpses"], "lessons should link back to runs/CORPSES.md")
+    require(lessons["links_meta_orchestrator"], "lessons should link to the memory_lessons meta axis")
+    require(corpses["forbids_live_execution_touchpoints"], "CORPSES should forbid live execution touchpoints")
+    require(lessons["forbids_live_execution_touchpoints"], "lessons should forbid live execution touchpoints")
+
+
+def eval_web_sentiment_invariants() -> None:
+    result = run_web_sentiment_invariants()
+    require(result["all_passed"], "web_sentiment scorer invariants must all pass")
+    require(result["n"] >= 6, "web_sentiment must exercise at least 6 invariants")
+
+
+def eval_proposed_artifact_validator() -> None:
+    valid_paths = [
+        REPO_ROOT / "runs" / "PROPOSED",
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "example-proposed-offline.json",
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "example-computer-alpha-pipeline.json",
+    ]
+    require(
+        validate_proposed_paths(valid_paths) == [],
+        "valid Teammate and Computer PROPOSED fixtures should pass offline validation",
+    )
+
+    execution_issues = validate_proposed_file(
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "invalid-execution-authorizing.json"
+    )
+    require(
+        any("execution-authorizing" in issue.message for issue in execution_issues),
+        "Teammate-authored proposal fixtures with order/sizing fields should fail validation",
+    )
+
+    transition_issues = validate_proposed_file(
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "invalid-state-transition.json"
+    )
+    require(
+        any("state" in issue.path and "Computer-owned" in issue.message for issue in transition_issues),
+        "Teammate-authored artifacts must not skip into Computer-owned states",
+    )
+
+    missing_path_issues = validate_proposed_paths([REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "missing.json"])
+    require(
+        any("does not exist" in issue.message for issue in missing_path_issues),
+        "validator CLI inputs should fail closed on missing files or directories",
+    )
+
+
+def eval_proposed_schema_validator_alignment() -> None:
+    schema = json.loads((REPO_ROOT / "schemas" / "proposed.schema.json").read_text())
+    base_schema = schema["$defs"]["base_envelope"]
+    teammate_payload = schema["$defs"]["teammate_payload"]
+    computer_payload = schema["$defs"]["computer_payload"]
+    live_checks = schema["$defs"]["common_payload_properties"]["requested_live_checks"]["items"]["enum"]
+    non_authorizations = schema["$defs"]["common_payload_properties"]["non_authorizations"]["items"]["enum"]
+
+    require(base_schema["properties"]["schema_version"]["const"] == proposed_validator.PROPOSED_SCHEMA_VERSION,
+            "PROPOSED schema_version const should match validator")
+    require(base_schema["properties"]["artifact_type"]["const"] == proposed_validator.PROPOSED_ARTIFACT_TYPE,
+            "PROPOSED artifact_type const should match validator")
+    require(base_schema["properties"]["state"]["const"] == proposed_validator.PROPOSED_STATE,
+            "PROPOSED state const should match validator")
+    require(set(base_schema["properties"]["writer"]["enum"]) == proposed_validator.PROPOSED_WRITERS,
+            "PROPOSED writer enum should match validator")
+    require(base_schema["properties"]["owner"]["const"] == proposed_validator.PROPOSED_OWNER,
+            "PROPOSED owner const should match validator")
+    require(set(base_schema["required"]) == proposed_validator.REQUIRED_TOP_LEVEL_FIELDS,
+            "base top-level required fields should match validator")
+    require(set(teammate_payload["required"]) == proposed_validator.TEAMMATE_REQUIRED_PAYLOAD_FIELDS,
+            "Teammate payload required fields should match validator")
+    require(set(computer_payload["required"]) == proposed_validator.COMPUTER_REQUIRED_PAYLOAD_FIELDS,
+            "Computer payload required fields should match validator")
+    require(set(live_checks) == proposed_validator.ALLOWED_LIVE_CHECKS,
+            "requested live check enum should match validator")
+    require(set(non_authorizations) == proposed_validator.REQUIRED_NON_AUTHORIZATIONS,
+            "non-authorization enum should match validator")
+
+
+def eval_strategy_space_candidate_status() -> None:
+    thesis = strategy_space.make_thesis(
+        strategy_space.SIGNALS[0],
+        strategy_space.UNIVERSES[0],
+        strategy_space.HORIZONS[0],
+        strategy_space.STRUCTURES[0],
+        strategy_space.RISKS[0],
+    )
+    require(
+        thesis["status"] == "candidate_unvetted",
+        "generated strategy coordinates must start at the untrusted ladder rung",
+    )
+
+    original_reg = strategy_space.REG
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        strategy_space.REG = Path(tmp_dir) / "REGISTRY.json"
+        try:
+            before_exists = strategy_space.REG.exists()
+            sampled = strategy_space.sample(3, seed=123)
+            require(len(sampled) == 3, "deterministic strategy sample should produce requested theses")
+            require(
+                {row["status"] for row in sampled} == {"candidate_unvetted"},
+                "sampled strategy coordinates must start at candidate_unvetted",
+            )
+            require(
+                strategy_space.REG.exists() == before_exists,
+                "dry generation/sample must not create or mutate the strategy registry",
+            )
+        finally:
+            strategy_space.REG = original_reg
 
 
 EVALS = [
@@ -345,6 +465,11 @@ EVALS = [
     eval_sentiment_source_weight_learning,
     eval_observed_finance_sentiment_fixture,
     eval_kg_observed_series_diagnostic,
+    eval_corpses_lessons_discipline,
+    eval_web_sentiment_invariants,
+    eval_proposed_artifact_validator,
+    eval_proposed_schema_validator_alignment,
+    eval_strategy_space_candidate_status,
 ]
 
 

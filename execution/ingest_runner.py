@@ -9,9 +9,14 @@ This is the thing that converts "one observation" into "a series we can falsify.
 Computer-side only (calls live connectors via injected call_tool). Writes observed
 events to runs/sentiment/series/<ENTITY>.jsonl and mirrors a price proxy when given.
 
-Usage (Computer-side, with a call_tool that hits the finance connector):
-    from execution.ingest_runner import capture
-    capture("TICKER:NVDA", call_sentiment=..., call_price=...)
+Usage:
+    from execution.ingest_runner import append_observation
+
+    append_observation("TICKER:NVDA", normalized_event, price_proxy=...)
+
+Computer-side capture orchestration lives in `scripts/capture_sentiment_tick.py`,
+which owns live connector calls, bounded retry/backoff, normalization, and the
+single append once a valid event is available.
 """
 from __future__ import annotations
 import json, datetime as dt
@@ -33,6 +38,7 @@ def append_observation(entity: str, event: dict, price_proxy: float | None = Non
         "captured_at": _now(),
         "entity": entity,
         "score": event.get("score"),
+        "score_raw": event.get("score_raw"),
         "confidence": event.get("confidence"),
         "source": event.get("source"),
         "ts": event.get("ts"),
@@ -52,10 +58,30 @@ def series_length(entity: str) -> int:
 
 
 def load_series(entity: str) -> list[dict]:
+    """Load a series, skipping any unparseable line defensively.
+
+    A single half-written line (capture append mid-flight, or a concurrent git
+    checkout swapping the file) must NOT crash the read or collapse the verdict to
+    INSUFFICIENT. We skip bad lines rather than fail the whole load. If a large
+    fraction is unparseable, that's a real signal (logged to stderr), not a race.
+    """
     path = SERIES_DIR / f"{entity.replace(':', '_')}.jsonl"
     if not path.exists():
         return []
-    return [json.loads(l) for l in path.open() if l.strip()]
+    rows, bad = [], 0
+    for l in path.open():
+        l = l.strip()
+        if not l:
+            continue
+        try:
+            rows.append(json.loads(l))
+        except json.JSONDecodeError:
+            bad += 1
+    if bad:
+        import sys as _sys
+        print(f"[load_series] skipped {bad} unparseable line(s) in {path.name} "
+              f"(likely a mid-write read race; {len(rows)} good rows kept)", file=_sys.stderr)
+    return rows
 
 
 if __name__ == "__main__":

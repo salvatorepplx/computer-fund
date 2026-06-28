@@ -5,15 +5,15 @@ A "battle location" is a contested arena where bull/bear views collide and senti
 repriced — the only places alpha-from-sentiment lives. This module turns raw market state into
 candidate battles and writes them into the knowledge graph.
 
-This file is the PURE logic (ranking, candidate construction). The live data (scanner results,
-quotes, earnings, ticker sentiment) is fetched by the agent via the Robinhood + finance connectors
-and passed in as plain dicts — keeping this testable offline and honest about provenance.
+This file is the PURE/offline logic (ranking, candidate construction). It never fetches live
+market data, account data, or connector-backed inputs itself; callers pass in timestamped plain
+dicts captured by Computer-owned live pipelines or loaded from offline fixtures.
 
-Inputs the agent should gather each discovery tick (all timestamped):
-  movers      — [{symbol, pct_change, volume}]  from RH scanners (DAILY_GAINERS/LOSERS, RSI, vol)
-  earnings    — [{symbol, report_date, when}]   from RH get_earnings_calendar (next ~7d)
-  sentiment   — {symbol: {score, confidence}}   from finance_ticker_sentiment (observed)
-  fundamentals- {symbol: {pe, short_interest?}} optional context
+Expected inputs for each discovery tick (all timestamped by the upstream source):
+  movers      — [{symbol, pct_change, volume}]  price-dislocation observations
+  earnings    — [{symbol, report_date, when}]   dated catalyst observations
+  sentiment   — {symbol: {score, confidence}}   observed sentiment, preferably web_search_sentiment
+  fundamentals- {symbol: {pe, short_interest?}} optional offline context
 
 A battle is "hot" when there's: a move (price dislocation) + a catalyst (dated event) +
 sentiment that is either extreme or rapidly changing (the crowd is mid-reprice).

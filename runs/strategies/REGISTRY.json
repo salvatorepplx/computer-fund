@@ -1,0 +1,357 @@
+{
+  "_doc": "Computer Fund strategy SEARCH SPACE. Entries are coordinates to investigate, not theses we rely on. A coordinate only becomes a real thesis (status=testing->edge) AFTER it survives research + the full falsification pipeline. Auto-sampled tuples are status=candidate_unvetted and carry NO weight until earned.",
+  "updated": "2026-06-27T00:18:23.438197+00:00",
+  "theses": {
+    "TH-b4dcf23284": {
+      "id": "TH-b4dcf23284",
+      "signal": "analyst_revision_breadth",
+      "data_source": "web_search",
+      "signal_desc": "breadth of target/rating changes predicts drift (PEAD-like)",
+      "universe": "rh_thematic",
+      "selector": "selector:research(thematic_basket:<theme>)",
+      "universe_desc": "research-resolved theme basket (AI/memory/power/GLP-1/...)",
+      "horizon": "5d",
+      "structure": "regime_overlay",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "research subagent (structured data extraction)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652024+00:00",
+      "notes": "analyst_revision_breadth on rh_thematic @ 5d, regime_overlay/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-8008e62803": {
+      "id": "TH-8008e62803",
+      "signal": "sentiment_leadlag",
+      "data_source": "web_search",
+      "signal_desc": "projected sentiment leads price (the seed thesis)",
+      "universe": "rh_high_short",
+      "selector": "selector:research(highest_short_interest)",
+      "universe_desc": "research-resolved high-short cohort",
+      "horizon": "5d",
+      "structure": "long_flat",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652037+00:00",
+      "notes": "sentiment_leadlag on rh_high_short @ 5d, long_flat/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-703f03ad99": {
+      "id": "TH-703f03ad99",
+      "signal": "mention_velocity",
+      "data_source": "web_search",
+      "signal_desc": "acceleration of mention/coverage volume predicts move",
+      "universe": "rh_crypto_proxies",
+      "selector": "selector:fixed(COIN,MSTR,MARA,RIOT)",
+      "universe_desc": "crypto-beta equities (crypto itself watch-only)",
+      "horizon": "1d",
+      "structure": "pair_neutral",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652046+00:00",
+      "notes": "mention_velocity on rh_crypto_proxies @ 1d, pair_neutral/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-75144af2b1": {
+      "id": "TH-75144af2b1",
+      "signal": "analyst_revision_breadth",
+      "data_source": "web_search",
+      "signal_desc": "breadth of target/rating changes predicts drift (PEAD-like)",
+      "universe": "rh_all_liquid",
+      "selector": "selector:liquid_us_equities_etfs",
+      "universe_desc": "any liquid RH equity/ETF (scanner-resolved)",
+      "horizon": "1d",
+      "structure": "long_short_single",
+      "risk": "equal_weight",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "research subagent (structured data extraction)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652053+00:00",
+      "notes": "analyst_revision_breadth on rh_all_liquid @ 1d, long_short_single/equal_weight",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-61d65c31c9": {
+      "id": "TH-61d65c31c9",
+      "signal": "analyst_revision_breadth",
+      "data_source": "web_search",
+      "signal_desc": "breadth of target/rating changes predicts drift (PEAD-like)",
+      "universe": "battle_singles_seed",
+      "selector": "selector:fixed(NVDA,RDDT,TSLA,SNDK)",
+      "universe_desc": "current contested singles (seed, not a cage)",
+      "horizon": "5d",
+      "structure": "ranked_decile",
+      "risk": "equal_weight",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "research subagent (structured data extraction)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652060+00:00",
+      "notes": "analyst_revision_breadth on battle_singles_seed @ 5d, ranked_decile/equal_weight",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-c4db55cb15": {
+      "id": "TH-c4db55cb15",
+      "signal": "sentiment_leadlag",
+      "data_source": "web_search",
+      "signal_desc": "projected sentiment leads price (the seed thesis)",
+      "universe": "rh_all_liquid",
+      "selector": "selector:liquid_us_equities_etfs",
+      "universe_desc": "any liquid RH equity/ETF (scanner-resolved)",
+      "horizon": "3d",
+      "structure": "regime_overlay",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652069+00:00",
+      "notes": "sentiment_leadlag on rh_all_liquid @ 3d, regime_overlay/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-316df405c0": {
+      "id": "TH-316df405c0",
+      "signal": "sentiment_reversal",
+      "data_source": "web_search",
+      "signal_desc": "sentiment extreme -> mean-reversion fade",
+      "universe": "rh_all_liquid",
+      "selector": "selector:liquid_us_equities_etfs",
+      "universe_desc": "any liquid RH equity/ETF (scanner-resolved)",
+      "horizon": "intraday",
+      "structure": "pair_neutral",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652075+00:00",
+      "notes": "sentiment_reversal on rh_all_liquid @ intraday, pair_neutral/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-db74dc5860": {
+      "id": "TH-db74dc5860",
+      "signal": "short_interest_squeeze",
+      "data_source": "web_search",
+      "signal_desc": "high+rising short interest -> squeeze asymmetry",
+      "universe": "rh_index_etfs",
+      "selector": "selector:fixed(SPY,QQQ,IWM,MDY)",
+      "universe_desc": "broad index ETFs",
+      "horizon": "5d",
+      "structure": "pair_neutral",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "research subagent (structured data extraction)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652080+00:00",
+      "notes": "short_interest_squeeze on rh_index_etfs @ 5d, pair_neutral/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-c3f14dbaa5": {
+      "id": "TH-c3f14dbaa5",
+      "signal": "analyst_revision_breadth",
+      "data_source": "web_search",
+      "signal_desc": "breadth of target/rating changes predicts drift (PEAD-like)",
+      "universe": "rh_all_liquid",
+      "selector": "selector:liquid_us_equities_etfs",
+      "universe_desc": "any liquid RH equity/ETF (scanner-resolved)",
+      "horizon": "3d",
+      "structure": "long_short_single",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "research subagent (structured data extraction)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652086+00:00",
+      "notes": "analyst_revision_breadth on rh_all_liquid @ 3d, long_short_single/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-eca9936909": {
+      "id": "TH-eca9936909",
+      "signal": "vol_regime_gate",
+      "data_source": "price_only",
+      "signal_desc": "realized-vol regime gates a momentum/reversion overlay",
+      "universe": "rh_crypto_proxies",
+      "selector": "selector:fixed(COIN,MSTR,MARA,RIOT)",
+      "universe_desc": "crypto-beta equities (crypto itself watch-only)",
+      "horizon": "1w",
+      "structure": "regime_overlay",
+      "risk": "equal_weight",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "finance connector / RH scanners (price/vol/technicals)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652092+00:00",
+      "notes": "vol_regime_gate on rh_crypto_proxies @ 1w, regime_overlay/equal_weight",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-29fe22acc2": {
+      "id": "TH-29fe22acc2",
+      "signal": "sentiment_leadlag",
+      "data_source": "web_search",
+      "signal_desc": "projected sentiment leads price (the seed thesis)",
+      "universe": "rh_scanner_movers",
+      "selector": "selector:rh_scanner(DAILY_GAINERS,DAILY_LOSERS,top_volume)",
+      "universe_desc": "today's movers from RH scanners",
+      "horizon": "intraday",
+      "structure": "long_short_single",
+      "risk": "kelly_capped",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652098+00:00",
+      "notes": "sentiment_leadlag on rh_scanner_movers @ intraday, long_short_single/kelly_capped",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    },
+    "TH-0e9cd92f46": {
+      "id": "TH-0e9cd92f46",
+      "signal": "sentiment_leadlag",
+      "data_source": "web_search",
+      "signal_desc": "projected sentiment leads price (the seed thesis)",
+      "universe": "rh_all_liquid",
+      "selector": "selector:liquid_us_equities_etfs",
+      "universe_desc": "any liquid RH equity/ETF (scanner-resolved)",
+      "horizon": "5d",
+      "structure": "long_short_single",
+      "risk": "vol_target",
+      "status": "candidate_unvetted",
+      "falsifiers_required": [
+        "min_n",
+        "permutation_null",
+        "circularity_guard",
+        "cross_sectional_generalization"
+      ],
+      "capabilities": [
+        "leadlag_real+permutation (verdict harness)",
+        "pplx_sdk.search.web (qualitative signal)",
+        "research subagent (deep multi-source falsification)",
+        "wide_browse (cross-sectional coverage at scale)",
+        "parallel subagents (test many universe members at once)"
+      ],
+      "created_at": "2026-06-27T00:17:22.652106+00:00",
+      "notes": "sentiment_leadlag on rh_all_liquid @ 5d, long_short_single/vol_target",
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+    }
+  }
+}

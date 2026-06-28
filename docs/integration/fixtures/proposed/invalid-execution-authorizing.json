@@ -1,0 +1,28 @@
+{
+  "schema_version": "cf.integration.v1",
+  "artifact_id": "invalid-execution-authorizing",
+  "artifact_type": "proposal",
+  "state": "PROPOSED",
+  "created_at": "2026-06-26T19:31:00Z",
+  "writer": "teammate",
+  "owner": "computer",
+  "simulated": true,
+  "provenance": {
+    "inputs": ["runs/rfcs/RFC-002-integration-substrate.md", "evals/README.md"],
+    "raw_ref_explanation": "Offline invalid fixture has no connector raw backing."
+  },
+  "validation": {
+    "required_checks": ["schema", "charter", "ownership", "transition"],
+    "passed_checks": []
+  },
+  "payload": {
+    "thesis": "Invalid fixture that tries to include order instructions.",
+    "entities": ["TICKER:NVDA"],
+    "dossier_refs": ["runs/rfcs/RFC-002-integration-substrate.md"],
+    "offline_eval_refs": ["evals/README.md"],
+    "requested_live_checks": ["quote_snapshot"],
+    "non_authorizations": ["no_order", "no_sizing", "no_execution_instruction"],
+    "open_risks": ["This fixture must fail validation."],
+    "order": {"side": "buy", "quantity": "1"}
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cf.integration.proposed.v1",
+  "title": "Computer Fund PROPOSED artifact",
+  "oneOf": [
+    {"$ref": "#/$defs/teammate_proposal"},
+    {"$ref": "#/$defs/computer_proposal"}
+  ],
+  "$defs": {
+    "repo_path": {
+      "type": "string",
+      "minLength": 1,
+      "not": {"anyOf": [{"pattern": "^/"}, {"pattern": "(^|/)\\.\\.(/|$)"}]}
+    },
+    "string_list": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "base_envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "artifact_id",
+        "artifact_type",
+        "state",
+        "created_at",
+        "writer",
+        "owner",
+        "simulated",
+        "payload"
+      ],
+      "properties": {
+        "schema_version": {"const": "cf.integration.v1"},
+        "artifact_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+        "artifact_type": {"const": "proposal"},
+        "state": {"const": "PROPOSED"},
+        "created_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(Z|\\+00:00)$"},
+        "writer": {"enum": ["teammate", "computer"]},
+        "owner": {"const": "computer"},
+        "simulated": {"type": "boolean"},
+        "payload": {"type": "object"},
+        "provenance": {"$ref": "#/$defs/provenance"},
+        "validation": {"$ref": "#/$defs/validation"}
+      }
+    },
+    "teammate_proposal": {
+      "allOf": [
+        {"$ref": "#/$defs/base_envelope"},
+        {
+          "required": ["provenance", "validation"],
+          "properties": {
+            "writer": {"const": "teammate"},
+            "simulated": {"const": true},
+            "payload": {"$ref": "#/$defs/teammate_payload"}
+          }
+        }
+      ]
+    },
+    "computer_proposal": {
+      "allOf": [
+        {"$ref": "#/$defs/base_envelope"},
+        {
+          "properties": {
+            "writer": {"const": "computer"},
+            "simulated": {"const": false},
+            "payload": {"$ref": "#/$defs/computer_payload"}
+          }
+        }
+      ]
+    },
+    "common_payload_properties": {
+      "thesis": {"type": "string", "minLength": 1},
+      "entities": {
+        "type": "array",
+        "minItems": 1,
+        "items": {"type": "string", "pattern": "^[A-Z_]+:[A-Za-z0-9._-]+$"}
+      },
+      "dossier_refs": {
+        "type": "array",
+        "minItems": 1,
+        "items": {"$ref": "#/$defs/repo_path"}
+      },
+      "requested_live_checks": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "enum": [
+            "quote_snapshot",
+            "account_safety_review",
+            "sentiment_capture_refresh",
+            "kill_switch_review",
+            "kill_switch_status",
+            "charter_review"
+          ]
+        }
+      },
+      "non_authorizations": {
+        "type": "array",
+        "contains": {"const": "no_order"},
+        "allOf": [
+          {"contains": {"const": "no_sizing"}},
+          {"contains": {"const": "no_execution_instruction"}}
+        ],
+        "items": {"enum": ["no_order", "no_sizing", "no_execution_instruction"]}
+      },
+      "open_risks": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+      "tags": {"$ref": "#/$defs/string_list"},
+      "time_horizon": {"type": "string", "minLength": 1},
+      "expected_falsifiers": {"$ref": "#/$defs/string_list"}
+    },
+    "teammate_payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "thesis",
+        "entities",
+        "dossier_refs",
+        "offline_eval_refs",
+        "requested_live_checks",
+        "non_authorizations",
+        "open_risks"
+      ],
+      "properties": {
+        "thesis": {"$ref": "#/$defs/common_payload_properties/thesis"},
+        "entities": {"$ref": "#/$defs/common_payload_properties/entities"},
+        "dossier_refs": {"$ref": "#/$defs/common_payload_properties/dossier_refs"},
+        "offline_eval_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/repo_path"}
+        },
+        "requested_live_checks": {"$ref": "#/$defs/common_payload_properties/requested_live_checks"},
+        "non_authorizations": {"$ref": "#/$defs/common_payload_properties/non_authorizations"},
+        "open_risks": {"$ref": "#/$defs/common_payload_properties/open_risks"},
+        "tags": {"$ref": "#/$defs/common_payload_properties/tags"},
+        "time_horizon": {"$ref": "#/$defs/common_payload_properties/time_horizon"},
+        "expected_falsifiers": {"$ref": "#/$defs/common_payload_properties/expected_falsifiers"}
+      }
+    },
+    "computer_payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "thesis",
+        "entities",
+        "dossier_refs",
+        "conviction",
+        "conviction_components",
+        "signal_provenance",
+        "requested_live_checks",
+        "non_authorizations",
+        "open_risks"
+      ],
+      "properties": {
+        "thesis": {"$ref": "#/$defs/common_payload_properties/thesis"},
+        "entities": {"$ref": "#/$defs/common_payload_properties/entities"},
+        "dossier_refs": {"$ref": "#/$defs/common_payload_properties/dossier_refs"},
+        "conviction": {"type": "number", "minimum": 0, "maximum": 1},
+        "conviction_components": {"type": "object", "minProperties": 1},
+        "signal_provenance": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["verdict", "best_lag", "best_corr", "circular", "source"],
+          "properties": {
+            "verdict": {"type": "string"},
+            "best_lag": {"type": "number"},
+            "best_corr": {"type": "number"},
+            "circular": {"type": "boolean"},
+            "source": {"type": "string", "minLength": 1}
+          }
+        },
+        "requested_live_checks": {"$ref": "#/$defs/common_payload_properties/requested_live_checks"},
+        "non_authorizations": {"$ref": "#/$defs/common_payload_properties/non_authorizations"},
+        "open_risks": {"$ref": "#/$defs/common_payload_properties/open_risks"},
+        "tags": {"$ref": "#/$defs/common_payload_properties/tags"},
+        "time_horizon": {"$ref": "#/$defs/common_payload_properties/time_horizon"},
+        "expected_falsifiers": {"$ref": "#/$defs/common_payload_properties/expected_falsifiers"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputs"],
+      "anyOf": [{"required": ["raw_refs"]}, {"required": ["raw_ref_explanation"]}],
+      "properties": {
+        "inputs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/repo_path"}},
+        "raw_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/repo_path"}},
+        "raw_ref_explanation": {"type": "string", "minLength": 1}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_checks", "passed_checks"],
+      "properties": {
+        "required_checks": {
+          "type": "array",
+          "minItems": 1,
+          "contains": {"const": "schema"},
+          "items": {"type": "string", "minLength": 1}
+        },
+        "passed_checks": {"type": "array", "maxItems": 0}
+      }
+    }
+  }
+}
