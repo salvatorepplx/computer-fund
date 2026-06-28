@@ -29,6 +29,14 @@ broker access, live market data, account state, or order placement. Current star
   current `runs/sentiment/series/TICKER_NVDA.jsonl` sample is intentionally treated as too small to
   calibrate shape/lag/edge behavior, so SIM-FIDELITY changes should not use `edge_score` as an
   observed-calibrated gate until this diagnostic reports `eligible_for_sim_fidelity_gate=true`.
+- KG observed-series replay for the frozen `evals/fixtures/kg_observed_series_nvda.jsonl` fixture,
+  using only a temporary graph to prove observed rows preserve `simulated:false`,
+  timestamp/provenance fields, latest observed sentiment, and observed-only momentum.
+
+The KG observed-series replay is a plumbing diagnostic, not a trading signal. Its fixture is
+NVDA-only, single-source, and intentionally below the readiness threshold for lead-lag/CAP credit
+or meaningful `current_step_est`; it performs no live fetches and never mutates
+`state/knowledge_graph.json`.
 
 See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist, and
 `evals/cap_calibration.md` for the CAP-vs-REG calibration pre-registration. See
@@ -40,4 +48,5 @@ env -u PYTHONPATH python -m evals.cap_calibration
 env -u PYTHONPATH python -m evals.corpses_lessons
 env -u PYTHONPATH python -m evals.proposed_validator runs/PROPOSED docs/integration/fixtures/proposed/example-proposed-offline.json docs/integration/fixtures/proposed/example-computer-alpha-pipeline.json
 env -u PYTHONPATH python -m evals.observed_series_sim_calibration
+env -u PYTHONPATH python -m evals.kg_observed_series
 ```

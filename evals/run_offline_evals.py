@@ -28,6 +28,7 @@ from execution.safety import (
     kill_check,
 )
 from graph.kg import KnowledgeGraph
+from evals.kg_observed_series import MIN_SERIES_ROWS_FOR_READINESS, run_kg_observed_series_diagnostic
 from evals.leadlag_placebo import run_leadlag_placebo_checks
 from evals.web_sentiment_invariants import run_web_sentiment_invariants
 from evals.observed_sentiment_fixture import validate_observed_finance_fixture
@@ -309,6 +310,33 @@ def eval_observed_finance_sentiment_fixture() -> None:
             "single observed fixture must not earn lead-lag/CAP credit")
 
 
+def eval_kg_observed_series_diagnostic() -> None:
+    result = run_kg_observed_series_diagnostic()
+
+    require(result["label"] == "kg_observed_series_offline_diagnostic",
+            "KG observed-series diagnostic should report the stable label")
+    require(result["mode"] == "offline_propose_only_no_fetch_no_trading",
+            "KG observed-series diagnostic should remain offline/propose-only")
+    require(result["series_path"] == "evals/fixtures/kg_observed_series_nvda.jsonl",
+            "KG observed-series diagnostic should use the frozen fixture")
+    require(result["state_graph_mutated"] is False, "diagnostic must not mutate state/knowledge_graph.json")
+    require(result["temp_graph_used"] is True, "diagnostic must use a temporary KG state file")
+    require(result["entity"] == "TICKER:NVDA", "diagnostic should replay the frozen NVDA entity")
+    require(result["source"] == "finance_ticker_sentiment", "diagnostic fixture source should remain frozen")
+    require(result["row_count"] == 3, "diagnostic fixture row count should remain frozen")
+    require(result["observed_rows_simulated_flags"] == [False, False, False],
+            "replayed observed rows must remain simulated:false")
+    require(result["latest_observed"]["score"] == 0.5, "latest observed fixture score should remain frozen")
+    require(result["latest_observed"]["event_id"] == "sha256:88c1a4c35775620d",
+            "latest observed fixture event_id should remain frozen")
+    require(result["momentum"] == 0.8333, "observed-only KG momentum should remain frozen")
+    require(result["expected_momentum"] == result["momentum"], "momentum summary should match recomputed value")
+    require(result["readiness"]["ready_for_leadlag_or_current_step_credit"] is False,
+            "fixture plumbing must not grant lead-lag/current-step readiness")
+    require(result["readiness"]["minimum_observed_rows"] == MIN_SERIES_ROWS_FOR_READINESS,
+            "diagnostic should report the pre-registered readiness floor")
+
+
 def eval_corpses_lessons_discipline() -> None:
     result = validate_corpses_lessons()
     corpses = result["corpses"]
@@ -436,6 +464,7 @@ EVALS = [
     eval_cap_calibration_fixture_metrics,
     eval_sentiment_source_weight_learning,
     eval_observed_finance_sentiment_fixture,
+    eval_kg_observed_series_diagnostic,
     eval_corpses_lessons_discipline,
     eval_web_sentiment_invariants,
     eval_proposed_artifact_validator,
