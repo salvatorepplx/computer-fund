@@ -52,6 +52,53 @@ class WebSentimentNormalizeTest(unittest.TestCase):
         self.assertGreater(result.detail["explicit_vals"][0], 0.0)
         self.assertLess(result.detail["explicit_vals"][1], 0.0)
 
+    def test_quote_and_forecast_boilerplate_stays_low_confidence(self):
+        result = normalize([
+            {
+                "title": "NVDA Stock Quote",
+                "summary": (
+                    "NVIDIA Corporation stock price quote today, forecast, analyst estimates, "
+                    "and chart page. Interactive tools let readers buy or sell shares through "
+                    "their brokerage account."
+                ),
+                "domain": "marketwatch.com",
+            },
+            {
+                "title": "NVIDIA Forecast Overview",
+                "summary": (
+                    "View the latest NVDA price target, stock forecast, quote details, market cap, "
+                    "historical data, news, and whether to buy, sell, or hold."
+                ),
+                "domain": "cnbc.com",
+            },
+            {
+                "title": "NVDA stock price",
+                "summary": (
+                    "Latest NVIDIA quote with daily change, volume, earnings calendar, and "
+                    "general investment research links."
+                ),
+                "domain": "robinhood.com",
+            },
+        ])
+
+        self.assertEqual(result.method, "no_signal")
+        self.assertEqual(result.n_explicit, 0)
+        self.assertEqual(result.score, 0.0)
+        self.assertLessEqual(result.confidence, 0.45)
+
+    def test_generic_call_to_buy_is_not_explicit_sentiment(self):
+        result = normalize([
+            {
+                "title": "How to buy NVDA stock",
+                "summary": "Open an account, search for Nvidia, review the current quote, and buy shares.",
+                "domain": "example.com",
+            }
+        ])
+
+        self.assertNotEqual(result.method, "explicit+lexical")
+        self.assertEqual(result.n_explicit, 0)
+        self.assertLess(result.confidence, 0.35)
+
     def test_lexical_only_and_no_signal_paths(self):
         lexical = normalize([
             {

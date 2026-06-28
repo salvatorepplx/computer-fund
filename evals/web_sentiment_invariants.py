@@ -27,6 +27,10 @@ def run_web_sentiment_invariants() -> dict:
         {"title": "TSLA probe", "summary": "extremely bearish on Stocktwits, selloff, downgrade, weak momentum, Sell rating", "domain": "stocktwits.com"},
         {"title": "Tesla slides", "summary": "TSLA slides 5.8%, bearish, headwinds, scrutiny, drop below support", "domain": "fxleaders.com"},
     ]
+    boilerplate = [
+        {"title": "NVDA Stock Quote", "summary": "NVIDIA stock price quote, chart, forecast, and links to buy or sell shares.", "domain": "marketwatch.com"},
+        {"title": "NVIDIA Forecast Overview", "summary": "Latest NVDA price target, quote details, news, and whether to buy, sell, or hold.", "domain": "cnbc.com"},
+    ]
 
     checks = []
     def chk(name, cond):
@@ -51,6 +55,9 @@ def run_web_sentiment_invariants() -> dict:
     chk("confidence non-decreasing with more docs", c2 >= c1)
     # 6) explicit readings present are reflected (method tag)
     chk("explicit readings detected", normalize(bull).n_explicit >= 1)
+    # 7) quote/forecast boilerplate is not high-confidence explicit sentiment
+    b = normalize(boilerplate)
+    chk("quote boilerplate stays neutral", b.score == 0.0 and b.n_explicit == 0 and b.confidence <= 0.4)
 
     return {"label": "web_sentiment_invariants", "all_passed": True, "checks": checks, "n": len(checks)}
 
