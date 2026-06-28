@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T01:15:11.088450+00:00 · HEAD 2f335e6_
+_Last updated: 2026-06-28T01:22:31.011928+00:00 · HEAD 10f6a45_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,10 +20,10 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 24 (raw 34) | EDGE | 2/0.5079 | circ=False |
-| TICKER:RDDT | 17 (raw 27) | PRELIMINARY_EDGE | 2/0.6972 | circ=False |
-| TICKER:TSLA | 17 (raw 27) | PRELIMINARY_EDGE | 4/0.4969 | circ=False |
-| TICKER:SNDK | 14 (raw 15) | PRELIMINARY_NO_EDGE | 0/0.4367 | circ=False |
+| TICKER:NVDA | 25 (raw 35) | EDGE | 2/0.5078 | circ=False |
+| TICKER:RDDT | 18 (raw 28) | PRELIMINARY_EDGE | 2/0.6922 | circ=False |
+| TICKER:TSLA | 18 (raw 28) | PRELIMINARY_EDGE | 4/0.4931 | circ=False |
+| TICKER:SNDK | 15 (raw 16) | PRELIMINARY_NO_EDGE | 0/0.4229 | circ=False |
 
 ## The one honest finding
 Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent edges ~ chance).
@@ -46,9 +46,9 @@ Promote the authoritative EDGE via alpha_pipeline -> PROPOSED -> safety review -
 
 ## Recent commits
 ```
-2f335e6 Restore heartbeat: recreate 3 crons (capture 80400d62 / watch 2dff0abe / self-audit 98c3d3f3) lost with source sandbox; commit trigger scripts + runs/CRONS.md
-6d27e68 web series capture tick (NVDA n_spaced=23, 1 from authoritative)
-7830f28 Capture point-in-time external evidence for the 5 research mechanisms (Failure 3)
-87a59a6 Capture & commit point-in-time external evidence for the 5 research mechanisms (Failure 3): analyst consensus/PT-revisions + 6q earnings/PEAD for NVDA/RDDT/TSLA/SNDK
-6c30d5a web series capture tick (NVDA n_spaced=22, +1 toward N=24 threshold)
+10f6a45 Add vol regime reversion dossier (#39)
+4b36118 Add short-interest squeeze dossier (#38)
+18ededd Add cross-source sentiment divergence dossier (#37)
+dd0e006 Add mention velocity acceleration dossier (#36)
+ad6a957 Add analyst revision breadth dossier (#35)
 ```
