@@ -47,6 +47,11 @@ def _axis_actionability(name):
     return True, "actionable"
 
 
+def _is_pending_non_actionable_audit_item(item, non_actionable_axes):
+    return (item.get("status", "pending") == "pending"
+            and item.get("id") in {f"AUDIT-{axis}" for axis in non_actionable_axes})
+
+
 def _open_nondraft_pr_count():
     """Count Teammate's open, non-draft PRs. An un-drained queue is a P1 forcing function
     (OBLIGATION A in skills/computer-fund-operating-doctrine). Returns (count, info);
@@ -232,7 +237,8 @@ def run():
                      "action_note": action_note, "note": note})
     rows_sorted = sorted(rows, key=lambda r: r["health"])
     actionable_rows = [r for r in rows_sorted if r["actionable"]]
-    weakest = actionable_rows[0] if actionable_rows else rows_sorted[0]
+    non_actionable_axes = {r["axis"] for r in rows_sorted if not r["actionable"]}
+    weakest = actionable_rows[0] if actionable_rows else None
 
     now = dt.datetime.now(dt.timezone.utc).isoformat()
     md = [f"# Computer Fund — SELF-AUDIT (every axis under scrutiny)",
@@ -240,11 +246,13 @@ def run():
           "| axis | health | actionable | note |", "|---|---|---|---|"]
     for r in rows_sorted:
         md.append(f"| {r['axis']} | {r['health']} | {r['action_note']} | {r['note']} |")
-    md += ["",
-           f"## Weakest actionable axis -> forcing function",
-           f"**{weakest['axis']}** (health {weakest['health']}): {weakest['note']}",
-           f"Next improvement must target this axis (or justify in writing why another axis is higher-leverage).",
-           f"Parked/retired axes stay visible in the audit but do not create queue churn unless reactivated."]
+    md += ["", f"## Weakest actionable axis -> forcing function"]
+    if weakest:
+        md += [f"**{weakest['axis']}** (health {weakest['health']}): {weakest['note']}",
+               f"Next improvement must target this axis (or justify in writing why another axis is higher-leverage)."]
+    else:
+        md += ["No actionable axis found; queue insertion skipped until a parked axis is reactivated or a new actionable axis is added."]
+    md += [f"Parked/retired axes stay visible in the audit but do not create queue churn unless reactivated."]
     (ROOT / "runs" / "SELF_AUDIT.md").write_text("\n".join(md) + "\n")
 
     # schedule the weakest-axis fix into the durable queue
@@ -253,17 +261,23 @@ def run():
         q = json.loads(qpath.read_text())
     except Exception:
         q = {"items": []}
-    aid = f"AUDIT-{weakest['axis']}"
-    items = [i for i in q.get("items", []) if i.get("id") != aid]
-    items.insert(0, {"id": aid, "kind": "improve", "priority": 1, "owner": "computer",
-                     "desc": f"Weakest axis per self-audit: {weakest['axis']} (health {weakest['health']}). {weakest['note']}",
-                     "status": "pending", "added": now})
+    items = [i for i in q.get("items", [])
+             if not _is_pending_non_actionable_audit_item(i, non_actionable_axes)]
+    if weakest:
+        aid = f"AUDIT-{weakest['axis']}"
+        items = [i for i in items if i.get("id") != aid]
+        items.insert(0, {"id": aid, "kind": "improve", "priority": 1, "owner": "computer",
+                         "desc": f"Weakest axis per self-audit: {weakest['axis']} (health {weakest['health']}). {weakest['note']}",
+                         "status": "pending", "added": now})
     q["items"] = items
     q["updated"] = now
     qpath.write_text(json.dumps(q, indent=2))
 
-    print(f"weakest actionable axis: {weakest['axis']} (health {weakest['health']})")
-    print(f"-> {weakest['note']}")
+    if weakest:
+        print(f"weakest actionable axis: {weakest['axis']} (health {weakest['health']})")
+        print(f"-> {weakest['note']}")
+    else:
+        print("weakest actionable axis: none (queue insertion skipped)")
     return weakest
 
 

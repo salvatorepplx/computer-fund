@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import json
 from pathlib import Path
 from unittest import mock
 
@@ -61,6 +62,69 @@ class SelfAuditParkedAxisTests(unittest.TestCase):
         self.assertIn('"id": "AUDIT-universe"', queue)
         self.assertNotIn("AUDIT-sim", queue)
         self.assertNotIn("AUDIT-graph", queue)
+
+    def test_stale_pending_parked_axis_items_are_removed(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / "runs").mkdir()
+            (root / "sim").mkdir()
+            (root / "graph").mkdir()
+            (root / "sim" / "RETIRED.md").write_text("PARKED\n")
+            (root / "graph" / "RETIRED.md").write_text("PARKED\n")
+            (root / "runs" / "QUEUE.json").write_text(json.dumps({"items": [
+                {"id": "AUDIT-sim", "status": "pending"},
+                {"id": "AUDIT-graph", "status": "pending"},
+                {"id": "AUDIT-signal", "status": "done"},
+                {"id": "Q-001", "status": "pending"},
+            ]}))
+
+            axes = [
+                ("sim", lambda: (0.1, "sim parked note")),
+                ("graph", lambda: (0.2, "graph parked note")),
+                ("universe", lambda: (0.5, "active universe note")),
+            ]
+
+            with mock.patch.object(self_audit, "ROOT", root), \
+                 mock.patch.object(self_audit, "AXES", axes):
+                weakest = self_audit.run()
+
+            queue = json.loads((root / "runs" / "QUEUE.json").read_text())
+
+        self.assertEqual(weakest["axis"], "universe")
+        self.assertEqual(queue["items"][0]["id"], "AUDIT-universe")
+        pending_ids = {item["id"] for item in queue["items"] if item.get("status") == "pending"}
+        self.assertNotIn("AUDIT-sim", pending_ids)
+        self.assertNotIn("AUDIT-graph", pending_ids)
+        self.assertIn("Q-001", pending_ids)
+
+    def test_all_non_actionable_axes_skip_queue_insertion(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / "runs").mkdir()
+            (root / "sim").mkdir()
+            (root / "graph").mkdir()
+            (root / "sim" / "RETIRED.md").write_text("PARKED\n")
+            (root / "graph" / "RETIRED.md").write_text("PARKED\n")
+            (root / "runs" / "QUEUE.json").write_text(json.dumps({"items": [
+                {"id": "AUDIT-sim", "status": "pending"},
+                {"id": "Q-001", "status": "pending"},
+            ]}))
+
+            axes = [
+                ("sim", lambda: (0.1, "sim parked note")),
+                ("graph", lambda: (0.2, "graph parked note")),
+            ]
+
+            with mock.patch.object(self_audit, "ROOT", root), \
+                 mock.patch.object(self_audit, "AXES", axes):
+                weakest = self_audit.run()
+
+            audit = (root / "runs" / "SELF_AUDIT.md").read_text()
+            queue = json.loads((root / "runs" / "QUEUE.json").read_text())
+
+        self.assertIsNone(weakest)
+        self.assertIn("No actionable axis found; queue insertion skipped", audit)
+        self.assertEqual([item["id"] for item in queue["items"]], ["Q-001"])
 
 
 if __name__ == "__main__":
