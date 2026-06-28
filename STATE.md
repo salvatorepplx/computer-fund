@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T01:38:01.782290+00:00 · HEAD 64b8405_
+_Last updated: 2026-06-28T01:54:01.809610+00:00 · HEAD 2d64216_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,10 +20,10 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 26 (raw 36) | EDGE | 2/0.5078 | circ=False; perm=EDGE_IS_NOISE p=0.1895 sig=False |
-| TICKER:RDDT | 19 (raw 29) | PRELIMINARY_EDGE | 2/0.6785 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.063 sig=True |
-| TICKER:TSLA | 19 (raw 29) | PRELIMINARY_EDGE | 4/0.4689 | circ=False; perm=PRELIMINARY_NULL p=0.2805 sig=False |
-| TICKER:SNDK | 16 (raw 17) | PRELIMINARY_NO_EDGE | 0/0.4235 | circ=False; perm=PRELIMINARY_NULL p=0.264 sig=False |
+| TICKER:NVDA | 27 (raw 37) | EDGE | 2/0.5078 | circ=False; perm=EDGE_IS_NOISE p=0.1635 sig=False |
+| TICKER:RDDT | 20 (raw 30) | PRELIMINARY_EDGE | 2/0.6758 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.0435 sig=True |
+| TICKER:TSLA | 20 (raw 30) | PRELIMINARY_EDGE | 4/0.4683 | circ=False; perm=PRELIMINARY_NULL p=0.2225 sig=False |
+| TICKER:SNDK | 17 (raw 18) | PRELIMINARY_NO_EDGE | 0/0.4006 | circ=False; perm=PRELIMINARY_NULL p=0.2555 sig=False |
 | TICKER:CRM | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 | TICKER:PATH | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 
@@ -47,9 +47,9 @@ Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve 
 
 ## Recent commits
 ```
+2d64216 [sal-bot Teammate] Add min_n to insufficient leadlag telemetry (#42)
+f102803 Clarify Teammate proposal flow in handoff (#41)
+a38de17 Record corpse: permutation gate blocks alpha; add lesson
 64b8405 web series capture tick
 97f393a Expand tracked universe (add CRM, PATH) + self-audit
-dddb300 [sal-bot Teammate] Add KG observed-series offline diagnostic (#20)
-847ca23 Gate STATE edge wording on permutation (#40)
-8ccfdac web series capture tick
 ```
