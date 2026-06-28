@@ -422,6 +422,21 @@ def eval_proposed_artifact_validator() -> None:
         "valid Teammate and Computer PROPOSED fixtures should pass offline validation",
     )
 
+    timestamp_fixture = json.loads(
+        (REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "example-proposed-offline.json").read_text()
+    )
+    for created_at in ("2026-06-26T19:30:00.123456Z", "2026-06-26T19:30:00.123456+00:00"):
+        timestamp_fixture["created_at"] = created_at
+        require(
+            proposed_validator.validate_proposed_artifact(timestamp_fixture, source_path="fractional-timestamp-fixture") == [],
+            "PROPOSED created_at should accept fractional-second UTC timestamps",
+        )
+    timestamp_fixture["created_at"] = "2026-06-26T19:30:00.123456-04:00"
+    require(
+        any(issue.path.endswith("created_at") for issue in proposed_validator.validate_proposed_artifact(timestamp_fixture)),
+        "PROPOSED created_at should reject non-UTC fractional-second offsets",
+    )
+
     execution_issues = validate_proposed_file(
         REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "invalid-execution-authorizing.json"
     )

@@ -117,7 +117,7 @@ EXECUTION_AUTHORIZING_PHRASES = (
     "target allocation",
     "position size",
 )
-ISO8601_UTC_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|\+00:00)$")
+ISO8601_UTC_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(Z|\+00:00)$")
 ARTIFACT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 ENTITY_RE = re.compile(r"^[A-Z_]+:[A-Za-z0-9._-]+$")
 
@@ -159,7 +159,7 @@ def validate_proposed_artifact(artifact: dict[str, Any], *, source_path: str = "
     if not _is_non_empty_string(artifact.get("artifact_id")) or not ARTIFACT_ID_RE.match(str(artifact.get("artifact_id", ""))):
         issues.append(ValidationIssue(f"{source_path}.artifact_id", "must be a non-empty filesystem-safe identifier"))
     if not _is_non_empty_string(artifact.get("created_at")) or not ISO8601_UTC_RE.match(str(artifact.get("created_at", ""))):
-        issues.append(ValidationIssue(f"{source_path}.created_at", "must be UTC ISO8601 like 2026-06-26T00:00:00Z or +00:00"))
+        issues.append(ValidationIssue(f"{source_path}.created_at", "must be UTC ISO8601 like 2026-06-26T00:00:00Z, 2026-06-26T00:00:00.123456Z, or +00:00"))
 
     payload = artifact.get("payload")
     if not isinstance(payload, dict):
