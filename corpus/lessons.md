@@ -315,6 +315,14 @@ Copy this block for each future distilled lesson.
 - **Meta/eval linkage**: this should move `self_audit` / wording to treat `perm=EDGE_IS_NOISE` as an authoritative KILL signal, not a blocked trade annoyance.
 - **Revisit trigger**: a later run achieves p<=0.10 with circ=False at n_spaced>=24 on any name, or a new signal family passes an improved null test.
 
+### 2026-06-28 — TSLA repeats the raw-EDGE / permutation-noise failure
+
+- **Source corpse**: `runs/CORPSES.md` entry "2026-06-28 — TSLA raw lead-lag EDGE fails permutation null".
+- **Reusable lesson**: TSLA now shows the same failure pattern as NVDA: authoritative, non-circular raw EDGE (`best_corr=0.4605` at lag 4) is still noise when the permutation p-value is 0.1575, above the 0.10 eligibility bar.
+- **Seeder rule**: treat multiple single-name raw EDGE / permutation-noise outcomes as evidence against lag/correlation-only variants; require permutation significance, cross-sectional breadth, or a different pre-registered falsifier before proposing capital-facing lead-lag logic.
+- **Meta/eval linkage**: threshold monitors should continue paging on new authoritative raw-EDGE/permutation-noise names only to record corpses and lessons, not to imply PROPOSED, sizing, ARMED handoff, or execution eligibility.
+- **Revisit trigger**: TSLA or a cross-sectional basket later clears the complete gate (authoritative n_spaced>=24, non-circular, permutation p<=0.10) on committed observed data.
+
 ## 2026-06-28 — The live regex sentiment scorer is systematically over-bullish (signal-quality flaw)
 - Spike (`scripts/spike_llm_extract.py`, `runs/spikes/2026-06-28_llm_extract_vs_regex.md`) compared the
   regex/lexical scorer in web_sentiment.py against pplx_sdk.llm.extract on a 22-doc NVDA corpus.

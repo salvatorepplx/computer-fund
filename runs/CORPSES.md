@@ -107,3 +107,28 @@ Copy this block for each future killed thesis.
 - **Killed thesis**: sentiment lead-lag EDGE implies tradable alpha once n_spaced>=24.
 - **Evidence**: latest authoritative series hit n_spaced>=24 for NVDA, but permutation p>0.10 (noise), so no trade is eligible under CHARTER gate.
 - **Action**: treat as honest KILL; do not trade; evolve signal model before retrying.
+
+### 2026-06-28 — TSLA raw lead-lag EDGE fails permutation null
+
+- **Status**: `KILLED` as a single-name support case for the seed web-search sentiment lead-lag thesis.
+- **Evidence type**: OBSERVED historical data from committed Computer-captured canonical series only;
+  offline/propose-only documentation, not live market/account/order state.
+- **Thesis**: TICKER:TSLA web-search sentiment changes lead short-horizon price changes strongly enough
+  to support tradeable lead-lag alpha after the authoritative n_spaced threshold is met.
+- **Kill reason**: `evals/leadlag_real.py` reached the authoritative threshold (`n=24`,
+  `n_raw_points=35`, `min_n=24`) and reported raw `verdict=EDGE` (`best_lag=4`,
+  `best_corr=0.4605`, `contemp_corr=-0.1965`, `circularity_flag=false`), but the required
+  permutation falsifier rejected eligibility: `evals/leadlag_permutation.py` returned
+  `verdict=EDGE_IS_NOISE` with `p=0.1575` at `k=2000`, `seed=7`, so
+  `significant_at_0.10=false`. The full gate (authoritative EDGE + non-circular + permutation
+  p<=0.10) is not met.
+- **Lesson**: TSLA independently confirms the NVDA failure mode: a clean-looking, non-circular raw
+  lead-lag EDGE at n_spaced>=24 is still not capital-eligible when shuffled-label paths can plausibly
+  match or beat it. Raw correlation is a diagnostic, not a trade signal.
+- **Seeder feedback**: do not seed nearby single-ticker web-search sentiment lead-lag variants that
+  optimize lag/correlation alone. Future variants must explain how they improve permutation
+  significance, add cross-sectional support, or change the signal family/null test before any
+  PROPOSED artifact is considered.
+- **Reopen criteria**: retry only if TSLA or a broader cross-sectional basket clears the complete gate
+  (authoritative n_spaced>=24, `circularity_flag=false`, and permutation `p<=0.10`) on committed
+  observed data, or if a pre-registered replacement null test supersedes the current permutation gate.
