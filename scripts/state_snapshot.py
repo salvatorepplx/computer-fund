@@ -1,7 +1,10 @@
 """
 Generate STATE.md — the canonical wake-state doc every agent (Computer, a cold
-background cron, Teammate) reads FIRST. Auto-derived from ground truth so it can
-never go stale or drift from reality. Run at the end of every capture tick.
+background cron, Teammate) reads FIRST. Auto-derived from repo-local ground
+truth at snapshot time, but it can lag later commits because the capture wrapper
+refreshes STATE.md before committing the tick. Cold agents should compare the
+STATE header HEAD with current git HEAD/origin and inspect intervening commits
+when they differ. Run during every capture tick.
 
 Sections: identity/mission pointer, hard rails, current series depth, live
 verdicts, the one honest finding, what's blocking the next outcome, and the
@@ -68,7 +71,9 @@ def build() -> str:
 _Last updated: {now} · HEAD {head}_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
-Regenerated every capture tick by scripts/state_snapshot.py from ground truth — never stale.
+Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
+It can lag commits created after the refresh: compare this header HEAD to current git HEAD/origin,
+and inspect intervening commits when they differ.
 
 ## Mission
 Recursively self-improving sentiment-alpha trading system. Generate alpha by predating public
