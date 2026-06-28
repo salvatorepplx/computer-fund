@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T02:20:31.462888+00:00 · HEAD 776e861_
+_Last updated: 2026-06-28T02:44:12.918625+00:00 · HEAD 91873a2_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,10 +20,10 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 28 (raw 38) | EDGE | 2/0.5067 | circ=False; perm=EDGE_IS_NOISE p=0.1505 sig=False |
-| TICKER:RDDT | 21 (raw 31) | PRELIMINARY_EDGE | 2/0.6756 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.029 sig=True |
-| TICKER:TSLA | 21 (raw 31) | PRELIMINARY_EDGE | 4/0.4663 | circ=False; perm=PRELIMINARY_NULL p=0.2155 sig=False |
-| TICKER:SNDK | 18 (raw 19) | PRELIMINARY_NO_EDGE | 0/0.4016 | circ=False; perm=PRELIMINARY_NULL p=0.237 sig=False |
+| TICKER:NVDA | 29 (raw 39) | EDGE | 2/0.5064 | circ=False; perm=EDGE_IS_NOISE p=0.1325 sig=False |
+| TICKER:RDDT | 22 (raw 32) | PRELIMINARY_EDGE | 2/0.6602 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.048 sig=True |
+| TICKER:TSLA | 22 (raw 32) | PRELIMINARY_EDGE | 4/0.4663 | circ=False; perm=PRELIMINARY_NULL p=0.205 sig=False |
+| TICKER:SNDK | 19 (raw 20) | PRELIMINARY_NO_EDGE | 0/0.3882 | circ=False; perm=PRELIMINARY_NULL p=0.2325 sig=False |
 | TICKER:CRM | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 | TICKER:PATH | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 
@@ -47,9 +47,9 @@ Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve 
 
 ## Recent commits
 ```
-776e861 Fix self-audit universe accounting (#43)
-55922c6 web series capture tick
-2d64216 [sal-bot Teammate] Add min_n to insufficient leadlag telemetry (#42)
-f102803 Clarify Teammate proposal flow in handoff (#41)
-a38de17 Record corpse: permutation gate blocks alpha; add lesson
+91873a2 state: advance last_seen pointers
+f70b137 Audit: improve universe coverage scoring + wire CRM/PATH series
+3d91b07 Add open-web tool split HPR (#44)
+f2aa107 Lesson: validate the scorer not just the verdict (regex over-bullish bias found)
+1df0c4a Spike: llm.extract vs regex scorer — regex is systematically over-bullish (+0.23 vs +0.09 honest read); evidence for signal-axis upgrade, parallel burn-in proposed (no hot-swap)
 ```
