@@ -12,18 +12,20 @@ COMPUTER_UID="U08C9BB5A2G"
 ROOT="/home/user/workspace/computer_fund"
 SEEN_FILE="$ROOT/state/last_seen_ts.txt"
 GH_STATE="$ROOT/state/gh_last_seen.txt"   # stores: "<latest_master_sha>|<sorted open PR numbers>"
-mkdir -p "$ROOT/state"
-LAST_SEEN=$(cat "$SEEN_FILE" 2>/dev/null || echo "0")
 
-fire=1  # default skip
-
-# ---- (a) Slack check ----
-SLACK=$(external-tool call "{\"source_id\":\"slack_direct\",\"tool_name\":\"slack_read_channel\",\"arguments\":{\"channel_id\":\"$CHANNEL\",\"limit\":15,\"response_format\":\"detailed\"}}" 2>/dev/null)
-if [ -n "$SLACK" ]; then
-  slack_fire=$(printf '%s' "$SLACK" | python3 - "$LAST_SEEN" "$COMPUTER_UID" <<'PY' 2>/dev/null
+parse_slack_fire() {
+  local slack_json="$1"
+  local last_seen="$2"
+  local computer_uid="$3"
+  local slack_file
+  slack_file=$(mktemp)
+  printf '%s' "$slack_json" > "$slack_file"
+  python3 - "$last_seen" "$computer_uid" "$slack_file" <<'PY' 2>/dev/null
 import json, sys, re
-last_seen=float(sys.argv[1] or 0); cu=sys.argv[2].lower()
-try: text=json.load(sys.stdin).get("messages","")
+last_seen=float(sys.argv[1] or 0); cu=sys.argv[2].lower(); path=sys.argv[3]
+try:
+    with open(path, encoding="utf-8") as fh:
+        text=json.load(fh).get("messages","")
 except Exception: print("err"); sys.exit(0)
 parts=re.split(r"(=== Message from .*? ===)", text)
 fire=False
@@ -39,7 +41,26 @@ for i in range(1,len(parts),2):
         fire=True
 print("fire" if fire else "skip")
 PY
-)
+  local status=$?
+  rm -f "$slack_file"
+  return "$status"
+}
+
+if [ "${1:-}" = "--parse-slack" ]; then
+  SLACK=$(cat)
+  parse_slack_fire "$SLACK" "${2:-0}" "${3:-$COMPUTER_UID}"
+  exit 0
+fi
+
+mkdir -p "$ROOT/state"
+LAST_SEEN=$(cat "$SEEN_FILE" 2>/dev/null || echo "0")
+
+fire=1  # default skip
+
+# ---- (a) Slack check ----
+SLACK=$(external-tool call "{\"source_id\":\"slack_direct\",\"tool_name\":\"slack_read_channel\",\"arguments\":{\"channel_id\":\"$CHANNEL\",\"limit\":15,\"response_format\":\"detailed\"}}" 2>/dev/null)
+if [ -n "$SLACK" ]; then
+  slack_fire=$(parse_slack_fire "$SLACK" "$LAST_SEEN" "$COMPUTER_UID")
   [ "$slack_fire" = "fire" ] && fire=0
 fi
 
