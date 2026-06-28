@@ -101,3 +101,9 @@ Copy this block for each future killed thesis.
 - **Reopen criteria**: a materially different signal (multi-source corroboration or mention-velocity, not
   raw web-sentiment level), tested on a >=30-name universe, that survives the permutation null (p<=0.10)
   AND the circularity guard AND cross-sectional generalization (>=30% of universe) on forward data.
+
+## 2026-06-28 — Permutation gate blocks lead-lag alpha (NVDA authoritative EDGE but p>0.10)
+
+- **Killed thesis**: sentiment lead-lag EDGE implies tradable alpha once n_spaced>=24.
+- **Evidence**: latest authoritative series hit n_spaced>=24 for NVDA, but permutation p>0.10 (noise), so no trade is eligible under CHARTER gate.
+- **Action**: treat as honest KILL; do not trade; evolve signal model before retrying.

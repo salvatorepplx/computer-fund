@@ -306,3 +306,11 @@ Copy this block for each future distilled lesson.
   (runs/strategies/research/evidence/), not a variant of the dead single-name single-source lead-lag.
   Real breadth = theses at researched+ with distinct mechanisms tested cross-sectionally (>=30% of a
   >=30-name universe), not one ticker.
+
+### 2026-06-28 — Permutation null test is the trade gate (edge-looking corr is not enough)
+
+- **Source corpse**: `runs/CORPSES.md` entry "2026-06-28 — Permutation gate blocks lead-lag alpha (NVDA authoritative EDGE but p>0.10)".
+- **Reusable lesson**: even with n_spaced>=24, a lead-lag correlation can be a small-sample or structure artifact; the permutation p-value is the only honest discriminator before risking capital.
+- **Seeder rule**: future thesis seeds must target improving permutation significance (p<=0.10) or designing a different null test; do not propose trading logic off corr alone.
+- **Meta/eval linkage**: this should move `self_audit` / wording to treat `perm=EDGE_IS_NOISE` as an authoritative KILL signal, not a blocked trade annoyance.
+- **Revisit trigger**: a later run achieves p<=0.10 with circ=False at n_spaced>=24 on any name, or a new signal family passes an improved null test.

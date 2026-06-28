@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T01:37:11.684507+00:00 · HEAD 97f393a_
+_Last updated: 2026-06-28T01:38:01.782290+00:00 · HEAD 64b8405_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -47,9 +47,9 @@ Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve 
 
 ## Recent commits
 ```
+64b8405 web series capture tick
 97f393a Expand tracked universe (add CRM, PATH) + self-audit
 dddb300 [sal-bot Teammate] Add KG observed-series offline diagnostic (#20)
 847ca23 Gate STATE edge wording on permutation (#40)
 8ccfdac web series capture tick
-10f6a45 Add vol regime reversion dossier (#39)
 ```
