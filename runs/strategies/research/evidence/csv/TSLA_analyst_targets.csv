@@ -1,0 +1,38 @@
+id,date,firm,analyst,action,rating_current,rating_prior,price_target_current,price_target_prior,sentiment
+6a2bf25831172d00012dd6c6,2026-06-12,GLJ Research,Gordon L. Johnson,Reiterates,Sell,Sell,24.86,24.86,bearish
+6a22c49b31172d00012a71dc,2026-06-05,JP Morgan,Rajat Gupta,Upgrades,Neutral,Underweight,475,145,neutral
+6a218c1e1c26a50001d89af7,2026-06-04,TD Cowen,Itay Michaeli,Reiterates,Buy,Buy,490,490,bullish
+69ea798748434300018016a6,2026-04-23,UBS,Joseph Spak,Maintains,Neutral,Neutral,364,352,neutral
+69ea582548434300018013ec,2026-04-23,Canaccord Genuity,George Gianarikas,Maintains,Buy,Buy,450,420,bullish
+69ea579779316e0001ccd350,2026-04-23,RBC Capital,Tom Narayan,Maintains,Outperform,Outperform,475,480,bullish
+69ea46e74843430001801158,2026-04-23,TD Cowen,Itay Michaeli,Reiterates,Buy,Buy,490,490,bullish
+69ea43748702f70001537361,2026-04-23,Cantor Fitzgerald,Andres Sheppard,Reiterates,Overweight,Overweight,510,510,bullish
+69ea324f8702f700015372e5,2026-04-23,Wedbush,Dan Ives,Reiterates,Outperform,Outperform,600,600,bullish
+69ea2a0979316e0001cc9add,2026-04-23,Mizuho,Vijay Rakesh,Maintains,Outperform,Outperform,480,540,bullish
+69e8cf3079316e0001cc0a9f,2026-04-22,Cantor Fitzgerald,Andres Sheppard,Reiterates,Overweight,Overweight,510,510,bullish
+69e77ac879316e0001cb88f6,2026-04-21,Wedbush,Dan Ives,Reiterates,Outperform,Outperform,600,600,bullish
+69e898e548434300017ff3ed,2026-04-21,GLJ Research,Gordon L. Johnson,Reinstates,Sell,Sell,24.86,24.86,bearish
+69dfae2af5df1e00010c16e4,2026-04-15,TD Cowen,Itay Michaeli,Maintains,Buy,Buy,490,519,bullish
+69de211ef5df1e00010bcb37,2026-04-14,UBS,Joseph Spak,Upgrades,Neutral,Sell,352,307,neutral
+69d3ce79fade490001f2989d,2026-04-06,Canaccord Genuity,George Gianarikas,Maintains,Buy,Buy,420,420,bullish
+69d3b4a4d1f6510001475dc2,2026-04-06,Baird,Ben Kallo,Maintains,Outperform,Outperform,538,548,bullish
+69cbc4948aa64600019464cf,2026-03-31,Canaccord Genuity,George Gianarikas,Maintains,Buy,Buy,420,520,bullish
+69ca7487d946a200010969e8,2026-03-30,GLJ Research,Gordon Johnson,Reiterates,Sell,Sell,24.86,24.86,bearish
+69c67a3bb96a7f00019ae48a,2026-03-27,Wedbush,Dan Ives,Reiterates,Outperform,Outperform,600,600,bullish
+69b3db5b85c81300016dedfa,2026-03-12,GLJ Research,Gordon L. Johnson,Reiterates,Sell,Sell,25.28,25.28,bearish
+69972045b97b820001d94bd4,2026-02-19,GLJ Research,Gordon L. Johnson,Reiterates,Sell,Sell,25.28,25.28,bearish
+6a2335f3a5d7f200013c2c1e,2026-01-30,JP Morgan,Rajat Gupta,Maintains,Underweight,Underweight,145,150,bearish
+697ba08824a26100013b9e8a,2026-01-29,Morgan Stanley,Andrew Percoco,Maintains,Equal-Weight,Equal-Weight,415,425,neutral
+697b86e95c001a0001a49e49,2026-01-29,RBC Capital,Tom Narayan,Reiterates,Outperform,Outperform,500,500,bullish
+697b769d24a26100013b981f,2026-01-29,Wedbush,Daniel Ives,Reiterates,Outperform,Outperform,600,600,bullish
+697b6ad1eb48050001379839,2026-01-29,Cantor Fitzgerald,Andres Sheppard,Reiterates,Overweight,Overweight,510,510,bullish
+697b6ac4ee849600014d8f03,2026-01-29,Wells Fargo,Colin Langan,Maintains,Underweight,Underweight,125,130,bearish
+697b5e8124a26100013b95a4,2026-01-29,GLJ Research,Gordon L. Johnson,Reiterates,Sell,Sell,25.28,25.28,bearish
+697b56405c001a0001a49294,2026-01-29,Mizuho,Vijay Rakesh,Maintains,Outperform,Outperform,540,530,bullish
+697b55eb5c001a0001a49271,2026-01-29,Truist Securities,William Stein,Maintains,Hold,Hold,438,439,neutral
+69c65a61e887260001cf4f64,2026-01-29,Freedom Broker,Dmitriy Pozdnyakov,Maintains,Hold,Hold,440,406,neutral
+69737a618efb0300010f6a6a,2026-01-23,Barclays,Dan Levy,Maintains,Equal-Weight,Equal-Weight,360,350,neutral
+6967dd7b4b626a0001ac1c81,2026-01-14,UBS,Joseph Spak,Maintains,Sell,Sell,307,247,bearish
+69651e9345160700014e54b5,2026-01-12,Wells Fargo,Colin Langan,Maintains,Underweight,Underweight,130,120,bearish
+695e6cd483cac20001bfcd76,2026-01-07,GLJ Research,Gordon Johnson,Maintains,Sell,Sell,25.28,19.05,bearish
+695800c083cac20001be8181,2026-01-02,Truist Securities,William Stein,Maintains,Hold,Hold,439,444,neutral

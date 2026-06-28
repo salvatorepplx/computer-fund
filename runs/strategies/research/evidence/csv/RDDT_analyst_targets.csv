@@ -1,0 +1,38 @@
+id,date,firm,analyst,action,rating_current,rating_prior,price_target_current,price_target_prior,sentiment
+6a3bb8f28e18670001470aea,2026-06-24,Needham,Laura Martin,Reiterates,Buy,Buy,300,300,bullish
+6a21920dd03ec60001130485,2026-06-04,Loop Capital,Rob Sanderson,Maintains,Buy,Buy,260,260,bullish
+69f4c65a2a497d0001075a6c,2026-05-01,Piper Sandler,Thomas Champion,Reiterates,Overweight,Overweight,215,205,bullish
+69f4bbb32a497d0001075702,2026-05-01,Wells Fargo,Alec Brondolo,Maintains,Equal-Weight,Equal-Weight,176,149,neutral
+69f4bb93e2f5610001fe95fb,2026-05-01,Cantor Fitzgerald,Deepak Mathivanan,Maintains,Neutral,Neutral,180,170,neutral
+69f4b3496091980001671adc,2026-05-01,Citizens,Andrew Boone,Maintains,Market Outperform,Market Outperform,240,250,bullish
+69f4a9f8609198000167041b,2026-05-01,Evercore ISI Group,Mark Mahaney,Maintains,Outperform,Outperform,300,290,bullish
+69f4a70860919800016702de,2026-05-01,DA Davidson,Wyatt Swanson,Maintains,Buy,Buy,200,200,bullish
+69f48c16d7ddd30001547cc8,2026-05-01,Needham,Laura Martin,Reiterates,Buy,Buy,300,300,bullish
+69e8c7e1e0d5030001dd0e73,2026-04-22,Citizens,Andrew Boone,Maintains,Market Outperform,Market Outperform,250,300,bullish
+69de6c94f5df1e00010bd5d0,2026-04-14,Goldman Sachs,Eric Sheridan,Maintains,Neutral,Neutral,180,206,neutral
+69d50efafade490001f2b15f,2026-04-07,Wells Fargo,Alec Brondolo,Maintains,Equal-Weight,Equal-Weight,149,196,neutral
+69d4ea9d829a6e00017f78f3,2026-04-07,Truist Securities,Youssef Squali,Maintains,Buy,Buy,260,275,bullish
+69ce5826fade490001f27241,2026-04-02,B of A Securities,Justin Post,Maintains,Neutral,Neutral,175,205,neutral
+69b049dc85c81300016d189e,2026-03-10,Jefferies,John Colantuoni,Maintains,Buy,Buy,250,285,bullish
+698a1b7c5c001a0001a65c68,2026-02-09,Goldman Sachs,Eric Sheridan,Maintains,Neutral,Neutral,206,236,neutral
+698659eb7acc0e0001cbb2ad,2026-02-06,JP Morgan,Doug Anmuth,Maintains,Neutral,Neutral,200,227,neutral
+6986258feb480500013840f3,2026-02-06,Oppenheimer,Jason Helfstein,Maintains,Outperform,Outperform,250,300,bullish
+698619107acc0e0001cbaa17,2026-02-06,Truist Securities,Youssef Squali,Maintains,Buy,Buy,275,270,bullish
+69860a027acc0e0001cba661,2026-02-06,Piper Sandler,Thomas Champion,Reiterates,Overweight,Overweight,205,290,bullish
+698608425c001a0001a5c62a,2026-02-06,Cantor Fitzgerald,Deepak Mathivanan,Maintains,Neutral,Neutral,170,240,neutral
+6985fb9e7acc0e0001cba2cb,2026-02-06,Guggenheim,Michael Morris,Maintains,Buy,Buy,255,245,bullish
+6985d67c0cde720001c0d5a3,2026-02-06,Needham,Laura Martin,Reiterates,Buy,Buy,300,300,bullish
+697ce943eb4805000137b55c,2026-01-30,Roth Capital,Rohit Kulkarni,Maintains,Neutral,Neutral,215,210,neutral
+6973831077e19b0001c76a1f,2026-01-23,Guggenheim,Michael Morris,Reiterates,Buy,Buy,245,245,bullish
+6966743d7ad65300012e91dd,2026-01-13,Morgan Stanley,Brian Nowak,Maintains,Overweight,Overweight,265,250,bullish
+6965205c45160700014e5709,2026-01-12,Wells Fargo,Ken Gawrelski,Maintains,Equal-Weight,Equal-Weight,207,186,neutral
+695271a86ab0a40001b35109,2025-12-29,Needham,Laura Martin,Reiterates,Buy,Buy,300,300,bullish
+694a83ce8d9f6300011cb27a,2025-12-23,Needham,Laura Martin,Reiterates,Buy,Buy,300,300,bullish
+693b2c027628080001c03d75,2025-12-11,Jefferies,John Colantuoni,Maintains,Buy,Buy,325,300,bullish
+690910a94cbdd0000140b9e7,2025-11-03,Citigroup,Ronald Josey,Maintains,Buy,Buy,265,250,bullish
+6905046a6d699e0001d01b23,2025-10-31,JP Morgan,Doug Anmuth,Maintains,Neutral,Neutral,227,190,neutral
+6904ebbc6ca0290001b49325,2025-10-31,B. Riley Securities,Naved Khan,Reiterates,Buy,Buy,245,235,bullish
+6904db2309445c000151eeba,2025-10-31,Bernstein,Mark Shmulik,Maintains,Market Perform,Market Perform,210,190,neutral
+6904987209445c000151e54f,2025-10-31,Needham,Laura Martin,Reiterates,Buy,Buy,300,300,bullish
+690495fd6ca0290001b44953,2025-10-31,B of A Securities,Justin Post,Maintains,Neutral,Neutral,210,180,neutral
+68f7aee5dd49b000011a5048,2025-10-21,Citigroup,Ronald Josey,Maintains,Buy,Buy,250,220,bullish

@@ -1,0 +1,37 @@
+id,date,firm,analyst,action,rating_current,rating_prior,price_target_current,price_target_prior,sentiment
+6a3d7cfdf11bb700014a7eb4,2026-06-25,Citigroup,Asiya Merchant,Maintains,Buy,Buy,2500,2025,bullish
+6a26faed1c26a50001d8c5c6,2026-06-08,Mizuho,Vijay Rakesh,Maintains,Outperform,Outperform,2200,1825,bullish
+6a26da3bd03ec6000113386e,2026-06-08,B of A Securities,Wamsi Mohan,Maintains,Buy,Buy,2100,1550,bullish
+6a26cd2ca5d7f200013c399f,2026-06-08,Cantor Fitzgerald,C.J. Muse,Maintains,Overweight,Overweight,2900,1800,bullish
+6a206b231c26a50001d87c1a,2026-06-03,Morgan Stanley,Joseph Moore,Maintains,Overweight,Overweight,1750,1100,bullish
+6a19a11fb523c50001ec6b33,2026-05-29,Susquehanna,Mehdi Hosseini,Maintains,Positive,Positive,3250,2000,bullish
+6a182bd7b523c50001ec348f,2026-05-28,Mizuho,Vijay Rakesh,Maintains,Outperform,Outperform,1825,1625,bullish
+6a171549700a22000146f731,2026-05-27,Barclays,Thomas O'Malley,Upgrades,Overweight,Equal-Weight,2300,1200,bullish
+6a0c7517e7dfeb0001e8a719,2026-05-19,Citigroup,Asiya Merchant,Maintains,Buy,Buy,2025,1300,bullish
+69f8d223e2f5610001feb3a2,2026-05-04,Bernstein,Mark C. Newman,Maintains,Outperform,Outperform,1700,1250,bullish
+69f4f6552a497d0001075e72,2026-05-01,Citigroup,Asiya Merchant,Maintains,Buy,Buy,1300,980,bullish
+69f4e175e2f5610001fe988e,2026-05-01,RBC Capital,Srini Pajjuri,Maintains,Sector Perform,Sector Perform,1000,650,neutral
+69f4c73d2a497d0001075abf,2026-05-01,Barclays,Thomas O'Malley,Maintains,Equal-Weight,Equal-Weight,1200,750,neutral
+69f4bef1d7ddd3000154800b,2026-05-01,Cantor Fitzgerald,Matthew Vanvliet,Maintains,Overweight,Overweight,1800,1400,bullish
+69f4bdd92a497d00010757a9,2026-05-01,Wells Fargo,Aaron Rakers,Maintains,Equal-Weight,Equal-Weight,1250,975,neutral
+69f4b5912a497d0001075508,2026-05-01,Evercore ISI Group,Amit Daryanani,Maintains,Outperform,Outperform,1400,1200,bullish
+69f48d6f2a497d00010750c9,2026-05-01,Susquehanna,Mehdi Hosseini,Maintains,Positive,Positive,2000,1000,bullish
+69f22a1c64ef780001b47660,2026-04-29,Wedbush,Matt Bryson,Maintains,Outperform,Outperform,1200,740,bullish
+69e6853ae0d5030001dcdcbf,2026-04-20,Wells Fargo,Aaron Rakers,Maintains,Equal-Weight,Equal-Weight,975,675,neutral
+69e2253614f78b00019d160f,2026-04-17,B of A Securities,Wamsi Mohan,Maintains,Buy,Buy,1080,900,bullish
+69dd194714f78b00019cceb1,2026-04-13,Citigroup,Asiya Merchant,Maintains,Buy,Buy,980,875,bullish
+69d7b5dd8aa646000194e86b,2026-04-09,Cantor Fitzgerald,C.J. Muse,Maintains,Overweight,Overweight,1000,800,bullish
+69c145c4da90f3000143443b,2026-03-23,B of A Securities,Wamsi Mohan,Maintains,Buy,Buy,900,850,bullish
+69bc180a85c81300016fd0e1,2026-03-19,Citigroup,Asiya Merchant,Maintains,Buy,Buy,875,750,bullish
+6980eda924a26100013bd52b,2026-02-02,Citigroup,Asiya Merchant,Maintains,Buy,Buy,750,490,bullish
+6980ed5624a26100013bd516,2026-02-02,Barclays,Thomas O'Malley,Maintains,Equal-Weight,Equal-Weight,750,385,neutral
+697d2790eb4805000137bcab,2026-01-30,Jefferies,Blayne Curtis,Maintains,Buy,Buy,700,600,bullish
+697ceeae24a26100013bb7ba,2026-01-30,Goldman Sachs,James Schneider,Maintains,Buy,Buy,700,320,bullish
+697ce4f8eb4805000137b4e0,2026-01-30,Morgan Stanley,Joseph Moore,Maintains,Overweight,Overweight,690,483,bullish
+697cc4b85c001a0001a4b10f,2026-01-30,Cantor Fitzgerald,C.J. Muse,Maintains,Overweight,Overweight,800,550,bullish
+697cc273eb4805000137afce,2026-01-30,Wedbush,Matt Bryson,Maintains,Outperform,Outperform,740,600,bullish
+696fc3b847b05e0001462c99,2026-01-20,Citigroup,Asiya Merchant,Maintains,Buy,Buy,490,280,bullish
+6968ff102591630001c48bdf,2026-01-15,Wells Fargo,Aaron Rakers,Maintains,Equal-Weight,Equal-Weight,380,230,neutral
+6968ec8416457900013585b0,2026-01-15,Benchmark,Mark Miller,Maintains,Buy,Buy,450,260,bullish
+6967b2d51645790001357526,2026-01-14,Bernstein,Mark Newman,Maintains,Outperform,Outperform,580,300,bullish
+696142dc8f047b0001ff530f,2026-01-09,Mizuho,Vijay Rakesh,Maintains,Outperform,Outperform,410,250,bullish

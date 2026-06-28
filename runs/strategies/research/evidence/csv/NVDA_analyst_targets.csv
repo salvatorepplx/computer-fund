@@ -1,0 +1,40 @@
+id,date,firm,analyst,action,rating_current,rating_prior,price_target_current,price_target_prior,sentiment
+6a1f0790a5d7f200013bee35,2026-06-02,Needham,N. Quinn Bolton,Reiterates,Buy,Buy,270,270,bullish
+6a1dc3ee5c8fcc0001ff3026,2026-06-01,DA Davidson,Gil Luria,Maintains,Buy,Buy,300,300,bullish
+6a17063de7dfeb0001eb41e4,2026-05-27,Tigress Financial,Ivan Feinseth,Maintains,Strong Buy,Strong Buy,425,360,bullish
+6a0f5454af42690001c1d5a9,2026-05-21,UBS,Timothy Arcuri,Maintains,Buy,Buy,280,275,bullish
+6a0f4656af42690001c1d50b,2026-05-21,Evercore ISI Group,Mark Lipacis,Maintains,Outperform,Outperform,413,352,bullish
+6a0f3615e7dfeb0001e9bfab,2026-05-21,DA Davidson,Gil Luria,Maintains,Buy,Buy,300,300,bullish
+6a0f35fcaf42690001c1d437,2026-05-21,Truist Securities,William Stein,Reiterates,Buy,Buy,307,287,bullish
+6a0f2af1700a22000146a189,2026-05-21,RBC Capital,Srini Pajjuri,Maintains,Outperform,Outperform,270,250,bullish
+6a0f20d7af42690001c1d2f5,2026-05-21,Cantor Fitzgerald,C.J. Muse,Reiterates,Overweight,Overweight,350,350,bullish
+6a0f1ec5af42690001c1d2d4,2026-05-21,Wedbush,Matt Bryson,Maintains,Outperform,Outperform,330,300,bullish
+6a0f1d09af42690001c1d2a2,2026-05-21,Stifel,Ruben Roy,Maintains,Buy,Buy,282,250,bullish
+6a0f1783af42690001c1d207,2026-05-21,JP Morgan,Harlan Sur,Maintains,Overweight,Overweight,280,265,bullish
+6a0f1298af42690001c1d0ee,2026-05-21,Jefferies,Blayne Curtis,Maintains,Buy,Buy,300,275,bullish
+6a0efebdaf42690001c1cd65,2026-05-21,Morgan Stanley,Joseph Moore,Maintains,Overweight,Overweight,288,285,bullish
+6a0efb7daf42690001c1cc74,2026-05-21,Rosenblatt,Kevin Cassidy,Maintains,Buy,Buy,325,325,bullish
+6a0eeee4b523c50001ebbb62,2026-05-21,Keybanc,John Vinh,Maintains,Overweight,Overweight,310,300,bullish
+6a0ee8fdb523c50001ebbb3a,2026-05-21,Benchmark,Cody Acree,Maintains,Buy,Buy,335,250,bullish
+6a0ee778af42690001c1c975,2026-05-21,B of A Securities,Vivek Arya,Maintains,Buy,Buy,350,320,bullish
+6a0ee649af42690001c1c925,2026-05-21,Baird,Tristan Gerra,Maintains,Outperform,Outperform,500,300,bullish
+6a0ed855e7dfeb0001e9794e,2026-05-21,Needham,N. Quinn Bolton,Maintains,Buy,Buy,270,240,bullish
+6a0c6e6baf42690001c1aa6c,2026-05-19,HSBC,Frank Lee,Maintains,Buy,Buy,325,295,bullish
+6a0b2dd5700a2200014650d2,2026-05-18,DA Davidson,Gil Luria,Maintains,Buy,Buy,300,250,bullish
+6a0b086a700a220001464c9c,2026-05-18,Morgan Stanley,Joseph Moore,Maintains,Overweight,Overweight,285,260,bullish
+6a0b04a2700a220001464c29,2026-05-18,Wedbush,Matt Bryson,Reiterates,Outperform,Outperform,300,300,bullish
+6a0af7c6e7dfeb0001e7f8a3,2026-05-18,Keybanc,John Vinh,Maintains,Overweight,Overweight,300,275,bullish
+6a074f4fb523c50001eb6a52,2026-05-15,TD Cowen,Joshua Buchalter,Maintains,Buy,Buy,275,235,bullish
+6a0636d5b523c50001eb57f3,2026-05-14,UBS,Timothy Arcuri,Maintains,Buy,Buy,275,245,bullish
+6a05f6c1700a2200014574bc,2026-05-14,RBC Capital,Srini Pajjuri,Reiterates,Outperform,Outperform,250,250,bullish
+6a05c24c700a220001452880,2026-05-14,Cantor Fitzgerald,C.J. Muse,Maintains,Overweight,Overweight,350,300,bullish
+6a032ca4157f2000011438df,2026-05-12,Wells Fargo,Aaron Rakers,Maintains,Overweight,Overweight,315,265,bullish
+69ccb36d829a6e00017f312e,2026-03-31,Benchmark,Cody Acree,Reiterates,Buy,Buy,250,250,bullish
+69c14e1dd6d8cf00012e8427,2026-03-23,Rosenblatt,Kevin Cassidy,Maintains,Buy,Buy,325,325,bullish
+69c1366fa5ac450001d85c54,2026-03-23,Cantor Fitzgerald,C.J. Muse,Reiterates,Overweight,Overweight,300,300,bullish
+69bbc73cda90f30001430d28,2026-03-19,Raymond James,Srini Pajjuri,Maintains,Strong Buy,Strong Buy,323,291,bullish
+69bad23485c81300016f60b8,2026-03-18,Truist Securities,William Stein,Maintains,Buy,Buy,287,283,bullish
+69ba955185c81300016f294f,2026-03-18,Rosenblatt,Kevin Cassidy,Maintains,Buy,Buy,325,300,bullish
+69ba81d385c81300016f25a2,2026-03-18,Needham,N. Quinn Bolton,Reiterates,Buy,Buy,240,240,bullish
+69b967dd85c81300016edc7d,2026-03-17,TD Cowen,Joshua Buchalter,Reiterates,Buy,Buy,235,235,bullish
+69b95cddd6d8cf00012e2dfb,2026-03-17,RBC Capital,Srini Pajjuri,Reiterates,Outperform,Outperform,250,250,bullish
