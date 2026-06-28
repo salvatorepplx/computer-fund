@@ -1,6 +1,6 @@
 {
   "_doc": "Durable work backlog for the Computer Fund continuous loop. Drain highest-value pending item every wake.",
-  "updated": "2026-06-28T00:54:02.852019+00:00",
+  "updated": "2026-06-28T01:32:19.803179+00:00",
   "items": [
     {
       "id": "AUDIT-universe",
@@ -9,7 +9,7 @@
       "owner": "computer",
       "desc": "Weakest axis per self-audit: universe (health 0.67). 4 names tracked (target broader cross-section for cross-sectional lead-lag; PATH/CRM queued)",
       "status": "pending",
-      "added": "2026-06-28T00:54:02.852019+00:00"
+      "added": "2026-06-28T01:32:19.803179+00:00"
     },
     {
       "id": "STRAT-WIDE",

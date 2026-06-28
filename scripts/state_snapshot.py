@@ -19,7 +19,15 @@ sys.path.insert(0, str(ROOT))
 from evals.leadlag_real import probe
 from evals.leadlag_permutation import permutation_test
 
-NAMES = ["TICKER:NVDA", "TICKER:RDDT", "TICKER:TSLA", "TICKER:SNDK"]
+NAMES = [
+    "TICKER:NVDA",
+    "TICKER:RDDT",
+    "TICKER:TSLA",
+    "TICKER:SNDK",
+    "TICKER:CRM",
+    "TICKER:PATH",
+]
+
 
 
 def _is_trade_eligible(v: dict) -> bool:
