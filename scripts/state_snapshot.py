@@ -17,9 +17,28 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from evals.leadlag_real import probe
-from execution.ingest_runner import load_series
+from evals.leadlag_permutation import permutation_test
 
 NAMES = ["TICKER:NVDA", "TICKER:RDDT", "TICKER:TSLA", "TICKER:SNDK"]
+
+
+def _is_trade_eligible(v: dict) -> bool:
+    perm = v.get("_perm") or {}
+    return bool(
+        v.get("authoritative")
+        and v.get("verdict") == "EDGE"
+        and not v.get("circularity_flag")
+        and perm.get("significant_at_0.10")
+    )
+
+
+def _perm_summary(perm: dict) -> str:
+    if perm.get("error"):
+        return f"perm_error={perm.get('error')}"
+    p_value = perm.get("p_value")
+    verdict = perm.get("verdict", "UNKNOWN")
+    significant = perm.get("significant_at_0.10")
+    return f"perm={verdict} p={p_value} sig={significant}"
 
 
 def _git(*args) -> str:
@@ -37,34 +56,60 @@ def build() -> str:
     recent = _git("log", "--oneline", "-5")
 
     rows = []
-    authoritative_edge = []
+    eligible_edges = []
+    raw_edges_blocked_by_perm = []
     for e in NAMES:
         try:
             v = probe(e)
         except Exception as ex:
             rows.append(f"| {e} | ERR | — | — | {str(ex)[:30]} |")
             continue
+        try:
+            v["_perm"] = permutation_test(e, k=2000, min_n=v.get("min_n", 24))
+        except Exception as ex:
+            v["_perm"] = {"significant_at_0.10": False, "p_value": None, "error": str(ex)[:80]}
         n = v.get("n"); verdict = v.get("verdict"); circ = v.get("circularity_flag")
         nraw = v.get("n_raw_points")
-        rows.append(f"| {e} | {n} (raw {nraw}) | {verdict} | {v.get('best_lag')}/{v.get('best_corr')} | circ={circ} |")
-        if v.get("authoritative") and verdict == "EDGE" and not circ:
-            authoritative_edge.append(e)
+        flags = f"circ={circ}; {_perm_summary(v.get('_perm') or {})}"
+        rows.append(f"| {e} | {n} (raw {nraw}) | {verdict} | {v.get('best_lag')}/{v.get('best_corr')} | {flags} |")
+        if _is_trade_eligible(v):
+            eligible_edges.append(e)
+        elif v.get("authoritative") and verdict == "EDGE" and not circ:
+            raw_edges_blocked_by_perm.append(e)
 
     # find the deepest series + how far from authoritative (n_spaced>=24)
     depths = {e: probe(e).get("n", 0) for e in NAMES}
     deepest = max(depths, key=depths.get)
     gap = max(0, 24 - depths[deepest])
 
-    blocking = ("An authoritative EDGE exists: " + ", ".join(authoritative_edge) +
-                " -> run alpha_pipeline, review, place." ) if authoritative_edge else (
-        f"No authoritative verdict yet. Deepest: {deepest} at n_spaced={depths[deepest]} "
-        f"(~{gap} more time-spaced points to authoritative). Permutation null so far: edges "
-        f"indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.")
-
-    next_action = ("Promote the authoritative EDGE via alpha_pipeline -> PROPOSED -> safety review -> trade."
-                   if authoritative_edge else
-                   "Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is "
-                   "authoritative: if it survives permutation (p<=0.10) -> trade; else KILL seed thesis, evolve.")
+    if eligible_edges:
+        honest_finding = (
+            "At least one lead-lag thesis survives the authoritative raw EDGE, circularity, "
+            "and permutation gates. Pipeline may emit PROPOSED artifacts, not orders.")
+        blocking = ("Trade-eligible EDGE exists after permutation gate: " + ", ".join(eligible_edges) +
+                    " -> run alpha_pipeline for PROPOSED review handoff.")
+        next_action = "Run alpha_pipeline; only PROPOSED artifacts that survive safety review may advance."
+    elif raw_edges_blocked_by_perm:
+        honest_finding = (
+            "Seed lead-lag thesis is NOT surviving the permutation null test so far "
+            "(apparent edges ~ chance). Pipeline correctly proposes ZERO trades. "
+            "An honest KILL is a win, not a failure.")
+        blocking = ("Raw authoritative EDGE failed the permutation trade gate: " +
+                    ", ".join(raw_edges_blocked_by_perm) +
+                    ". Alpha pipeline should have no eligible proposal; KILL+evolve the thesis.")
+        next_action = "Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve the thesis."
+    else:
+        honest_finding = (
+            "No current series satisfies every trade-eligibility gate. Pipeline should propose ZERO trades "
+            "until an authoritative non-circular EDGE also survives the permutation null test.")
+        blocking = (
+            f"No trade-eligible verdict yet. Deepest: {deepest} at n_spaced={depths[deepest]} "
+            f"(~{gap} more time-spaced points to authoritative). Permutation null so far: edges "
+            f"indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.")
+        next_action = (
+            "Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is "
+            "authoritative: if it survives permutation (p<=0.10) -> alpha_pipeline PROPOSED; "
+            "else KILL seed thesis, evolve.")
 
     return f"""# Computer Fund — STATE (auto-generated; do not hand-edit)
 
@@ -91,8 +136,7 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 {chr(10).join(rows)}
 
 ## The one honest finding
-Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent edges ~ chance).
-Pipeline correctly proposes ZERO trades. An honest KILL is a win, not a failure.
+{honest_finding}
 
 ## What's blocking the next outcome
 {blocking}
