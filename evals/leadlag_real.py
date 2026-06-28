@@ -23,6 +23,11 @@ sys.path.insert(0, str(ROOT))
 from execution.ingest_runner import load_series
 
 
+def _insufficient_result(entity: str, n: int, n_raw: int, min_n: int, note: str) -> dict:
+    return {"entity": entity, "n": n, "n_raw_points": n_raw, "min_n": min_n,
+            "verdict": "INSUFFICIENT", "authoritative": False, "note": note}
+
+
 def _pearson(a: list[float], b: list[float]) -> float:
     if len(a) != len(b) or len(a) < 2:
         return 0.0
@@ -79,8 +84,7 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
     n_raw = len(valid)
     n = len(pts)
     if n < 3:
-        return {"entity": entity, "n": n, "n_raw_points": n_raw, "verdict": "INSUFFICIENT",
-                "authoritative": False, "note": "need >=3 aligned points"}
+        return _insufficient_result(entity, n, n_raw, min_n, "need >=3 aligned points")
 
     sent = [s for s, _ in pts]
     price = [pr for _, pr in pts]
@@ -103,8 +107,7 @@ def probe(entity: str, min_n: int = 24, max_lag: int = 5,
             lags.append({"lag": lag, "corr": round(_pearson(a, b), 4), "n_pairs": len(a)})
 
     if not lags:
-        return {"entity": entity, "n": n, "n_raw_points": n_raw, "verdict": "INSUFFICIENT",
-                "authoritative": False, "note": "not enough diff pairs"}
+        return _insufficient_result(entity, n, n_raw, min_n, "not enough diff pairs")
 
     # Circularity guard: if sentiment LEVEL tracks price LEVEL contemporaneously
     # too tightly, the "signal" may just be reading price action back (lookahead-ish).
