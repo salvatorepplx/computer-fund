@@ -41,18 +41,24 @@ _RATING_MAP = [
     (re.compile(r"extremely\s+bullish", re.I), 0.8),
     (re.compile(r"moderate\s+buy", re.I), 0.45),
     (re.compile(r"moderate\s+sell", re.I), -0.45),
-    (re.compile(r"\bbuy\b", re.I), 0.4),
-    (re.compile(r"\bsell\b", re.I), -0.4),
-    (re.compile(r"\bhold\b|\bneutral\b", re.I), 0.0),
+    (re.compile(
+        r"\b(?:rated|rating|consensus|recommendation)\s+(?:a\s+)?buy\b|"
+        r"\bbuy\s+(?:rating|recommendation)\b", re.I), 0.4),
+    (re.compile(
+        r"\b(?:rated|rating|consensus|recommendation)\s+(?:a\s+)?sell\b|"
+        r"\bsell\s+(?:rating|recommendation)\b", re.I), -0.4),
+    (re.compile(
+        r"\b(?:rated|rating|consensus|recommendation)\s+(?:a\s+)?(?:hold|neutral)\b|"
+        r"\b(?:hold|neutral)\s+(?:rating|recommendation)\b", re.I), 0.0),
 ]
 
 # Lexical balance terms (broad, domain-tuned for equities commentary).
 _BULL = re.compile(
-    r"\b(bull|bullish|buy|upgrade|outperform|accelerat\w*|record|beat\w*|"
+    r"\b(bull|bullish|upgrade|outperform|accelerat\w*|record|beat\w*|"
     r"upside|rally|rebound|breakout|strong\w*|support holds|reclaim\w*|"
     r"constructive|overweight|undervalued|momentum up)\b", re.I)
 _BEAR = re.compile(
-    r"\b(bear|bearish|sell|downgrade|underperform|slowdown|decelerat\w*|"
+    r"\b(bear|bearish|downgrade|underperform|slowdown|decelerat\w*|"
     r"miss\w*|downside|selloff|sell-off|breakdown|weak\w*|drop\w*|slip\w*|"
     r"slid\w*|cut\w*|overvalued|oversold|pressure|headwind\w*|probe|scrutiny)\b", re.I)
 
