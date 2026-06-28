@@ -314,3 +314,14 @@ Copy this block for each future distilled lesson.
 - **Seeder rule**: future thesis seeds must target improving permutation significance (p<=0.10) or designing a different null test; do not propose trading logic off corr alone.
 - **Meta/eval linkage**: this should move `self_audit` / wording to treat `perm=EDGE_IS_NOISE` as an authoritative KILL signal, not a blocked trade annoyance.
 - **Revisit trigger**: a later run achieves p<=0.10 with circ=False at n_spaced>=24 on any name, or a new signal family passes an improved null test.
+
+## 2026-06-28 — The live regex sentiment scorer is systematically over-bullish (signal-quality flaw)
+- Spike (`scripts/spike_llm_extract.py`, `runs/spikes/2026-06-28_llm_extract_vs_regex.md`) compared the
+  regex/lexical scorer in web_sentiment.py against pplx_sdk.llm.extract on a 22-doc NVDA corpus.
+- Regex: +0.2293 (flagged 10 boilerplate quote pages as high-conf "explicit"). LLM honest read: +0.0939.
+- The regex scorer treats generic quote-page text as bullish signal — a systematic upward bias. An
+  over-bullish input feeding the lead-lag thesis could manufacture a false EDGE. The seed thesis dying on
+  the permutation null may be partly masking that the underlying signal itself is mis-calibrated.
+- Lesson: validate the SCORER, not just the verdict. We were stress-testing lead-lag (downstream) while
+  the upstream sentiment scorer had an unaudited bias. Upgrade path = llm.extract in PARALLEL burn-in
+  (score_llm alongside score_raw), never a hot-swap mid-thesis. Use the full pplx_sdk surface, not 1 call.
