@@ -507,6 +507,36 @@ def eval_strategy_space_candidate_status() -> None:
             strategy_space.REG = original_reg
 
 
+def eval_promote_and_place_executor_rails() -> None:
+    """Blocker B: the PROPOSED->ARMED->place executor must be hard-bound to the allowlisted
+    account and fail closed on an ineligible / non-PROPOSED artifact. This is a critical
+    money-path; keep it covered by the gating suite so a regression can't silently re-arm a kill."""
+    import scripts.promote_and_place as P
+    from execution.safety import assert_account_allowed, SafetyViolation
+    # 1. Executor binds to the ONLY allowlisted account; the account rail rejects Roth/margin.
+    require(P.ACCOUNT == "696264779", "executor must target the Agentic allowlisted account only")
+    assert_account_allowed(P.ACCOUNT)  # must not raise
+    for bad in ("671638849", "875691461"):  # Roth, margin
+        rejected = False
+        try:
+            assert_account_allowed(bad)
+        except SafetyViolation:
+            rejected = True
+        require(rejected, f"executor account rail must reject {bad}")
+    # 2. Gate 0 fails closed on a non-PROPOSED (e.g. KILLED) artifact: it must raise, not arm.
+    killed = REPO_ROOT / "runs" / "KILLED" / "battle-RDDT-leadlag-2026-06-28.json"
+    if killed.exists():
+        raised = False
+        try:
+            P.gate_validate_artifact(killed)
+        except Exception:
+            raised = True
+        require(raised, "executor gate 0 must refuse a non-PROPOSED (KILLED) artifact")
+    # 3. The price-axis-quality gate thresholds match the RDDT-kill reopen criteria.
+    require(P.MIN_DISTINCT_PRICES >= 15 and P.MAX_ZERO_RETURN_FRAC <= 0.20,
+            "executor price-axis gate must enforce the RDDT-kill data-quality thresholds")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -523,6 +553,7 @@ EVALS = [
     eval_proposed_artifact_validator,
     eval_proposed_schema_validator_alignment,
     eval_strategy_space_candidate_status,
+    eval_promote_and_place_executor_rails,
 ]
 
 
