@@ -1,6 +1,6 @@
 {
   "_doc": "Computer Fund strategy SEARCH SPACE. Entries are coordinates to investigate, not theses we rely on. A coordinate only becomes a real thesis (status=testing->edge) AFTER it survives research + the full falsification pipeline. Auto-sampled tuples are status=candidate_unvetted and carry NO weight until earned.",
-  "updated": "2026-06-27T00:18:23.438197+00:00",
+  "updated": "2026-06-28T01:14:59.532709+00:00",
   "theses": {
     "TH-b4dcf23284": {
       "id": "TH-b4dcf23284",
@@ -43,7 +43,7 @@
       "horizon": "5d",
       "structure": "long_flat",
       "risk": "kelly_capped",
-      "status": "candidate_unvetted",
+      "status": "killed",
       "falsifiers_required": [
         "min_n",
         "permutation_null",
@@ -59,7 +59,10 @@
       ],
       "created_at": "2026-06-27T00:17:22.652037+00:00",
       "notes": "sentiment_leadlag on rh_high_short @ 5d, long_flat/kelly_capped",
-      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts"
+      "note_demote": "auto-sampled tuple, NOT evidence-backed; must pass research+falsification before it counts",
+      "killed_at": "2026-06-27T18:14:00-07:00",
+      "kill_reason": "FIRST AUTHORITATIVE verdict at n_spaced=24 (NVDA): leadlag_real=EDGE (best_corr=0.5079 @ lag2, non-circular) BUT permutation null p=0.2075 (>0.10) => EDGE_IS_NOISE. Indistinguishable from chance. Trade gate not met; 0 proposals. Honest KILL. See runs/CORPSES.md 2026-06-27 entry.",
+      "corpse_ref": "runs/CORPSES.md#2026-06-27-seed-thesis"
     },
     "TH-703f03ad99": {
       "id": "TH-703f03ad99",

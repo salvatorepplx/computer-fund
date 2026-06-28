@@ -70,3 +70,34 @@ Copy this block for each future killed thesis.
 - **Seeder feedback**: How future research/sim prompts should change.
 - **Reopen criteria**: Exact new evidence required before retrying.
 ```
+
+### 2026-06-27 — Seed thesis: web-sentiment lead-lag predicts NVDA price (FIRST AUTHORITATIVE KILL)
+
+- **Status**: `KILLED`.
+- **Thesis**: short-horizon web-search sentiment changes lead NVDA price changes at a positive lag
+  (sentiment predates price), generating tradeable alpha — the Fund's seed "predate public sentiment
+  on a battle location" hypothesis.
+- **Evidence type**: OBSERVED data. 24 time-spaced points (n_spaced=24, de-bursted from 35 raw) of
+  Computer-captured web_search_sentiment vs corpus price proxy for TICKER:NVDA, 2026-06-26 → 2026-06-27.
+  This is the FIRST verdict to clear the authoritative threshold (n_spaced>=24); all prior verdicts were
+  PRELIMINARY and not a basis for capital.
+- **Kill reason**: FAILED the permutation null test. `evals/leadlag_real.py` reports verdict=EDGE
+  (best_corr=0.5079 at lag 2, non-circular) — but the raw correlation gate is too easy to fool at small N.
+  `evals/leadlag_permutation.py` (k=2000 label shuffles, seed=7) gives verdict=EDGE_IS_NOISE,
+  p_value=0.2075 (> the 0.10 bar): shuffled-label paths beat the observed correlation ~21% of the time.
+  The apparent edge is statistically indistinguishable from chance. The trade gate
+  (authoritative EDGE AND non-circular AND permutation p<=0.10) is NOT met. Alpha pipeline correctly
+  emits ZERO proposals. No trade placed. This is the system working exactly as designed: an honest KILL.
+- **Lesson**: a positive lead-lag correlation that clears a fixed magnitude threshold is NOT evidence of
+  alpha at small N — the permutation null is the gate that matters. Earlier preliminary readings (NVDA
+  ~0.51–0.64 best_corr) looked encouraging and would have been a trap without the shuffle test. Never let
+  the raw-correlation EDGE label authorize anything; the permutation p-value is authoritative.
+- **Seeder feedback**: do NOT re-propose "web-search sentiment level/change leads price at a short horizon"
+  for the same single-name, single-source setup. Future sentiment theses must either (a) use a different,
+  corroborated signal construction (cross-source divergence, mention-velocity acceleration), (b) operate on
+  a different horizon/structure, or (c) be tested cross-sectionally (>=30% of a >=30-name universe), not on
+  one ticker. Prefer the 5 researched mechanisms now seeded with evidence in
+  runs/strategies/research/evidence/ over re-running the seed.
+- **Reopen criteria**: a materially different signal (multi-source corroboration or mention-velocity, not
+  raw web-sentiment level), tested on a >=30-name universe, that survives the permutation null (p<=0.10)
+  AND the circularity guard AND cross-sectional generalization (>=30% of universe) on forward data.

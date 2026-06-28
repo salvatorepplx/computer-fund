@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T01:01:38.829883+00:00 · HEAD 7830f28_
+_Last updated: 2026-06-28T01:15:11.088450+00:00 · HEAD 2f335e6_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,7 +20,7 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 23 (raw 33) | PRELIMINARY_EDGE | 2/0.5078 | circ=False |
+| TICKER:NVDA | 24 (raw 34) | EDGE | 2/0.5079 | circ=False |
 | TICKER:RDDT | 17 (raw 27) | PRELIMINARY_EDGE | 2/0.6972 | circ=False |
 | TICKER:TSLA | 17 (raw 27) | PRELIMINARY_EDGE | 4/0.4969 | circ=False |
 | TICKER:SNDK | 14 (raw 15) | PRELIMINARY_NO_EDGE | 0/0.4367 | circ=False |
@@ -30,10 +30,10 @@ Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent
 Pipeline correctly proposes ZERO trades. An honest KILL is a win, not a failure.
 
 ## What's blocking the next outcome
-No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=23 (~1 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
+An authoritative EDGE exists: TICKER:NVDA -> run alpha_pipeline, review, place.
 
 ## Single next action
-Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is authoritative: if it survives permutation (p<=0.10) -> trade; else KILL seed thesis, evolve.
+Promote the authoritative EDGE via alpha_pipeline -> PROPOSED -> safety review -> trade.
 
 ## Where things live
 - Soul/law: CONSTITUTION.md, CHARTER.md, HANDOFF.md
@@ -46,9 +46,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
+2f335e6 Restore heartbeat: recreate 3 crons (capture 80400d62 / watch 2dff0abe / self-audit 98c3d3f3) lost with source sandbox; commit trigger scripts + runs/CRONS.md
+6d27e68 web series capture tick (NVDA n_spaced=23, 1 from authoritative)
 7830f28 Capture point-in-time external evidence for the 5 research mechanisms (Failure 3)
 87a59a6 Capture & commit point-in-time external evidence for the 5 research mechanisms (Failure 3): analyst consensus/PT-revisions + 6q earnings/PEAD for NVDA/RDDT/TSLA/SNDK
 6c30d5a web series capture tick (NVDA n_spaced=22, +1 toward N=24 threshold)
-1bdb7b6 Structural fix (Failure 2): add pr_queue_drain axis to self_audit; add computer-fund-operating-doctrine skill (Obligations A+B)
-b4b0036 Structural fix (Failure 2): operating-doctrine skill + pr_queue self-audit axis
 ```

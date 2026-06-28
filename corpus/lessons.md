@@ -293,3 +293,16 @@ Copy this block for each future distilled lesson.
   the open PR numbers when non-draft PRs are open, and a fail-safe 0.6 "unknown" when `gh` is
   unavailable (sandbox down). Also fixed `_has_test()` to scan `tests/` as well as `evals/` (tests
   moved to tests/), which honestly raised the signal axis to tested=True.
+
+## 2026-06-27 — FIRST AUTHORITATIVE VERDICT: seed thesis KILLED (the system worked)
+- NVDA reached n_spaced=24 (de-bursted from 35 raw web_search_sentiment points). First verdict to clear
+  the authoritative threshold. leadlag_real=EDGE (best_corr=0.5079 @ lag2, non-circular) — but the
+  permutation null (k=2000, seed=7) returned p=0.2075 > 0.10 => EDGE_IS_NOISE. The seed "predate public
+  sentiment via lead-lag" thesis is statistically indistinguishable from chance. Trade gate (auth EDGE +
+  non-circular + p<=0.10) NOT met; alpha pipeline emitted 0 proposals; no trade placed. KILLED, corpse +
+  registry updated (TH-8008e62803 -> killed). This is the chip-on-shoulder discipline paying off: the
+  raw-correlation EDGE label would have been a trap; the permutation p-value is the gate that mattered.
+- NEXT (evolve, per CONSTITUTION): pursue the 5 researched mechanisms now seeded with committed evidence
+  (runs/strategies/research/evidence/), not a variant of the dead single-name single-source lead-lag.
+  Real breadth = theses at researched+ with distinct mechanisms tested cross-sectionally (>=30% of a
+  >=30-name universe), not one ticker.
