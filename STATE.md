@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T02:44:12.918625+00:00 · HEAD 91873a2_
+_Last updated: 2026-06-28T03:07:43.546155+00:00 · HEAD cd292e8_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,10 +20,10 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 29 (raw 39) | EDGE | 2/0.5064 | circ=False; perm=EDGE_IS_NOISE p=0.1325 sig=False |
-| TICKER:RDDT | 22 (raw 32) | PRELIMINARY_EDGE | 2/0.6602 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.048 sig=True |
-| TICKER:TSLA | 22 (raw 32) | PRELIMINARY_EDGE | 4/0.4663 | circ=False; perm=PRELIMINARY_NULL p=0.205 sig=False |
-| TICKER:SNDK | 19 (raw 20) | PRELIMINARY_NO_EDGE | 0/0.3882 | circ=False; perm=PRELIMINARY_NULL p=0.2325 sig=False |
+| TICKER:NVDA | 30 (raw 40) | EDGE | 2/0.5039 | circ=False; perm=EDGE_IS_NOISE p=0.1505 sig=False |
+| TICKER:RDDT | 23 (raw 33) | PRELIMINARY_EDGE | 2/0.6575 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.041 sig=True |
+| TICKER:TSLA | 23 (raw 33) | PRELIMINARY_EDGE | 4/0.4645 | circ=False; perm=PRELIMINARY_NULL p=0.1745 sig=False |
+| TICKER:SNDK | 20 (raw 21) | PRELIMINARY_NO_EDGE | 0/0.384 | circ=False; perm=PRELIMINARY_NULL p=0.1965 sig=False |
 | TICKER:CRM | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 | TICKER:PATH | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 
@@ -47,9 +47,9 @@ Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve 
 
 ## Recent commits
 ```
-91873a2 state: advance last_seen pointers
-f70b137 Audit: improve universe coverage scoring + wire CRM/PATH series
-3d91b07 Add open-web tool split HPR (#44)
-f2aa107 Lesson: validate the scorer not just the verdict (regex over-bullish bias found)
-1df0c4a Spike: llm.extract vs regex scorer — regex is systematically over-bullish (+0.23 vs +0.09 honest read); evidence for signal-axis upgrade, parallel burn-in proposed (no hot-swap)
+cd292e8 state: advance last seen after PR46 merge
+916da95 Guard web sentiment against quote boilerplate bias (#46)
+cfdb9d5 state: advance slack last_seen_ts
+8e3e2b2 [sal-bot Teammate] Skip parked axes for self-audit queue (#45)
+c6a2877 web series capture tick
 ```
