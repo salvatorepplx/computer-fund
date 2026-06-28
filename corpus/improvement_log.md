@@ -13,8 +13,9 @@ Each entry: `[DATE] AXIS — what was wrong / could be better → what changed (
   Until calibrated, treat sim output as a weak prior, not a trigger.
 - **[GRAPH-SENT-1] knowledge graph** — sentiment is hand-seeded; needs real observed-sentiment
   ingestion (finance ticker sentiment + social proxies) before momentum/`current_step_est` mean anything.
-- **[EVAL follow-ups] self-eval** — the starter offline REG harness exists; remaining work is CAP
-  eval/calibration coverage and additional falsification suites.
+- **[EVAL follow-ups] self-eval** — the starter offline REG harness exists and now includes
+  pre-registered CAP calibration fixture metrics. Remaining work is observed-history calibration,
+  broader CAP coverage, and additional falsification suites.
 - **[EXEC-SETTLE-1] execution** — cash account is T+1 settlement; sizing logic does not yet model
   unsettled cash. Could over-deploy across same-day round-trips. Add settlement-aware buying power.
 
@@ -24,7 +25,9 @@ Each entry: `[DATE] AXIS — what was wrong / could be better → what changed (
   time-to-saturation, peak timing, edge-score distribution, and persistent-network/cascade
   sensitivity. Current output measures the weakness; it does not yet prove improvement.
 - [2026-06-26] self-eval — added EVAL-0 starter offline REG harness at
-  `evals/run_offline_evals.py`. This does not yet cover CAP evals or calibration.
+  `evals/run_offline_evals.py`, now including deterministic CAP calibration fixture metrics via
+  `evals/cap_calibration.py`. This is pre-registered fixture coverage, not observed-history
+  calibration.
 - [2026-06-26] engineering — replaced deprecated `datetime.utcnow()` with timezone-aware UTC.
 - [2026-06-26] external-systems — Fund versioned in private GitHub repo; can PR against itself.
 
