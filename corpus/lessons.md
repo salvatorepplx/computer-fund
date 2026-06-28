@@ -249,3 +249,34 @@ Copy this block for each future distilled lesson.
   NOT count of generated tuples. No silent promotions; each rung needs logged evidence.
 - The right SOURCE of breadth is real research (Computer web-research + Teammate's eng-org investigating
   mechanisms), not a tuple sampler. Generation proposes coordinates; evidence earns theses.
+
+## 2026-06-28 — Hard-coded repo path broke BOTH cron wrappers (P1, found on cold-boot)
+- **Bug:** `scripts/capture_and_commit.sh` and `scripts/watch_trigger.sh` both set
+  `ROOT="/home/user/workspace/computer_fund"` (underscore). The real clone dir is `computer-fund`
+  (hyphen). With `cd "$ROOT" || exit 1`, every capture and watch tick hit FATAL and exited BEFORE
+  capturing or watching. This was a contributing cause to the overnight stall, independent of the
+  sandbox outage — even when the sandbox was up, the wrappers self-aborted.
+- **Why it hid:** The handoff narrated the wrapper as "the ONE hardened entry point," but no tick
+  had actually exercised `cd "$ROOT"` against a fresh clone since the dir was renamed. Narration of
+  robustness is not robustness.
+- **Fix:** Derive `ROOT` from the script's own location
+  (`SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"`)
+  so the wrapper works regardless of clone dir name. NEVER hard-code an absolute repo path again.
+- **Lesson:** Any script meant to be run by a cold cron must locate the repo relative to itself, and
+  must be smoke-tested from a clean clone, not just read.
+
+## 2026-06-28 — Gating evals must not depend on live capture output (PR #20, change-requested)
+- PR #20's KG observed-series diagnostic was wired into the gating `run_offline_evals` list but
+  hard-asserted `row_count == 3`, `source == "finance_ticker_sentiment"`, a pinned score/event_id/
+  momentum — all true only against a stale 3-row fixture. Live NVDA series is now 32 rows
+  (4 finance_ticker + 28 web_search). Merging would have failed the whole suite + broken the verdict
+  gate. **Disposal caught it by reading the diff against ground truth; Teammate's "validation PASS"
+  was against the old snapshot.** Lesson: a gating eval must read a FROZEN committed fixture, never
+  mutable live series output; if it reads live data it must assert structural invariants only.
+
+## 2026-06-28 — Two ticks can collide; reconcile, don't fight
+- On cold-boot, a parallel tick (cron firing as Computer) merged #32 + several PRs and committed the
+  verbatim HANDOFF_CONTEXT.md while this thread was working from an older clone, producing an add/add
+  conflict. Resolution: keep the better/verbatim remote artifact, `git reset --hard origin/master`,
+  re-derive open work from live `gh pr list`. Lesson: never trust a local clone's snapshot over
+  origin; always re-fetch + re-list before deciding what work remains.

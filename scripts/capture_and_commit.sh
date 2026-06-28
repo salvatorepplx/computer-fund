@@ -11,7 +11,12 @@
 # Requires api_credentials=["pplx-sdk","github"], or split capture/commit credentials as above.
 set -uo pipefail   # NOT -e: we never want one failing step to strand a commit
 
-ROOT="/home/user/workspace/computer_fund"
+# Derive repo root from THIS script's location so the wrapper works regardless of the
+# clone directory name. (Bug fix: a hard-coded "/home/user/workspace/computer_fund" with an
+# underscore never matched the real "computer-fund" dir, so `cd` hit FATAL and every cron
+# tick exited before capturing. Never hard-code the path again.)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT" || { echo "FATAL: cannot cd $ROOT"; exit 1; }
 
 PAIRS=( "TICKER:NVDA NVDA Nvidia" "TICKER:RDDT RDDT Reddit" \

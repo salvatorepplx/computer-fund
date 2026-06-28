@@ -9,7 +9,11 @@ set -uo pipefail
 
 CHANNEL="C0BCXKG835M"
 COMPUTER_UID="U08C9BB5A2G"
-ROOT="/home/user/workspace/computer_fund"
+# Derive repo root from this script's location (do not hard-code; the old
+# "/home/user/workspace/computer_fund" underscore path never matched the real
+# "computer-fund" dir and made the watch trigger exit FATAL every tick).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SEEN_FILE="$ROOT/state/last_seen_ts.txt"
 GH_STATE="$ROOT/state/gh_last_seen.txt"   # stores: "<latest_master_sha>|<sorted open PR numbers>"
 
