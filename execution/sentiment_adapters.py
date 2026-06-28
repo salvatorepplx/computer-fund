@@ -79,15 +79,36 @@ class FinanceTickerSentimentSource:
     # Embedded quantified sentiment signal, e.g. "social sentiment declined 9.88 points".
     _QUANT = re.compile(r"social sentiment (declined|dropped|fell|rose|increased|gained)\s+([0-9.]+)", re.I)
 
+    def tool_arguments(self, symbol: str) -> dict:
+        return {
+            "ticker_symbol": symbol,
+            "query": f"{symbol} bull vs bear",
+            "action": f"Analyzing bulls vs bears for {symbol}",
+        }
+
+    def raw_text_from_payload(self, payload) -> str:
+        if isinstance(payload, dict):
+            return payload.get("content", "") or ""
+        return str(payload or "")
+
+    def fetch_record(self, entity: str, symbol: str, raw_id: str, call_tool) -> dict:
+        """Computer-side. call_tool(source_id, tool_name, arguments) -> raw connector dict."""
+        payload = call_tool("finance", self.source_id, self.tool_arguments(symbol))
+        return {
+            "entity": entity,
+            "symbol": symbol,
+            "raw_text": self.raw_text_from_payload(payload),
+            "raw_id": raw_id,
+        }
+
     def fetch(self, since: str, until: str, query: SentimentQuery, call_tool) -> Iterable[dict]:
-        """Computer-side. call_tool(ticker, q) -> raw connector dict."""
+        """Computer-side. call_tool(source_id, tool_name, arguments) -> raw connector dict."""
         for ent in query.entities:
             # only ticker entities are resolvable here (TICKER:NVDA -> NVDA)
             if not ent.startswith("TICKER:"):
                 continue
             sym = ent.split(":", 1)[1]
-            raw = call_tool(sym, " ".join(query.keywords) or f"{sym} sentiment")
-            yield {"entity": ent, "symbol": sym, "raw_text": raw, "raw_id": f"{sym}:{since}"}
+            yield self.fetch_record(ent, sym, f"{sym}:{since}", call_tool)
 
     def _score_text(self, text: str) -> tuple[float, float, dict]:
         """Return (score[-1..1], confidence[0..1], provenance). Structured-first, lexicon fallback.
