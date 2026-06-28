@@ -22,7 +22,8 @@ class SelfAuditUniverseTests(unittest.TestCase):
                  mock.patch.object(self_audit, "_tracked_universe_names", return_value=names):
                 health, note = self_audit.axis_universe()
 
-        self.assertAlmostEqual(health, 2.5 / 6)
+        expected_health = 0.5 * (3 / 6) + 0.5 * (2 / 6)
+        self.assertAlmostEqual(health, expected_health)
         self.assertIn("4 configured names", note)
         self.assertIn("3 wired series files", note)
         self.assertIn("2 observed series with rows", note)
