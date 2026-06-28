@@ -132,3 +132,45 @@ Copy this block for each future killed thesis.
 - **Reopen criteria**: retry only if TSLA or a broader cross-sectional basket clears the complete gate
   (authoritative n_spaced>=24, `circularity_flag=false`, and permutation `p<=0.10`) on committed
   observed data, or if a pre-registered replacement null test supersedes the current permutation gate.
+
+### 2026-06-28 — RDDT lead-lag EDGE survives the permutation null but rides a DEGENERATE price proxy
+
+- **Status**: `KILLED` (proposal withdrawn to `runs/KILLED/battle-RDDT-leadlag-2026-06-28.json` before ARM). Not traded.
+- **Evidence type**: OBSERVED committed canonical series only (`runs/sentiment/series/TICKER_RDDT.jsonl`); offline diagnostic, no live broker/account/order touch.
+- **Thesis**: TICKER:RDDT web-search sentiment changes lead short-horizon price changes (raw `verdict=EDGE`, `best_lag=2`, `best_corr=0.6522`, `circularity_flag=false`, n_spaced=24) strongly enough to trade after the full gate is met.
+- **What I checked (chip-on-shoulder, per V2 handoff)**: the handoff flagged this EDGE as a bug suspect because it appeared right after the #46/#47 scorer-bias fixes. Two findings:
+  1. **The scorer-change suspicion is CLEARED**: 32 of 35 raw points predate the scorer change (#46 03:05Z / #47 03:24Z); on RDDT the `score` vs `score_raw` divergence is negligible (mean +0.0014, max ±0.07). The edge is not manufactured by the mid-thesis signal change.
+  2. **The permutation null is ROBUST**: p = 0.0345 / 0.0465 / 0.0435 / 0.038 / 0.036 across seeds 7/1/42/123/2024 — all `significant_at_0.10=True`. Not a single-seed fluke.
+- **Kill reason (the defect the permutation test cannot see)**: the `price_proxy` series the lead-lag correlates against is **degenerate**. Across the 24 de-bursted points there are only **9 distinct price values** (167.0×7, 166.71×5, 162.37×5, …), **8 of 23 consecutive price-changes are exactly ZERO**, and there is a **24.1h capture gap** mid-series (the overnight hard-coded-path stall). The corpus price extractor is returning repeated/stuck boilerplate quotes, so the lead-lag is correlating real sentiment drift against a **step-function price artifact**, not real price discovery. A permutation test that shuffles *sentiment* labels against a corrupted *price* axis cannot detect the corruption — so a low p does NOT certify a tradeable edge. CHARTER: data quality is upstream of every verdict; no look-ahead, no fabrication.
+- **Lesson**: a robust permutation p is necessary but NOT sufficient. The null model only stress-tests the label axis; it assumes the OTHER axis (price) is trustworthy. Before trusting any lead-lag p-value, audit the price series for degeneracy (distinct-value count, zero-return fraction, capture gaps). See `corpus/lessons.md` 2026-06-28 entry.
+- **Diagnostic**: `scripts/diag_rddt_scorer_boundary.py`.
+- **Reopen criteria**: RDDT (or a cross-sectional basket) clears the full gate on a NON-degenerate price series — a real per-capture quote (live Robinhood/finance quote, not corpus-extracted), >=15 distinct price values with <20% zero-return fraction over n_spaced>=24, no multi-hour capture gaps, AND permutation p<=0.10.
+
+### 2026-06-28 — RDDT lead-lag "EDGE" killed: permutation can't see a degenerate price axis
+
+- **Status**: `KILLED`. The PROPOSED artifact (battle-RDDT-leadlag-2026-06-28) was withdrawn to
+  `runs/KILLED/`. NOT ARMED. No order placed.
+- **Evidence type**: OBSERVED committed canonical series only; offline/propose-only.
+- **Thesis**: RDDT web-search sentiment changes lead short-horizon price changes (best_lag=2,
+  best_corr=0.6522), authoritative n_spaced=24, non-circular, permutation p=0.0345
+  (EDGE_SURVIVES_NULL, seed-robust p in [0.032,0.0465] across 8 seeds).
+- **Why killed despite passing the literal gate**: the `price_proxy` axis the lead-lag correlates
+  against is DEGENERATE. Across the 24 de-bursted points there are only ~9 distinct price values
+  (167.0 x7, 166.71 x5, 162.37 x5), 8 of 23 consecutive price-changes are exactly ZERO, plus a
+  24.1h capture gap mid-series and a lone corpus-extraction spike (192.72 vs ~167 neighbors). The
+  corpus price extractor is returning stuck/repeated boilerplate quotes, so the "edge" is real
+  sentiment drift correlated against a step-function price artifact, not real price discovery.
+- **The key lesson**: a permutation test that shuffles SENTIMENT labels cannot detect a corrupted
+  PRICE axis. p=0.0345 certifies "this sentiment ordering is unusual vs shuffles" — it says nothing
+  about whether the price series is valid. Robustness probes (drop-worst-point, winsorize, reseed,
+  drop-tail) ALSO ran on the same degenerate prices and so falsely "confirmed" the edge. Data
+  quality is upstream of every verdict and upstream of every null test.
+- **NOT a #46/#47 scorer artifact**: 32/35 points predate the scorer change; score vs score_raw
+  divergence on RDDT is negligible (mean +0.0014). The original suspicion (scorer non-stationarity)
+  was the wrong bug; the real bug was the price axis. (Two suspicions, the deeper one won.)
+- **Diagnostics**: `scripts/diag_rddt_scorer_boundary.py` (price-axis degeneracy + scorer boundary),
+  `scripts/spike_rddt_robustness.py` (perturbation probes — useful but blind to the price-axis flaw).
+- **Reopen criteria**: RDDT (or a cross-sectional basket) clears the full gate on a NON-degenerate
+  price series: a real per-capture live quote (Robinhood/finance, not corpus-extracted), >=15
+  distinct price values with <20% zero-return fraction over n_spaced>=24, no multi-hour capture
+  gaps, AND permutation p<=0.10.

@@ -1,0 +1,54 @@
+{
+  "schema_version": "cf.integration.v1",
+  "artifact_id": "battle-RDDT-leadlag-2026-06-28",
+  "artifact_type": "proposal",
+  "state": "KILLED",
+  "killed": {
+    "killed_at": "2026-06-28T04:00:00Z",
+    "killed_by": "computer",
+    "reason": "Degenerate price proxy invalidates the lead-lag verdict. The permutation null is ROBUST (p=0.034-0.047 across seeds 7/1/42/123/2024, all significant) and the edge is NOT a #46/#47 scorer-change artifact (32/35 points predate the scorer change; score-vs-score_raw divergence on RDDT is negligible, mean +0.0014). BUT the price_proxy series the lead-lag correlates against is degenerate: across the 24 de-bursted points there are only 9 distinct price values (167.0 x7, 166.71 x5, 162.37 x5), 8 of 23 consecutive price-changes are exactly ZERO, and there is a 24.1h capture gap mid-series. The corpus price extractor is returning repeated/stuck boilerplate quotes, so the lead-lag is correlating real sentiment drift against a step-function price artifact, not real price discovery. A permutation test that shuffles sentiment labels cannot detect a corrupted price axis, so p=0.0345 does NOT certify a tradeable edge. CHARTER: data quality is upstream of every verdict; no fabrication, no look-ahead. NOT ARMED.",
+    "diagnostic": "scripts/diag_rddt_scorer_boundary.py",
+    "reopen_criteria": "RDDT (or a cross-sectional basket) clears the full gate on a NON-degenerate price series: a real per-capture quote (Robinhood/finance live quote, not corpus-extracted), >=15 distinct price values with <20% zero-return fraction over n_spaced>=24, no multi-hour capture gaps, AND permutation p<=0.10."
+  },
+  "created_at": "2026-06-28T03:25:22Z",
+  "writer": "computer",
+  "owner": "computer",
+  "simulated": false,
+  "payload": {
+    "thesis": "predate sentiment->price lead-lag edge on RDDT (authoritative EDGE, conviction=0.4908)",
+    "entities": [
+      "TICKER:RDDT"
+    ],
+    "conviction": 0.4908,
+    "conviction_components": {
+      "lead_strength": 0.6522,
+      "cleanliness": 0.5849,
+      "sentiment_conv": 0.2553,
+      "corroboration": 0.0
+    },
+    "signal_provenance": {
+      "verdict": "EDGE",
+      "best_lag": 2,
+      "best_corr": 0.6522,
+      "circular": false,
+      "source": "evals/leadlag_real.py on web_search_sentiment series"
+    },
+    "dossier_refs": [
+      "research/discoveries/"
+    ],
+    "requested_live_checks": [
+      "quote_snapshot",
+      "account_safety_review",
+      "sentiment_capture_refresh",
+      "kill_switch_status"
+    ],
+    "non_authorizations": [
+      "no_order",
+      "no_sizing",
+      "no_execution_instruction"
+    ],
+    "open_risks": [
+      "Computer must verify live price, account, sizing caps, kill-switch, and re-confirm the edge has not decayed before promoting."
+    ]
+  }
+}

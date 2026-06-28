@@ -333,3 +333,10 @@ Copy this block for each future distilled lesson.
 - Lesson: validate the SCORER, not just the verdict. We were stress-testing lead-lag (downstream) while
   the upstream sentiment scorer had an unaudited bias. Upgrade path = llm.extract in PARALLEL burn-in
   (score_llm alongside score_raw), never a hot-swap mid-thesis. Use the full pplx_sdk surface, not 1 call.
+
+## 2026-06-28 — A robust permutation p-value does NOT certify edge if the PRICE axis is degenerate (RDDT)
+- **Source corpse**: `runs/CORPSES.md` entry "2026-06-28 — RDDT lead-lag EDGE survives the permutation null but rides a DEGENERATE price proxy".
+- **Reusable lesson**: the permutation null shuffles the SENTIMENT labels against the observed price path; it tests whether the sentiment->price association is better than chance GIVEN the price series. It is blind to corruption in the price series itself. RDDT showed a robust p (0.034-0.047 across 5 seeds) AND a non-circular EDGE AND was not a scorer-change artifact — yet the price_proxy had only 9 distinct values over 24 points, 8/23 zero returns, and a 24h gap. The "edge" was sentiment drift correlated against a step-function quote artifact. Capital-grade only if BOTH axes are clean.
+- **Seeder rule**: add a price-series degeneracy gate UPSTREAM of (or inside) the verdict — reject a lead-lag verdict when, over the de-bursted points, distinct price values < ~15, zero-return fraction > ~20%, or any capture gap > ~2-3h. Prefer a real per-capture broker/finance quote over the corpus price extractor for any name that reaches the authoritative threshold. Do not propose a trade on a corpus-extracted price.
+- **Meta/eval linkage**: candidate new deterministic eval `eval_price_proxy_not_degenerate` (offline, fixture-based) wired into `run_offline_evals`; and a `price_quality` axis in `scripts/self_audit.py`. The permutation gate stays, but it is necessary-not-sufficient.
+- **Revisit trigger**: a name clears the full gate on a non-degenerate, real-quote price series (>=15 distinct prices, <20% zero returns, no multi-hour gaps, n_spaced>=24, p<=0.10).
