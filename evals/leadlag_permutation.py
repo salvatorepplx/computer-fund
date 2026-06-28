@@ -95,8 +95,10 @@ def main() -> int:
     ap.add_argument("entity", nargs="?", default="TICKER:NVDA")
     ap.add_argument("--k", type=int, default=2000)
     ap.add_argument("--max-lag", type=int, default=5)
+    ap.add_argument("--min-n", type=int, default=24)
+    ap.add_argument("--seed", type=int, default=7)
     a = ap.parse_args()
-    print(json.dumps(permutation_test(a.entity, a.k, a.max_lag), indent=2))
+    print(json.dumps(permutation_test(a.entity, a.k, a.max_lag, a.min_n, a.seed), indent=2))
     return 0
 
 
