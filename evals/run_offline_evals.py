@@ -18,6 +18,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from evals.cap_calibration import MIN_CALIBRATION_SAMPLE_SIZE, run_metrics as run_cap_metrics
 from evals.corpses_lessons import validate_corpses_lessons
+import evals.leadlag_real as leadlag_real
 from execution.safety import (
     MAX_OPTION_PREMIUM_FRAC,
     MAX_SINGLE_POS_FRAC,
@@ -233,6 +234,57 @@ def eval_sentiment_sim_deterministic_invariants() -> None:
 def eval_sentiment_leadlag_placebo() -> None:
     result = run_leadlag_placebo_checks()
     require(result["all_expectations_met"], "lead-lag placebo fixtures should accept only the true leading signal")
+
+
+def eval_leadlag_insufficient_telemetry() -> None:
+    original_load_series = leadlag_real.load_series
+
+    def row(ts: str, score: float | None, price: float | None) -> dict:
+        return {"ts": ts, "score_raw": score, "score": None, "price_proxy": price}
+
+    cases = [
+        (
+            "no_rows",
+            [],
+            0,
+            {"n": 0, "n_raw_points": 0, "note": "need >=3 aligned points"},
+        ),
+        (
+            "fewer_than_three_aligned_rows",
+            [
+                row("2026-06-28T00:00:00Z", 0.1, 100.0),
+                row("2026-06-28T00:04:00Z", 0.2, 101.0),
+                row("2026-06-28T00:08:00Z", None, 102.0),
+            ],
+            0,
+            {"n": 2, "n_raw_points": 2, "note": "need >=3 aligned points"},
+        ),
+        (
+            "no_lag_diff_pairs",
+            [
+                row("2026-06-28T00:00:00Z", 0.1, 100.0),
+                row("2026-06-28T00:04:00Z", 0.2, 101.0),
+                row("2026-06-28T00:08:00Z", 0.4, 103.0),
+            ],
+            -1,
+            {"n": 3, "n_raw_points": 3, "note": "not enough diff pairs"},
+        ),
+    ]
+
+    try:
+        for entity, fake_series, max_lag, expected in cases:
+            leadlag_real.load_series = lambda _entity, fake_series=fake_series: fake_series
+            result = leadlag_real.probe(f"TICKER:{entity}", min_n=24, max_lag=max_lag)
+            require(result["entity"] == f"TICKER:{entity}", f"{entity}: entity should round-trip")
+            require(result["n"] == expected["n"], f"{entity}: spaced N should be preserved")
+            require(result["n_raw_points"] == expected["n_raw_points"],
+                    f"{entity}: raw aligned point count should be preserved")
+            require(result["min_n"] == 24, f"{entity}: insufficient telemetry should report min_n")
+            require(result["verdict"] == "INSUFFICIENT", f"{entity}: verdict should stay INSUFFICIENT")
+            require(result["authoritative"] is False, f"{entity}: insufficient verdict is not authoritative")
+            require(result["note"] == expected["note"], f"{entity}: note should be preserved")
+    finally:
+        leadlag_real.load_series = original_load_series
 
 
 def eval_cap_calibration_fixture_metrics() -> None:
@@ -461,6 +513,7 @@ EVALS = [
     eval_battle_discovery_deterministic_ranking,
     eval_sentiment_sim_deterministic_invariants,
     eval_sentiment_leadlag_placebo,
+    eval_leadlag_insufficient_telemetry,
     eval_cap_calibration_fixture_metrics,
     eval_sentiment_source_weight_learning,
     eval_observed_finance_sentiment_fixture,
