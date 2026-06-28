@@ -1,6 +1,6 @@
 {
   "_doc": "Durable work backlog for the Computer Fund continuous loop. Drain highest-value pending item every wake.",
-  "updated": "2026-06-28T02:32:44.309353+00:00",
+  "updated": "2026-06-28T03:25:17.875848+00:00",
   "items": [
     {
       "id": "AUDIT-sim",
@@ -8,8 +8,9 @@
       "priority": 1,
       "owner": "computer",
       "desc": "Weakest axis per self-audit: sim (health 0.7). sim PARKED by decision (RETIRED.md): off critical path, re-activate only if a future thesis needs it",
-      "status": "pending",
-      "added": "2026-06-28T02:32:44.309353+00:00"
+      "status": "parked",
+      "added": "2026-06-28T02:32:44.309353+00:00",
+      "notes": "Parked 2026-06-28T03:25:17.875848+00:00: sim explicitly PARKED by RETIRED.md; off critical path until a future thesis needs it."
     },
     {
       "id": "AUDIT-universe",
@@ -44,8 +45,9 @@
       "priority": 1,
       "owner": "computer",
       "desc": "Weakest axis per self-audit: signal (health 0.4). web_sentiment present=True tested=False; single source (no cross-source corroboration yet)",
-      "status": "pending",
-      "added": "2026-06-26T23:38:46.962870+00:00"
+      "status": "in_progress",
+      "added": "2026-06-26T23:38:46.962870+00:00",
+      "notes": "Started 2026-06-28T03:25:17.875848+00:00."
     },
     {
       "id": "Q-001",
