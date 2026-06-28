@@ -25,6 +25,10 @@ broker access, live market data, account state, or order placement. Current star
 - PROPOSED artifact schema validation for connector-free handoffs, including Teammate offline
   proposals, Computer alpha-pipeline proposals, execution-authorizing field rejection, and invalid
   state transitions.
+- Observed-series sim-calibration readiness for committed sanitized sentiment series fixtures. The
+  current `runs/sentiment/series/TICKER_NVDA.jsonl` sample is intentionally treated as too small to
+  calibrate shape/lag/edge behavior, so SIM-FIDELITY changes should not use `edge_score` as an
+  observed-calibrated gate until this diagnostic reports `eligible_for_sim_fidelity_gate=true`.
 
 See `evals/falsification_playbook.md` for the tiered sentiment falsification checklist, and
 `evals/cap_calibration.md` for the CAP-vs-REG calibration pre-registration. See
@@ -35,4 +39,5 @@ env -u PYTHONPATH python -m evals.leadlag_placebo
 env -u PYTHONPATH python -m evals.cap_calibration
 env -u PYTHONPATH python -m evals.corpses_lessons
 env -u PYTHONPATH python -m evals.proposed_validator runs/PROPOSED docs/integration/fixtures/proposed/example-proposed-offline.json docs/integration/fixtures/proposed/example-computer-alpha-pipeline.json
+env -u PYTHONPATH python -m evals.observed_series_sim_calibration
 ```
