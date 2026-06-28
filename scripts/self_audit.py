@@ -84,9 +84,48 @@ def axis_capture_infra():
     ok = _exists("scripts/capture_and_commit.sh")
     return (0.85 if ok else 0.3, f"hardened single wrapper={ok}; transient 400/502 still skips ticks (no in-script session retry possible)")
 
+
+def _tracked_universe_names():
+    from scripts.state_snapshot import NAMES
+    return list(NAMES)
+
+
+def _series_file_for_name(name):
+    if not name.startswith("TICKER:"):
+        return None
+    symbol = name.split(":", 1)[1]
+    if not symbol:
+        return None
+    return ROOT / "runs" / "sentiment" / "series" / f"TICKER_{symbol}.jsonl"
+
+
+def _jsonl_row_count(path):
+    if path is None or not path.exists():
+        return 0
+    return sum(1 for line in path.read_text().splitlines() if line.strip())
+
+
 def axis_universe():
-    n = sum(1 for _ in (ROOT / "runs" / "sentiment" / "series").glob("TICKER_*.jsonl"))
-    return (min(1.0, n / 6.0), f"{n} names tracked (target broader cross-section for cross-sectional lead-lag; PATH/CRM queued)")
+    names = _tracked_universe_names()
+    observed = []
+    pending = []
+    total_rows = 0
+    for name in names:
+        rows = _jsonl_row_count(_series_file_for_name(name))
+        total_rows += rows
+        if rows > 0:
+            observed.append(name)
+        else:
+            pending.append(name)
+
+    tracked_count = len(names)
+    observed_count = len(observed)
+    target_count = max(6, tracked_count)
+    health = min(1.0, observed_count / target_count) if target_count else 0.0
+    pending_symbols = ", ".join(name.split(":", 1)[-1] for name in pending) or "none"
+    return (health,
+            f"{tracked_count} configured names; {observed_count} observed series with rows "
+            f"({total_rows} rows total); pending/no rows: {pending_symbols}")
 
 def axis_state_memory():
     age = _age_h("STATE.md")
