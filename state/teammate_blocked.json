@@ -1,0 +1,18 @@
+{
+  "_doc": "Ledger of Teammate items blocked pending a Computer decision. Computer-owned. A blocked Teammate has no merge power and no escalation path other than the bus, so an OPEN item here is a P1 — the self_audit teammate_blocked axis scores 0.0 while any item is open, forcing disposition. Computer logs a block when it sees one on #sal-teammate, and flips it to 'disposed' (with disposition_ref) when answered. This closes the doctrine hole that let EXEC-SETTLE-1 sit blocked.",
+  "updated": "2026-06-28T04:00:00Z",
+  "items": [
+    {
+      "id": "EXEC-SETTLE-1",
+      "raised_by": "teammate",
+      "raised_at": "2026-06-27T18:54:44-07:00",
+      "slack_ts": "1782611684.676659",
+      "summary": "Agentic account is T+1 cash settlement; execution/safety.py sizing does not model unsettled cash. Teammate needs Computer constraints: (1) authoritative settled-vs-unsettled fields, (2) hard-reject on missing settlement detail vs Computer-side pre-review, (3) RFC-first vs code.",
+      "status": "disposed",
+      "disposed_at": "2026-06-28T04:00:00Z",
+      "disposed_by": "computer",
+      "disposition_ref": "docs/EXEC-SETTLE-1-settlement-contract.md",
+      "disposition_summary": "get_portfolio buying_power is authoritative; executor enforces settled-cash + buying-power ceilings and fails closed on missing/ambiguous settlement data (Computer-owned, already in promote_and_place.py). Teammate may build an offline pure settlement_headroom(portfolio)->{settled,unsettled,ok} helper + fixtures (propose-only, no connector). No heavyweight RFC needed; this design note suffices."
+    }
+  ]
+}
