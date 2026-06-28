@@ -21,12 +21,46 @@ class SelfAuditUniverseTests(unittest.TestCase):
                  mock.patch.object(self_audit, "_tracked_universe_names", return_value=names):
                 health, note = self_audit.axis_universe()
 
-        self.assertEqual(health, 2 / 6)
+        self.assertAlmostEqual(health, 2.5 / 6)
         self.assertIn("4 configured names", note)
+        self.assertIn("3 wired series files", note)
         self.assertIn("2 observed series with rows", note)
         self.assertIn("2 rows total", note)
         self.assertIn("pending/no rows: CRM, PATH", note)
         self.assertNotIn("2 names tracked", note)
+
+
+class SelfAuditParkedAxisTests(unittest.TestCase):
+    def test_parked_axes_stay_visible_but_do_not_force_queue(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / "runs").mkdir()
+            (root / "sim").mkdir()
+            (root / "graph").mkdir()
+            (root / "sim" / "RETIRED.md").write_text("PARKED\n")
+            (root / "graph" / "RETIRED.md").write_text("PARKED\n")
+            (root / "runs" / "QUEUE.json").write_text('{"items": []}')
+
+            axes = [
+                ("sim", lambda: (0.1, "sim parked note")),
+                ("graph", lambda: (0.2, "graph parked note")),
+                ("universe", lambda: (0.5, "active universe note")),
+            ]
+
+            with mock.patch.object(self_audit, "ROOT", root), \
+                 mock.patch.object(self_audit, "AXES", axes):
+                weakest = self_audit.run()
+
+            audit = (root / "runs" / "SELF_AUDIT.md").read_text()
+            queue = (root / "runs" / "QUEUE.json").read_text()
+
+        self.assertEqual(weakest["axis"], "universe")
+        self.assertIn("| sim | 0.1 | parked by sim/RETIRED.md", audit)
+        self.assertIn("| graph | 0.2 | parked by graph/RETIRED.md", audit)
+        self.assertIn("## Weakest actionable axis -> forcing function", audit)
+        self.assertIn('"id": "AUDIT-universe"', queue)
+        self.assertNotIn("AUDIT-sim", queue)
+        self.assertNotIn("AUDIT-graph", queue)
 
 
 if __name__ == "__main__":

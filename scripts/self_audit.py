@@ -2,9 +2,10 @@
 Self-audit: enforce "NO axis unscrutinized" (CONSTITUTION RSI mandate).
 
 Enumerates EVERY axis of the Fund, scores each on health/coverage/freshness from
-ground truth, finds the weakest, and emits a forcing function (the single highest-
-leverage improvement to make next). Writes runs/SELF_AUDIT.md and appends the
-weakest-axis action to runs/QUEUE.json so improvement is scheduled, not hoped-for.
+ground truth, finds the weakest actionable axis, and emits a forcing function (the
+single highest-leverage improvement to make next). Writes runs/SELF_AUDIT.md and
+appends the weakest actionable-axis action to runs/QUEUE.json so improvement is
+scheduled, not hoped-for.
 
 Run periodically (e.g. hourly cron or end of an idle tick). The point is that the
 *completeness of improvement* is itself audited — a meta-axis.
@@ -15,6 +16,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+
+PARKED_AXIS_MARKERS = {
+    "sim": "sim/RETIRED.md",
+    "graph": "graph/RETIRED.md",
+}
 
 
 def _exists(p): return (ROOT / p).exists()
@@ -32,6 +38,13 @@ def _has_test(module_stem):
     hits = subprocess.run(["grep", "-rl", module_stem, *search_dirs],
                           capture_output=True, text=True).stdout.strip()
     return bool(hits)
+
+
+def _axis_actionability(name):
+    marker = PARKED_AXIS_MARKERS.get(name)
+    if marker and _exists(marker):
+        return False, f"parked by {marker}; visible but skipped for queue forcing functions"
+    return True, "actionable"
 
 
 def _open_nondraft_pr_count():
@@ -214,20 +227,24 @@ def run():
             score, note = fn()
         except Exception as e:
             score, note = 0.0, f"AUDIT ERROR: {str(e)[:60]}"
-        rows.append({"axis": name, "health": round(score, 2), "note": note})
+        actionable, action_note = _axis_actionability(name)
+        rows.append({"axis": name, "health": round(score, 2), "actionable": actionable,
+                     "action_note": action_note, "note": note})
     rows_sorted = sorted(rows, key=lambda r: r["health"])
-    weakest = rows_sorted[0]
+    actionable_rows = [r for r in rows_sorted if r["actionable"]]
+    weakest = actionable_rows[0] if actionable_rows else rows_sorted[0]
 
     now = dt.datetime.now(dt.timezone.utc).isoformat()
     md = [f"# Computer Fund — SELF-AUDIT (every axis under scrutiny)",
           f"_Generated {now}. RSI mandate: no axis sits unimproved._\n",
-          "| axis | health | note |", "|---|---|---|"]
+          "| axis | health | actionable | note |", "|---|---|---|---|"]
     for r in rows_sorted:
-        md.append(f"| {r['axis']} | {r['health']} | {r['note']} |")
+        md.append(f"| {r['axis']} | {r['health']} | {r['action_note']} | {r['note']} |")
     md += ["",
-           f"## Weakest axis -> forcing function",
+           f"## Weakest actionable axis -> forcing function",
            f"**{weakest['axis']}** (health {weakest['health']}): {weakest['note']}",
-           f"Next improvement must target this axis (or justify in writing why another axis is higher-leverage)."]
+           f"Next improvement must target this axis (or justify in writing why another axis is higher-leverage).",
+           f"Parked/retired axes stay visible in the audit but do not create queue churn unless reactivated."]
     (ROOT / "runs" / "SELF_AUDIT.md").write_text("\n".join(md) + "\n")
 
     # schedule the weakest-axis fix into the durable queue
@@ -245,7 +262,7 @@ def run():
     q["updated"] = now
     qpath.write_text(json.dumps(q, indent=2))
 
-    print(f"weakest axis: {weakest['axis']} (health {weakest['health']})")
+    print(f"weakest actionable axis: {weakest['axis']} (health {weakest['health']})")
     print(f"-> {weakest['note']}")
     return weakest
 
