@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T00:56:43.996379+00:00 · HEAD 1bdb7b6_
+_Last updated: 2026-06-28T01:01:38.829883+00:00 · HEAD 7830f28_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,17 +20,17 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 22 (raw 32) | PRELIMINARY_EDGE | 2/0.508 | circ=False |
-| TICKER:RDDT | 16 (raw 26) | PRELIMINARY_EDGE | 2/0.7013 | circ=False |
-| TICKER:TSLA | 16 (raw 26) | PRELIMINARY_EDGE | 4/0.7718 | circ=False |
-| TICKER:SNDK | 13 (raw 14) | PRELIMINARY_NO_EDGE | 0/0.4478 | circ=False |
+| TICKER:NVDA | 23 (raw 33) | PRELIMINARY_EDGE | 2/0.5078 | circ=False |
+| TICKER:RDDT | 17 (raw 27) | PRELIMINARY_EDGE | 2/0.6972 | circ=False |
+| TICKER:TSLA | 17 (raw 27) | PRELIMINARY_EDGE | 4/0.4969 | circ=False |
+| TICKER:SNDK | 14 (raw 15) | PRELIMINARY_NO_EDGE | 0/0.4367 | circ=False |
 
 ## The one honest finding
 Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent edges ~ chance).
 Pipeline correctly proposes ZERO trades. An honest KILL is a win, not a failure.
 
 ## What's blocking the next outcome
-No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=22 (~2 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
+No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=23 (~1 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
 
 ## Single next action
 Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is authoritative: if it survives permutation (p<=0.10) -> trade; else KILL seed thesis, evolve.
@@ -46,9 +46,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
+7830f28 Capture point-in-time external evidence for the 5 research mechanisms (Failure 3)
+87a59a6 Capture & commit point-in-time external evidence for the 5 research mechanisms (Failure 3): analyst consensus/PT-revisions + 6q earnings/PEAD for NVDA/RDDT/TSLA/SNDK
+6c30d5a web series capture tick (NVDA n_spaced=22, +1 toward N=24 threshold)
 1bdb7b6 Structural fix (Failure 2): add pr_queue_drain axis to self_audit; add computer-fund-operating-doctrine skill (Obligations A+B)
 b4b0036 Structural fix (Failure 2): operating-doctrine skill + pr_queue self-audit axis
-7227b97 P1 fix: derive repo ROOT from script location in both cron wrappers (was hard-coded computer_fund underscore -> FATAL); log lessons
-f2a922b Add observed-series sim calibration diagnostic (#19)
-de7a1c5 Align strategy generator status with ladder (#33)
 ```
