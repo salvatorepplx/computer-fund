@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T01:32:16.543847+00:00 · HEAD dddb300_
+_Last updated: 2026-06-28T01:37:11.684507+00:00 · HEAD 97f393a_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,10 +20,10 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 25 (raw 35) | EDGE | 2/0.5078 | circ=False; perm=EDGE_IS_NOISE p=0.191 sig=False |
-| TICKER:RDDT | 18 (raw 28) | PRELIMINARY_EDGE | 2/0.6922 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.053 sig=True |
-| TICKER:TSLA | 18 (raw 28) | PRELIMINARY_EDGE | 4/0.4931 | circ=False; perm=PRELIMINARY_NULL p=0.282 sig=False |
-| TICKER:SNDK | 15 (raw 16) | PRELIMINARY_NO_EDGE | 0/0.4229 | circ=False; perm=PRELIMINARY_NULL p=0.268 sig=False |
+| TICKER:NVDA | 26 (raw 36) | EDGE | 2/0.5078 | circ=False; perm=EDGE_IS_NOISE p=0.1895 sig=False |
+| TICKER:RDDT | 19 (raw 29) | PRELIMINARY_EDGE | 2/0.6785 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.063 sig=True |
+| TICKER:TSLA | 19 (raw 29) | PRELIMINARY_EDGE | 4/0.4689 | circ=False; perm=PRELIMINARY_NULL p=0.2805 sig=False |
+| TICKER:SNDK | 16 (raw 17) | PRELIMINARY_NO_EDGE | 0/0.4235 | circ=False; perm=PRELIMINARY_NULL p=0.264 sig=False |
 | TICKER:CRM | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 | TICKER:PATH | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 
@@ -47,9 +47,9 @@ Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve 
 
 ## Recent commits
 ```
+97f393a Expand tracked universe (add CRM, PATH) + self-audit
 dddb300 [sal-bot Teammate] Add KG observed-series offline diagnostic (#20)
 847ca23 Gate STATE edge wording on permutation (#40)
 8ccfdac web series capture tick
 10f6a45 Add vol regime reversion dossier (#39)
-4b36118 Add short-interest squeeze dossier (#38)
 ```
