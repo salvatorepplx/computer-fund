@@ -279,4 +279,17 @@ Copy this block for each future distilled lesson.
   verbatim HANDOFF_CONTEXT.md while this thread was working from an older clone, producing an add/add
   conflict. Resolution: keep the better/verbatim remote artifact, `git reset --hard origin/master`,
   re-derive open work from live `gh pr list`. Lesson: never trust a local clone's snapshot over
-  origin; always re-fetch + re-list before deciding what work remains.
+  origin; always re-fetch + re-list before deciding what work remains. (Corollary: commit WIP before
+  any `git reset --hard` — a hard reset wiped uncommitted self_audit.py edits when master moved under
+  this thread. The repo is the only durable substrate across the two agents.)
+
+## 2026-06-27 — Failure 2 structural fix landed (operating-doctrine skill + pr_queue audit axis)
+- Added `skills/computer-fund-operating-doctrine/SKILL.md` (load at the START of every tick): encodes
+  OBLIGATION A (drain Teammate's non-draft PR queue before declaring idle — P1, never "nothing to do";
+  read the diff, merge-onto-master, run the suite, dispose) and OBLIGATION B (decisiveness: act on
+  anything reversible/in-scope; `confirm_action` ONLY for trade placement + destructive ops; narration
+  is not progress; finish the chain). This is the missing config that let the queue rot for ~24h.
+- Wired a `pr_queue` axis into `scripts/self_audit.py`: 1.0 when drained, a P1 forcing function listing
+  the open PR numbers when non-draft PRs are open, and a fail-safe 0.6 "unknown" when `gh` is
+  unavailable (sandbox down). Also fixed `_has_test()` to scan `tests/` as well as `evals/` (tests
+  moved to tests/), which honestly raised the signal axis to tested=True.

@@ -24,10 +24,30 @@ def _age_h(p):
         return None
     return round((dt.datetime.now().timestamp() - f.stat().st_mtime) / 3600, 1)
 def _has_test(module_stem):
-    """crude: is this module exercised by any eval/dryrun?"""
-    hits = subprocess.run(["grep", "-rl", module_stem, str(ROOT / "evals")],
+    """crude: is this module exercised by any eval/dryrun or unit test?"""
+    search_dirs = [str(ROOT / "evals"), str(ROOT / "tests")]
+    search_dirs = [d for d in search_dirs if Path(d).exists()]
+    if not search_dirs:
+        return False
+    hits = subprocess.run(["grep", "-rl", module_stem, *search_dirs],
                           capture_output=True, text=True).stdout.strip()
     return bool(hits)
+
+
+def _open_nondraft_pr_count():
+    """Count Teammate's open, non-draft PRs. An un-drained queue is a P1 forcing function
+    (OBLIGATION A in skills/computer-fund-operating-doctrine). Returns (count, info);
+    count is None if gh is unavailable (sandbox down) so the axis fails-safe to 'unknown'."""
+    try:
+        out = subprocess.run(
+            ["gh", "pr", "list", "--repo", "salvatorepplx/computer-fund",
+             "--state", "open", "--json", "number,isDraft"],
+            capture_output=True, text=True, timeout=30).stdout.strip()
+        prs = json.loads(out) if out else []
+        nondraft = [p for p in prs if not p.get("isDraft")]
+        return len(nondraft), [p["number"] for p in nondraft]
+    except Exception as e:
+        return None, f"gh unavailable: {str(e)[:50]}"
 
 
 # Each axis: (name, why_it_matters, score_fn -> (0..1 health, note))
@@ -36,6 +56,17 @@ def axis_signal():
     tested = _has_test("web_sentiment")
     return (0.8 if ok and tested else 0.4 if ok else 0.0,
             f"web_sentiment present={ok} tested={tested}; single source (no cross-source corroboration yet)")
+
+def axis_pr_queue():
+    """OBLIGATION A: Teammate cannot merge. An un-drained non-draft PR queue freezes his
+    throughput and is a P1 — never 'nothing to act on'."""
+    count, info = _open_nondraft_pr_count()
+    if count is None:
+        return (0.6, f"Teammate PR queue UNKNOWN ({info}); re-check when gh is available")
+    if count == 0:
+        return (1.0, "Teammate PR queue DRAINED (0 non-draft open PRs)")
+    return (max(0.0, 0.4 - 0.05 * count),
+            f"P1: {count} non-draft Teammate PR(s) OPEN and undisposed: {info}. Drain now (review->merge/request-changes).")
 
 def axis_verdict():
     ok = _exists("evals/leadlag_real.py") and _exists("evals/leadlag_permutation.py")
@@ -89,6 +120,7 @@ def axis_meta_improvement():
 
 
 AXES = [
+    ("pr_queue", axis_pr_queue),
     ("signal", axis_signal), ("verdict", axis_verdict), ("pipeline", axis_pipeline),
     ("safety", axis_safety), ("capture_infra", axis_capture_infra), ("universe", axis_universe),
     ("state_memory", axis_state_memory), ("lessons", axis_lessons), ("sim", axis_sim),
