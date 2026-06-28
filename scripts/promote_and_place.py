@@ -173,7 +173,7 @@ def gate_account_state() -> dict:
 def gate_kill_switch() -> dict:
     port = call_tool("get_portfolio", {"account_number": ACCOUNT})
     book = None
-    for k in ("total_market_value", "market_value", "equity", "portfolio_value"):
+    for k in ("total_value", "total_market_value", "market_value", "equity", "portfolio_value"):
         v = port.get(k) if isinstance(port, dict) else None
         if v is not None:
             try:
@@ -192,7 +192,53 @@ def gate_kill_switch() -> dict:
     ks = safety.kill_check([], book, hwm)
     if ks["circuit_breaker_tripped"] or not ks["new_entries_allowed"]:
         raise GateFail(f"kill-switch: circuit breaker tripped (book_dd={ks['book_drawdown']}); no new entries")
-    return {"book_value": book, "hwm": hwm, **ks}
+    return {"book_value": book, "hwm": hwm, "_portfolio": port, **ks}
+
+
+# ---- GATE 5b: settled buying power (EXEC-SETTLE-1) ----------------------------
+# The Agentic account is a CASH account with T+1 settlement (CHARTER §5). Trading on
+# UNSETTLED funds in a cash account risks a good-faith / free-riding violation. The
+# broker's nominal buying_power can include pending_deposits / unsettled proceeds, so
+# we compute a fail-closed SETTLED buying power and size against THAT, never nominal.
+# This is Computer-owned (live connector at promotion time), the answer to Teammate's
+# EXEC-SETTLE-1: settlement-awareness lives here in the executor, not in offline safety.py.
+def gate_settled_buying_power(portfolio: dict | None = None) -> dict:
+    port = portfolio if portfolio is not None else call_tool("get_portfolio", {"account_number": ACCOUNT})
+    if not isinstance(port, dict):
+        raise GateFail(f"get_portfolio unexpected shape for settlement check: {str(port)[:200]}")
+
+    def _num(*path, default=None):
+        cur = port
+        for k in path:
+            if isinstance(cur, dict) and k in cur:
+                cur = cur[k]
+            else:
+                return default
+        try:
+            return float(cur)
+        except (TypeError, ValueError):
+            return default
+
+    nominal_bp = _num("buying_power", "buying_power")
+    if nominal_bp is None:
+        nominal_bp = _num("buying_power")  # flat shape fallback
+    cash = _num("cash")
+    pending = _num("pending_deposits", default=0.0) or 0.0
+    # Authoritative SETTLED buying power = nominal buying power minus anything that is
+    # demonstrably unsettled (pending deposits). Fail closed if we cannot determine it.
+    if nominal_bp is None:
+        raise GateFail("settlement: buying_power missing from get_portfolio (fail closed).")
+    settled_bp = nominal_bp - pending
+    info = {
+        "nominal_buying_power": nominal_bp, "cash": cash,
+        "pending_deposits": pending, "settled_buying_power": round(settled_bp, 2),
+    }
+    if settled_bp <= 0:
+        raise GateFail(
+            f"settlement: settled buying power ${settled_bp:,.2f} <= 0 "
+            f"(nominal ${nominal_bp:,.2f} is unsettled: pending_deposits ${pending:,.2f}). "
+            f"Cash account T+1 — cannot trade on unsettled funds. {info}")
+    return info
 
 
 # ---- GATE 6: live quote -------------------------------------------------------
@@ -215,12 +261,19 @@ def gate_live_quote(symbol: str) -> float:
 
 
 # ---- GATE 7+8: sizing + review ------------------------------------------------
-def gate_size_and_review(symbol: str, book_value: float, live_price: float, rationale: str) -> tuple:
+def gate_size_and_review(symbol: str, book_value: float, live_price: float, rationale: str,
+                        settled_bp: float | None = None) -> tuple:
     # Phase-0 sizing: target the single-position cap, conservative. Whole shares only.
+    # Clamp to SETTLED buying power (EXEC-SETTLE-1): never size above funds that have settled.
     target_cost = safety.MAX_SINGLE_POS_FRAC * book_value
+    if settled_bp is not None:
+        target_cost = min(target_cost, settled_bp)
     qty = int(target_cost // live_price)
     if qty < 1:
-        raise GateFail(f"sizing: cap ${target_cost:,.2f} at ${live_price:,.2f}/sh => 0 shares; position too small to place")
+        raise GateFail(f"sizing: affordable cap ${target_cost:,.2f} at ${live_price:,.2f}/sh => 0 shares "
+                       f"(single-pos cap ${safety.MAX_SINGLE_POS_FRAC*book_value:,.2f}, "
+                       f"settled BP {('$%.2f' % settled_bp) if settled_bp is not None else 'n/a'}); "
+                       f"position too small to place")
     new_position_cost = qty * live_price
     # build_ticket validates allowlist + sizing (raises SafetyViolation on any cap breach)
     ticket = safety.build_ticket(
@@ -291,13 +344,14 @@ def main() -> int:
         gate_account_allowlist();                                     print(f"GATE 3 account-allowlist: PASS ({ACCOUNT})")
         acct = gate_account_state();                                  print("GATE 4 account-state: PASS (agentic_allowed)")
         ks = gate_kill_switch();                                       print(f"GATE 5 kill-switch: PASS (book=${ks['book_value']:,.2f} dd={ks['book_drawdown']})")
+        settle = gate_settled_buying_power(ks.get("_portfolio")); print(f"GATE 5b settled-buying-power: PASS (settled=${settle['settled_buying_power']:,.2f} of nominal ${settle['nominal_buying_power']:,.2f}; pending ${settle['pending_deposits']:,.2f})")
         live_px = gate_live_quote(elig["symbol"]);                    print(f"GATE 6 live-quote: PASS (${live_px:,.2f})")
         rationale = f"RDDT-class lead-lag PROPOSED {art_path.name}: lag={elig['best_lag']} corr={elig['best_corr']} perm_p={elig['perm_p']}"
-        ticket, qty, cost, review = gate_size_and_review(elig["symbol"], ks["book_value"], live_px, rationale)
-        print(f"GATE 7 sizing: PASS ({qty} sh ~${cost:,.2f}, <= {safety.MAX_SINGLE_POS_FRAC:.0%} cap)")
+        ticket, qty, cost, review = gate_size_and_review(elig["symbol"], ks["book_value"], live_px, rationale, settled_bp=settle["settled_buying_power"])
+        print(f"GATE 7 sizing: PASS ({qty} sh ~${cost:,.2f}, <= {safety.MAX_SINGLE_POS_FRAC:.0%} cap, settled-clamped)")
         print("GATE 8 review-order: PASS (no blocking alerts)")
-        gates = {"eligibility": elig, "price_axis": pxq, "kill_switch": ks,
-                 "live_price": live_px, "qty": qty, "est_cost": round(cost, 2)}
+        gates = {"eligibility": elig, "price_axis": pxq, "kill_switch": {k: v for k, v in ks.items() if k != '_portfolio'},
+                 "settlement": settle, "live_price": live_px, "qty": qty, "est_cost": round(cost, 2)}
         armed_path = write_armed(art_path, art, gates, ticket)
         print(f"GATE 9 ARMED written: {armed_path.relative_to(ROOT)}  (ref_id={ticket.ref_id})")
     except (GateFail, SafetyViolation) as e:
