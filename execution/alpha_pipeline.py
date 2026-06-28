@@ -42,7 +42,11 @@ def _clip(x, lo=0.0, hi=1.0):
 
 
 def _now():
-    return dt.datetime.now(dt.timezone.utc).isoformat()
+    # Canonical UTC ISO8601 with whole seconds and a trailing 'Z' (no microseconds,
+    # no '+00:00'), matching schemas/proposed.schema.json + evals/proposed_validator.py
+    # (ISO8601_UTC_RE) and the accepted fixtures. Emitting microseconds previously made
+    # the RDDT artifact fail the strict validator (the one red offline eval).
+    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def conviction_from_verdict(v: dict, sent_state: dict) -> dict:
