@@ -1,0 +1,32 @@
+{
+  "schema_version": "cf.integration.v1",
+  "artifact_id": "example-computer-alpha-pipeline",
+  "artifact_type": "proposal",
+  "state": "PROPOSED",
+  "created_at": "2026-06-26T19:45:00+00:00",
+  "writer": "computer",
+  "owner": "computer",
+  "simulated": false,
+  "payload": {
+    "thesis": "predate sentiment->price lead-lag edge on NVDA (authoritative EDGE, conviction=0.7123)",
+    "entities": ["TICKER:NVDA"],
+    "conviction": 0.7123,
+    "conviction_components": {
+      "lead_strength": 0.8,
+      "cleanliness": 0.7,
+      "sentiment_conv": 0.4,
+      "corroboration": 0.6
+    },
+    "signal_provenance": {
+      "verdict": "EDGE",
+      "best_lag": 2,
+      "best_corr": 0.8,
+      "circular": false,
+      "source": "evals/leadlag_real.py on web_search_sentiment series"
+    },
+    "dossier_refs": ["research/discoveries/"],
+    "requested_live_checks": ["quote_snapshot", "account_safety_review", "sentiment_capture_refresh", "kill_switch_status"],
+    "non_authorizations": ["no_order", "no_sizing", "no_execution_instruction"],
+    "open_risks": ["Computer must verify live price, account, sizing caps, kill-switch, and re-confirm the edge has not decayed before promoting."]
+  }
+}

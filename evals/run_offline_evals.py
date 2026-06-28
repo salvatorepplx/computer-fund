@@ -31,6 +31,8 @@ from graph.kg import KnowledgeGraph
 from evals.leadlag_placebo import run_leadlag_placebo_checks
 from evals.web_sentiment_invariants import run_web_sentiment_invariants
 from evals.observed_sentiment_fixture import validate_observed_finance_fixture
+import evals.proposed_validator as proposed_validator
+from evals.proposed_validator import validate_proposed_file, validate_proposed_paths
 from evals.source_weight_learning import OBSERVED_EVENT_THRESHOLD, run_source_weight_learning_fixture
 from research.battle_discovery import discover_battles, score_battle
 from sim.sentiment_sim import predate_signal, simulate
@@ -328,6 +330,70 @@ def eval_web_sentiment_invariants() -> None:
     require(result["n"] >= 6, "web_sentiment must exercise at least 6 invariants")
 
 
+def eval_proposed_artifact_validator() -> None:
+    valid_paths = [
+        REPO_ROOT / "runs" / "PROPOSED",
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "example-proposed-offline.json",
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "example-computer-alpha-pipeline.json",
+    ]
+    require(
+        validate_proposed_paths(valid_paths) == [],
+        "valid Teammate and Computer PROPOSED fixtures should pass offline validation",
+    )
+
+    execution_issues = validate_proposed_file(
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "invalid-execution-authorizing.json"
+    )
+    require(
+        any("execution-authorizing" in issue.message for issue in execution_issues),
+        "Teammate-authored proposal fixtures with order/sizing fields should fail validation",
+    )
+
+    transition_issues = validate_proposed_file(
+        REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "invalid-state-transition.json"
+    )
+    require(
+        any("state" in issue.path and "Computer-owned" in issue.message for issue in transition_issues),
+        "Teammate-authored artifacts must not skip into Computer-owned states",
+    )
+
+    missing_path_issues = validate_proposed_paths([REPO_ROOT / "docs" / "integration" / "fixtures" / "proposed" / "missing.json"])
+    require(
+        any("does not exist" in issue.message for issue in missing_path_issues),
+        "validator CLI inputs should fail closed on missing files or directories",
+    )
+
+
+def eval_proposed_schema_validator_alignment() -> None:
+    schema = json.loads((REPO_ROOT / "schemas" / "proposed.schema.json").read_text())
+    base_schema = schema["$defs"]["base_envelope"]
+    teammate_payload = schema["$defs"]["teammate_payload"]
+    computer_payload = schema["$defs"]["computer_payload"]
+    live_checks = schema["$defs"]["common_payload_properties"]["requested_live_checks"]["items"]["enum"]
+    non_authorizations = schema["$defs"]["common_payload_properties"]["non_authorizations"]["items"]["enum"]
+
+    require(base_schema["properties"]["schema_version"]["const"] == proposed_validator.PROPOSED_SCHEMA_VERSION,
+            "PROPOSED schema_version const should match validator")
+    require(base_schema["properties"]["artifact_type"]["const"] == proposed_validator.PROPOSED_ARTIFACT_TYPE,
+            "PROPOSED artifact_type const should match validator")
+    require(base_schema["properties"]["state"]["const"] == proposed_validator.PROPOSED_STATE,
+            "PROPOSED state const should match validator")
+    require(set(base_schema["properties"]["writer"]["enum"]) == proposed_validator.PROPOSED_WRITERS,
+            "PROPOSED writer enum should match validator")
+    require(base_schema["properties"]["owner"]["const"] == proposed_validator.PROPOSED_OWNER,
+            "PROPOSED owner const should match validator")
+    require(set(base_schema["required"]) == proposed_validator.REQUIRED_TOP_LEVEL_FIELDS,
+            "base top-level required fields should match validator")
+    require(set(teammate_payload["required"]) == proposed_validator.TEAMMATE_REQUIRED_PAYLOAD_FIELDS,
+            "Teammate payload required fields should match validator")
+    require(set(computer_payload["required"]) == proposed_validator.COMPUTER_REQUIRED_PAYLOAD_FIELDS,
+            "Computer payload required fields should match validator")
+    require(set(live_checks) == proposed_validator.ALLOWED_LIVE_CHECKS,
+            "requested live check enum should match validator")
+    require(set(non_authorizations) == proposed_validator.REQUIRED_NON_AUTHORIZATIONS,
+            "non-authorization enum should match validator")
+
+
 EVALS = [
     eval_safety_rails_fail_closed,
     eval_knowledge_graph_observed_sentiment,
@@ -339,6 +405,8 @@ EVALS = [
     eval_observed_finance_sentiment_fixture,
     eval_corpses_lessons_discipline,
     eval_web_sentiment_invariants,
+    eval_proposed_artifact_validator,
+    eval_proposed_schema_validator_alignment,
 ]
 
 
