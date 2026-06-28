@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from execution import safety
-from execution.alpha_pipeline import conviction_from_verdict, write_proposed
+from execution.alpha_pipeline import apply_cross_sectional_generalization_gate, conviction_from_verdict, write_proposed
 
 PASS, FAIL = "PASS", "FAIL"
 results = []
@@ -44,6 +44,14 @@ print("STEP 1: conviction from synthetic EDGE")
 c = conviction_from_verdict(edge, sent)
 check("eligible EDGE accepted", c["eligible"] and c["conviction"] > 0)
 print(f"        conviction={c['conviction']} components={c['components']}")
+ranked_fixture = apply_cross_sectional_generalization_gate([
+    {"entity": "TICKER:NVDA", **c},
+    {"entity": "TICKER:RDDT", **c},
+    {"entity": "TICKER:TSLA", "eligible": False, "conviction": 0.0, "reason": "fixture reject"},
+    {"entity": "TICKER:SNDK", "eligible": False, "conviction": 0.0, "reason": "fixture reject"},
+])
+c = ranked_fixture[0]
+check("cross-sectional breadth gate accepted", c["eligible"] and c["cross_sectional_generalization"]["passed"])
 
 print("STEP 2: write PROPOSE-ONLY artifact + schema/non-authorization checks")
 path = write_proposed("TICKER:NVDA", c)
@@ -109,6 +117,8 @@ check("preliminary rejected", not cp["eligible"])
 noise = dict(edge); noise["_perm"] = {"significant_at_0.10": False, "p_value": 0.6}
 cn = conviction_from_verdict(noise, sent)
 check("EDGE failing permutation null rejected", not cn["eligible"])
+one_name = apply_cross_sectional_generalization_gate([{"entity": "TICKER:NVDA", **conviction_from_verdict(edge, sent)}])
+check("one-name breadth helper fails closed", not one_name[0]["eligible"])
 
 # cleanup the dry-run proposal so it can't be mistaken for a real one
 (ROOT / path).unlink(missing_ok=True)

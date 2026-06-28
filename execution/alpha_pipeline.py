@@ -12,8 +12,10 @@ HARD boundaries (Charter / HANDOFF):
   incapable of placing or implying an order: no order fields, no sizing, no
   broker/account data, no execution wording. Promotion (PROPOSED->ARMED->...)
   and all sizing/review/placement happen ELSEWHERE under execution/safety.py.
-- A name is eligible ONLY if its verdict is authoritative EDGE and NOT circular.
-  PRELIMINARY / KILL / circular-flagged names are rejected (logged as such).
+- A name is currently eligible ONLY if its verdict is authoritative EDGE,
+  NOT circular, and permutation-significant. The cross-sectional breadth helper
+  below prepares the next falsifier gate, but is not wired into proposal writes
+  until Computer/owner disposes the active RDDT blocker.
 - conviction is a RANKING signal, not a position size. Sizing is decided at
   promotion time by safety.check_sizing against the live account + risk phase.
 
@@ -26,6 +28,7 @@ Circularity or non-EDGE => conviction forced to 0 and name rejected.
 """
 from __future__ import annotations
 import sys, json, datetime as dt
+from math import ceil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -35,6 +38,8 @@ from evals.leadlag_permutation import permutation_test
 from execution.ingest_runner import load_series
 
 PROPOSED_DIR = ROOT / "runs" / "PROPOSED"
+CROSS_SECTIONAL_GENERALIZATION_THRESHOLD = 0.30
+CROSS_SECTIONAL_MIN_PASSING_MEMBERS = 2
 
 
 def _clip(x, lo=0.0, hi=1.0):
@@ -47,6 +52,59 @@ def _now():
     # (ISO8601_UTC_RE) and the accepted fixtures. Emitting microseconds previously made
     # the RDDT artifact fail the strict validator (the one red offline eval).
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def cross_sectional_generalization(
+    rows: list[dict],
+    threshold: float = CROSS_SECTIONAL_GENERALIZATION_THRESHOLD,
+    min_passing_members: int = CROSS_SECTIONAL_MIN_PASSING_MEMBERS,
+) -> dict:
+    """Measure whether the full existing gate generalizes across the evaluated universe."""
+    evaluated = len(rows)
+    passed = sum(1 for row in rows if row.get("eligible"))
+    breadth = (passed / evaluated) if evaluated else 0.0
+    required_passing_members = max(min_passing_members, ceil(evaluated * threshold)) if evaluated else min_passing_members
+    gate_passed = evaluated > 0 and breadth >= threshold and passed >= required_passing_members
+    return {
+        "falsifier": "cross_sectional_generalization",
+        "threshold": threshold,
+        "min_passing_members": required_passing_members,
+        "evaluated_universe_members": evaluated,
+        "passed_full_gate": passed,
+        "breadth": round(breadth, 4),
+        "passed": gate_passed,
+        "reason": (
+            f"{passed}/{evaluated}={breadth:.1%}; requires >= {threshold:.0%} breadth "
+            f"and >= {required_passing_members} full-gate members"
+        ),
+    }
+
+
+def apply_cross_sectional_generalization_gate(
+    rows: list[dict],
+    threshold: float = CROSS_SECTIONAL_GENERALIZATION_THRESHOLD,
+    min_passing_members: int = CROSS_SECTIONAL_MIN_PASSING_MEMBERS,
+) -> list[dict]:
+    """Fail closed when one surviving name carries the thesis cross-section."""
+    telemetry = cross_sectional_generalization(
+        rows,
+        threshold=threshold,
+        min_passing_members=min_passing_members,
+    )
+    gated = []
+    for row in rows:
+        out = dict(row)
+        full_gate_eligible = bool(out.get("eligible"))
+        out["full_gate_eligible"] = full_gate_eligible
+        out["cross_sectional_generalization"] = telemetry
+        if full_gate_eligible and not telemetry["passed"]:
+            out["eligible"] = False
+            out["reason"] = (
+                f"fails cross-sectional generalization gate ({telemetry['reason']}); "
+                f"full entity gate passed but thesis breadth is insufficient"
+            )
+        gated.append(out)
+    return gated
 
 
 def conviction_from_verdict(v: dict, sent_state: dict) -> dict:

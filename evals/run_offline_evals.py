@@ -19,6 +19,7 @@ if str(REPO_ROOT) not in sys.path:
 from evals.cap_calibration import MIN_CALIBRATION_SAMPLE_SIZE, run_metrics as run_cap_metrics
 from evals.corpses_lessons import validate_corpses_lessons
 import evals.leadlag_real as leadlag_real
+from execution.alpha_pipeline import apply_cross_sectional_generalization_gate, conviction_from_verdict
 from execution.safety import (
     MAX_OPTION_PREMIUM_FRAC,
     MAX_SINGLE_POS_FRAC,
@@ -475,6 +476,50 @@ def eval_proposed_schema_validator_alignment() -> None:
             "non-authorization enum should match validator")
 
 
+def eval_alpha_pipeline_cross_sectional_gate() -> None:
+    verdict = {
+        "verdict": "EDGE",
+        "authoritative": True,
+        "circularity_flag": False,
+        "best_corr": 0.71,
+        "best_lag": 2,
+        "n": 26,
+        "min_n": 24,
+        "all_lags": [
+            {"lag": -1, "corr": 0.15},
+            {"lag": 0, "corr": 0.20},
+            {"lag": 1, "corr": 0.55},
+            {"lag": 2, "corr": 0.71},
+        ],
+        "_perm": {"significant_at_0.10": True, "p_value": 0.02},
+    }
+    full_gate_pass = conviction_from_verdict(verdict, {"score": 0.42, "confidence": 0.95})
+    require(full_gate_pass["eligible"], "fixture should pass the existing full entity gate")
+
+    one_name = apply_cross_sectional_generalization_gate([{"entity": "TICKER:NVDA", **full_gate_pass}])
+    require(not one_name[0]["eligible"], "one-name carry must fail the cross-sectional gate")
+    require(one_name[0]["full_gate_eligible"], "telemetry should preserve the pre-breadth entity gate outcome")
+    require(
+        one_name[0]["cross_sectional_generalization"]["threshold"] == 0.30,
+        "cross-sectional gate should default to the STRAT-WIDE 30% threshold",
+    )
+
+    two_of_four = apply_cross_sectional_generalization_gate([
+        {"entity": "TICKER:NVDA", **full_gate_pass},
+        {"entity": "TICKER:RDDT", **full_gate_pass},
+        {"entity": "TICKER:TSLA", "eligible": False, "conviction": 0.0, "reason": "fixture reject"},
+        {"entity": "TICKER:SNDK", "eligible": False, "conviction": 0.0, "reason": "fixture reject"},
+    ])
+    require(
+        sum(1 for row in two_of_four if row["eligible"]) == 2,
+        "two of four full-gate passers should clear the 30% breadth gate",
+    )
+    require(
+        all(row["cross_sectional_generalization"]["passed"] for row in two_of_four),
+        "all rows should carry shared breadth telemetry for reviewability",
+    )
+
+
 def eval_strategy_space_candidate_status() -> None:
     thesis = strategy_space.make_thesis(
         strategy_space.SIGNALS[0],
@@ -552,6 +597,7 @@ EVALS = [
     eval_web_sentiment_invariants,
     eval_proposed_artifact_validator,
     eval_proposed_schema_validator_alignment,
+    eval_alpha_pipeline_cross_sectional_gate,
     eval_strategy_space_candidate_status,
     eval_promote_and_place_executor_rails,
 ]
