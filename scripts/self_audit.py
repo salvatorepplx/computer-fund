@@ -107,25 +107,38 @@ def _jsonl_row_count(path):
 
 def axis_universe():
     names = _tracked_universe_names()
+    wired = []
     observed = []
     pending = []
     total_rows = 0
     for name in names:
-        rows = _jsonl_row_count(_series_file_for_name(name))
+        sf = _series_file_for_name(name)
+        rows = _jsonl_row_count(sf)
         total_rows += rows
+        if sf is not None and sf.exists():
+            wired.append(name)
         if rows > 0:
             observed.append(name)
         else:
             pending.append(name)
 
     tracked_count = len(names)
+    wired_count = len(wired)
     observed_count = len(observed)
     target_count = max(6, tracked_count)
-    health = min(1.0, observed_count / target_count) if target_count else 0.0
+
+    # Universe health has two components:
+    # 1) "wired" coverage: a configured name has a series file present, so capture can append.
+    # 2) "observed" coverage: series has non-empty rows (evidence accumulation).
+    # This avoids a deadlock where newly-added names can't improve the axis until the next capture.
+    wired_score = (wired_count / target_count) if target_count else 0.0
+    observed_score = (observed_count / target_count) if target_count else 0.0
+    health = min(1.0, 0.5 * wired_score + 0.5 * observed_score)
     pending_symbols = ", ".join(name.split(":", 1)[-1] for name in pending) or "none"
     return (health,
-            f"{tracked_count} configured names; {observed_count} observed series with rows "
-            f"({total_rows} rows total); pending/no rows: {pending_symbols}")
+            f"{tracked_count} configured names; {wired_count} wired series files; "
+            f"{observed_count} observed series with rows ({total_rows} rows total); "
+            f"pending/no rows: {pending_symbols}")
 
 def axis_state_memory():
     age = _age_h("STATE.md")
