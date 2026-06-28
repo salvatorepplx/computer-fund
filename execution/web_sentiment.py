@@ -55,7 +55,7 @@ _RATING_MAP = [
 # Lexical balance terms (broad, domain-tuned for equities commentary).
 _BULL = re.compile(
     r"\b(bull|bullish|upgrade|outperform|accelerat\w*|record|beat\w*|"
-    r"upside|rally|rebound|breakout|strong\w*|support holds|reclaim\w*|"
+    r"upside|rally|rebound|breakout|support holds|reclaim\w*|"
     r"constructive|overweight|undervalued|momentum up)\b", re.I)
 _BEAR = re.compile(
     r"\b(bear|bearish|downgrade|underperform|slowdown|decelerat\w*|"

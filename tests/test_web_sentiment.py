@@ -99,6 +99,20 @@ class WebSentimentNormalizeTest(unittest.TestCase):
         self.assertEqual(result.n_explicit, 0)
         self.assertLess(result.confidence, 0.35)
 
+    def test_strong_bearish_language_does_not_add_bullish_lexical_signal(self):
+        result = normalize([
+            {
+                "title": "Analysts strongly bearish on NVDA",
+                "summary": "Strong Sell rating, shares weak amid strong headwinds and bearish selloff.",
+                "domain": "example.com",
+            }
+        ])
+
+        self.assertLess(result.score, -0.7)
+        self.assertLess(result.detail["raw_score"], -0.7)
+        self.assertEqual(result.detail["lex_num"], -5.0)
+        self.assertEqual(result.detail["lex_den"], 5.0)
+
     def test_lexical_only_and_no_signal_paths(self):
         lexical = normalize([
             {
