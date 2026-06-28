@@ -1,6 +1,6 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-28T03:07:43.546155+00:00 · HEAD cd292e8_
+_Last updated: 2026-06-28T03:25:22.213918+00:00 · HEAD b558e89_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
 Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
@@ -20,21 +20,21 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 30 (raw 40) | EDGE | 2/0.5039 | circ=False; perm=EDGE_IS_NOISE p=0.1505 sig=False |
-| TICKER:RDDT | 23 (raw 33) | PRELIMINARY_EDGE | 2/0.6575 | circ=False; perm=PRELIMINARY_SIGNIFICANT p=0.041 sig=True |
-| TICKER:TSLA | 23 (raw 33) | PRELIMINARY_EDGE | 4/0.4645 | circ=False; perm=PRELIMINARY_NULL p=0.1745 sig=False |
-| TICKER:SNDK | 20 (raw 21) | PRELIMINARY_NO_EDGE | 0/0.384 | circ=False; perm=PRELIMINARY_NULL p=0.1965 sig=False |
+| TICKER:NVDA | 31 (raw 42) | EDGE | 2/0.5039 | circ=False; perm=EDGE_IS_NOISE p=0.132 sig=False |
+| TICKER:RDDT | 24 (raw 35) | EDGE | 2/0.6522 | circ=False; perm=EDGE_SURVIVES_NULL p=0.0345 sig=True |
+| TICKER:TSLA | 24 (raw 35) | EDGE | 4/0.4605 | circ=False; perm=EDGE_IS_NOISE p=0.1575 sig=False |
+| TICKER:SNDK | 21 (raw 23) | PRELIMINARY_NO_EDGE | 0/0.3638 | circ=False; perm=PRELIMINARY_NULL p=0.2165 sig=False |
 | TICKER:CRM | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 | TICKER:PATH | 0 (raw 0) | INSUFFICIENT | None/None | circ=None; perm=INSUFFICIENT p=None sig=None |
 
 ## The one honest finding
-Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent edges ~ chance). Pipeline correctly proposes ZERO trades. An honest KILL is a win, not a failure.
+At least one lead-lag thesis survives the authoritative raw EDGE, circularity, and permutation gates. Pipeline may emit PROPOSED artifacts, not orders.
 
 ## What's blocking the next outcome
-Raw authoritative EDGE failed the permutation trade gate: TICKER:NVDA. Alpha pipeline should have no eligible proposal; KILL+evolve the thesis.
+Trade-eligible EDGE exists after permutation gate: TICKER:RDDT -> run alpha_pipeline for PROPOSED review handoff.
 
 ## Single next action
-Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve the thesis.
+Run alpha_pipeline; only PROPOSED artifacts that survive safety review may advance.
 
 ## Where things live
 - Soul/law: CONSTITUTION.md, CHARTER.md, HANDOFF.md
@@ -47,9 +47,9 @@ Respect alpha_pipeline zero-eligible outcome; record the KILL/corpse and evolve 
 
 ## Recent commits
 ```
+b558e89 Remove strong lexical bullish bias (#47)
+374f47b web series capture tick
 cd292e8 state: advance last seen after PR46 merge
 916da95 Guard web sentiment against quote boilerplate bias (#46)
 cfdb9d5 state: advance slack last_seen_ts
-8e3e2b2 [sal-bot Teammate] Skip parked axes for self-audit queue (#45)
-c6a2877 web series capture tick
 ```
