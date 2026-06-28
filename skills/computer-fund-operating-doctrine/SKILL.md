@@ -74,6 +74,13 @@ self-audit ever reports `pr_queue_drain` as weakest, drop everything and drain.
   axis from `runs/SELF_AUDIT.md`, work the top `runs/QUEUE.json` item, probe a new battle location,
   add cross-source signal corroboration, try to break my own latest result, or widen the hypothesis
   space. Stopping is the exception that must justify itself.
+- **Use the full toolset, not a slice.** Read `reference/CAPABILITY_INVENTORY.md` — it is the durable
+  list of what's actually reachable (the full `pplx_sdk` surface: `web_many`/`fanout`, `secgov`,
+  `academic`, `llm.extract`; open web via `curl`/`wget`/`gh` directly from the sandbox; research
+  subagents; `wide_browse`; finance tools). The Fund currently uses ~1 of ~10 `pplx_sdk` capabilities.
+  Before re-implementing a heuristic or declaring a research path blocked, check the inventory: we can
+  read arXiv, OSS repos, SEC filings, and peer materials from inside the sandbox. Learning from
+  open-source work and our own under-used tools is first-class research, not a distraction.
 - **Chip on the shoulder.** After every artifact: "what's the most likely way this is worse than I
   think?" The amazing backtest is a bug. Re-fetch origin before deciding what work remains — never
   trust a local clone's snapshot (two ticks can collide; reconcile to `origin/master`).
