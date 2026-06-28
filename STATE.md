@@ -1,9 +1,11 @@
 # Computer Fund — STATE (auto-generated; do not hand-edit)
 
-_Last updated: 2026-06-27T00:50:03.780209+00:00 · HEAD dcced73_
+_Last updated: 2026-06-28T00:56:43.996379+00:00 · HEAD 1bdb7b6_
 
 THE FRONT DOOR. Any agent waking cold (Computer, background cron, Teammate) reads this FIRST.
-Regenerated every capture tick by scripts/state_snapshot.py from ground truth — never stale.
+Regenerated during each capture tick by scripts/state_snapshot.py from repo-local ground truth.
+It can lag commits created after the refresh: compare this header HEAD to current git HEAD/origin,
+and inspect intervening commits when they differ.
 
 ## Mission
 Recursively self-improving sentiment-alpha trading system. Generate alpha by predating public
@@ -18,17 +20,17 @@ sentiment on contested "battle locations". Real money via Robinhood. Soul = CONS
 ## Current series + verdicts
 | entity | n_spaced | verdict | best_lag/corr | flags |
 |---|---|---|---|---|
-| TICKER:NVDA | 21 (raw 31) | PRELIMINARY_EDGE | 2/0.5104 | circ=False |
-| TICKER:RDDT | 15 (raw 25) | PRELIMINARY_EDGE | 2/0.7245 | circ=False |
-| TICKER:TSLA | 15 (raw 25) | PRELIMINARY_EDGE | 4/0.7686 | circ=False |
-| TICKER:SNDK | 12 (raw 13) | PRELIMINARY_NO_EDGE | 0/0.4597 | circ=False |
+| TICKER:NVDA | 22 (raw 32) | PRELIMINARY_EDGE | 2/0.508 | circ=False |
+| TICKER:RDDT | 16 (raw 26) | PRELIMINARY_EDGE | 2/0.7013 | circ=False |
+| TICKER:TSLA | 16 (raw 26) | PRELIMINARY_EDGE | 4/0.7718 | circ=False |
+| TICKER:SNDK | 13 (raw 14) | PRELIMINARY_NO_EDGE | 0/0.4478 | circ=False |
 
 ## The one honest finding
 Seed lead-lag thesis is NOT surviving the permutation null test so far (apparent edges ~ chance).
 Pipeline correctly proposes ZERO trades. An honest KILL is a win, not a failure.
 
 ## What's blocking the next outcome
-No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=21 (~3 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
+No authoritative verdict yet. Deepest: TICKER:NVDA at n_spaced=22 (~2 more time-spaced points to authoritative). Permutation null so far: edges indistinguishable from chance (see lessons.md). Likely KILL+evolve when N hits 24.
 
 ## Single next action
 Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is authoritative: if it survives permutation (p<=0.10) -> trade; else KILL seed thesis, evolve.
@@ -44,9 +46,9 @@ Keep capturing (cron */10). When deepest name hits n_spaced>=24, the verdict is 
 
 ## Recent commits
 ```
-dcced73 web series capture tick
-22e2fcd web series capture tick
-2af7050 Correct the breadth mistake: generation != theses. Demote 12 auto-tuples; add evidence ladder
-1b37208 Go WIDE: strategy portfolio over a 4800-tuple OPEN hypothesis space (was 1 thesis)
-20fb681 Fix transient INSUFFICIENT verdict bug: defensive series read (skip torn lines)
+1bdb7b6 Structural fix (Failure 2): add pr_queue_drain axis to self_audit; add computer-fund-operating-doctrine skill (Obligations A+B)
+b4b0036 Structural fix (Failure 2): operating-doctrine skill + pr_queue self-audit axis
+7227b97 P1 fix: derive repo ROOT from script location in both cron wrappers (was hard-coded computer_fund underscore -> FATAL); log lessons
+f2a922b Add observed-series sim calibration diagnostic (#19)
+de7a1c5 Align strategy generator status with ladder (#33)
 ```
