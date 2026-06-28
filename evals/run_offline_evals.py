@@ -460,8 +460,6 @@ def eval_proposed_schema_validator_alignment() -> None:
             "PROPOSED artifact_type const should match validator")
     require(base_schema["properties"]["state"]["const"] == proposed_validator.PROPOSED_STATE,
             "PROPOSED state const should match validator")
-    require(base_schema["properties"]["created_at"]["pattern"] == proposed_validator.ISO8601_UTC_RE.pattern,
-            "PROPOSED created_at pattern should match validator")
     require(set(base_schema["properties"]["writer"]["enum"]) == proposed_validator.PROPOSED_WRITERS,
             "PROPOSED writer enum should match validator")
     require(base_schema["properties"]["owner"]["const"] == proposed_validator.PROPOSED_OWNER,

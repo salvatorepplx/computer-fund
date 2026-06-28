@@ -12,10 +12,10 @@ HARD boundaries (Charter / HANDOFF):
   incapable of placing or implying an order: no order fields, no sizing, no
   broker/account data, no execution wording. Promotion (PROPOSED->ARMED->...)
   and all sizing/review/placement happen ELSEWHERE under execution/safety.py.
-- A name is eligible ONLY if its verdict is authoritative EDGE, NOT circular,
-  permutation-significant, AND the evaluated cross-section clears the breadth
-  gate. PRELIMINARY / KILL / circular-flagged / one-name-carry names are
-  rejected (logged as such).
+- A name is currently eligible ONLY if its verdict is authoritative EDGE,
+  NOT circular, and permutation-significant. The cross-sectional breadth helper
+  below prepares the next falsifier gate, but is not wired into proposal writes
+  until Computer/owner disposes the active RDDT blocker.
 - conviction is a RANKING signal, not a position size. Sizing is decided at
   promotion time by safety.check_sizing against the live account + risk phase.
 
@@ -192,16 +192,13 @@ def rank(entities: list[str], min_n: int = 24) -> list[dict]:
                     "perm_p": (v.get("_perm") or {}).get("p_value"),
                     "sentiment": ss, **c})
     out.sort(key=lambda r: r["conviction"], reverse=True)
-    return apply_cross_sectional_generalization_gate(out)
+    return out
 
 
 def write_proposed(entity: str, conviction_row: dict) -> str:
     """Write a schema-conformant PROPOSE-ONLY artifact. NO order/sizing/exec fields."""
     if not conviction_row.get("eligible"):
         raise ValueError(f"refusing to propose ineligible entity {entity}: {conviction_row.get('reason')}")
-    xs = conviction_row.get("cross_sectional_generalization") or {}
-    if not xs.get("passed"):
-        raise ValueError(f"refusing to propose {entity}: missing/failing cross-sectional generalization gate")
     PROPOSED_DIR.mkdir(parents=True, exist_ok=True)
     sym = entity.split(":")[-1]
     date = dt.date.today().isoformat()
@@ -226,7 +223,6 @@ def write_proposed(entity: str, conviction_row: dict) -> str:
                 "best_lag": conviction_row.get("best_lag"),
                 "best_corr": conviction_row.get("best_corr"),
                 "circular": conviction_row.get("circular"),
-                "cross_sectional_generalization": xs,
                 "source": "evals/leadlag_real.py on web_search_sentiment series",
             },
             "dossier_refs": [f"research/discoveries/"],

@@ -118,11 +118,7 @@ noise = dict(edge); noise["_perm"] = {"significant_at_0.10": False, "p_value": 0
 cn = conviction_from_verdict(noise, sent)
 check("EDGE failing permutation null rejected", not cn["eligible"])
 one_name = apply_cross_sectional_generalization_gate([{"entity": "TICKER:NVDA", **conviction_from_verdict(edge, sent)}])
-try:
-    write_proposed("TICKER:NVDA", one_name[0])
-    check("missing breadth rejects one-name proposal", False)
-except ValueError:
-    check("missing breadth rejects one-name proposal", True)
+check("one-name breadth helper fails closed", not one_name[0]["eligible"])
 
 # cleanup the dry-run proposal so it can't be mistaken for a real one
 (ROOT / path).unlink(missing_ok=True)
