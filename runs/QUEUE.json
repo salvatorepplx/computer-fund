@@ -1,15 +1,15 @@
 {
   "_doc": "Durable work backlog for the Computer Fund continuous loop. Drain highest-value pending item every wake.",
-  "updated": "2026-06-28T00:53:59.284175+00:00",
+  "updated": "2026-06-28T00:54:02.852019+00:00",
   "items": [
     {
-      "id": "AUDIT-pr_queue",
+      "id": "AUDIT-universe",
       "kind": "improve",
       "priority": 1,
       "owner": "computer",
-      "desc": "Weakest axis per self-audit: pr_queue (health 0.35). P1: 1 non-draft Teammate PR(s) OPEN and undisposed: [20]. Drain now (review->merge/request-changes).",
+      "desc": "Weakest axis per self-audit: universe (health 0.67). 4 names tracked (target broader cross-section for cross-sectional lead-lag; PATH/CRM queued)",
       "status": "pending",
-      "added": "2026-06-28T00:53:59.284175+00:00"
+      "added": "2026-06-28T00:54:02.852019+00:00"
     },
     {
       "id": "STRAT-WIDE",
@@ -19,15 +19,6 @@
       "desc": "Go wide: build per-signal test runners for the strategy portfolio (runs/strategies/REGISTRY.json), a breadth-first explorer that tests proposed theses each idle tick using research subagents + RH scanners, and the cross-sectional generalization gate (thesis must hold on >=30% of its universe).",
       "status": "pending",
       "added": "2026-06-27T00:17:45.050837+00:00"
-    },
-    {
-      "id": "AUDIT-universe",
-      "kind": "improve",
-      "priority": 1,
-      "owner": "computer",
-      "desc": "Weakest axis per self-audit: universe (health 0.67). 4 names tracked (target broader cross-section for cross-sectional lead-lag; PATH/CRM queued)",
-      "status": "pending",
-      "added": "2026-06-26T23:49:11.303305+00:00"
     },
     {
       "id": "AUDIT-meta_improvement",

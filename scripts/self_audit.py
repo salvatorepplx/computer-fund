@@ -112,6 +112,32 @@ def axis_graph():
 def axis_cron_tasks():
     return (0.7, "cron task prompts now self-orienting (read STATE.md/lessons first, act-not-log); watch cron prompt not yet upgraded to same standard")
 
+def axis_pr_queue_drain():
+    """OBLIGATION A (operating doctrine): an un-drained Teammate PR queue is a P1, never idle.
+    Teammate proposes and cannot merge; Computer disposes. Every tick must drain the queue
+    (read each diff -> approve/merge or request-changes) before declaring 'nothing to do'.
+    Scores 0.0 (forces weakest=top-of-queue) if any actionable PR is open. PRs already in
+    CHANGES_REQUESTED are 'disposed, awaiting Teammate' and do not count as actionable."""
+    try:
+        out = subprocess.run(
+            ["gh", "pr", "list", "--repo", "salvatorepplx/computer-fund", "--state", "open",
+             "--limit", "100", "--json", "number,reviewDecision,isDraft"],
+            capture_output=True, text=True, timeout=30)
+        if out.returncode != 0:
+            return (0.5, f"PR-queue check unavailable (gh rc={out.returncode}); cannot confirm drained — treat as suspect")
+        prs = json.loads(out.stdout or "[]")
+    except Exception as e:
+        return (0.5, f"PR-queue check errored ({str(e)[:50]}); cannot confirm drained — treat as suspect")
+    actionable = [p for p in prs if p.get("reviewDecision") != "CHANGES_REQUESTED"]
+    awaiting = [p for p in prs if p.get("reviewDecision") == "CHANGES_REQUESTED"]
+    if actionable:
+        nums = ", ".join(f"#{p['number']}" for p in actionable[:20])
+        return (0.0, f"P1: {len(actionable)} undrained Teammate PR(s) open: {nums}. DRAIN NOW (read diff -> merge or request-changes). Teammate cannot merge.")
+    note = f"queue drained: 0 actionable PRs open"
+    if awaiting:
+        note += f"; {len(awaiting)} in CHANGES_REQUESTED awaiting Teammate ({', '.join('#'+str(p['number']) for p in awaiting[:20])})"
+    return (0.95, note)
+
 def axis_meta_improvement():
     # self-audit exists AND is scheduled hourly (cron 253ff74b) AND every cron task is
     # self-orienting + never-idle. The completeness-of-improvement axis is now covered.
@@ -125,6 +151,7 @@ AXES = [
     ("safety", axis_safety), ("capture_infra", axis_capture_infra), ("universe", axis_universe),
     ("state_memory", axis_state_memory), ("lessons", axis_lessons), ("sim", axis_sim),
     ("graph", axis_graph), ("cron_tasks", axis_cron_tasks), ("meta_improvement", axis_meta_improvement),
+    ("pr_queue_drain", axis_pr_queue_drain),
 ]
 
 
