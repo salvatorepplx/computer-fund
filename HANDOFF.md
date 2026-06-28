@@ -30,7 +30,7 @@ attempts per tick with capped 15s/45s backoff for empty, rate-limited, or otherw
 responses. Failed attempts do not append to the observed JSONL series; if all attempts fail, the
 script returns `captured:false` so the missed sample is explicit and retry limits remain finite.
 
-## Directories Teammate owns (proposes via PR or direct commit)
+## Directories Teammate owns (proposes via reviewed PRs)
 - `sim/`, `research/`, `graph/` logic improvements
 - `evals/` — build + sharpen the eval harness (open ticket EVAL-0)
 - `corpus/improvement_log.md` — work the open tickets; add new ones
@@ -44,7 +44,7 @@ script returns `captured:false` so the missed sample is explicit and retry limit
 
 ## The PROPOSED handoff (how a trade idea reaches the trader)
 1. Teammate researches a battle → runs sim → if it passes falsifiers + the conviction ladder,
-   it commits a **PROPOSED artifact** (`runs/PROPOSED/<id>.json`, shape below) to the repo. This
+   it proposes a **PROPOSED artifact** (`runs/PROPOSED/<id>.json`, shape below) through the repo/PR flow. This
    artifact is offline/propose-only and must be incapable of placing or implying an order.
    Computer may also write `writer=computer` PROPOSED artifacts from its own alpha pipeline; these
    remain propose-only until Computer separately promotes them after Charter review.
